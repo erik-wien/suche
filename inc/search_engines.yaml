@@ -1,0 +1,76 @@
+# Global (non-per-user) search engine config.
+# Edited by the admin directly in this file — admin.php tab 1 renders it read-only.
+
+engines:
+  - id: google
+    label: Google
+    icon: "fa fa-search"
+    accesskey: g
+    action: https://www.google.com/search
+    method: get
+    input_name: q
+    placeholder: "Auf Google suchen …"
+    title: "Durchsuche Google [g]"
+    site_restrict:
+      param: sitesearch
+      options:
+        - { value: "",               label: "Web" }
+        - { value: "derstandard.at", label: "Der Standard" }
+        - { value: "w3schools.com",  label: "W3 Schools" }
+
+  - id: wikipedia
+    label: Wikipedia
+    icon: "fa fa-book"
+    accesskey: w
+    action: https://de.wikipedia.org/wiki/Spezial:Suche
+    method: get
+    input_name: search
+    placeholder: "Auf Wikipedia suchen …"
+    title: "Durchsuche Wikipedia [w]"
+
+  - id: geizhals
+    label: Geizhals
+    icon_text: "€"
+    accesskey: z
+    action: https://geizhals.at/
+    method: get
+    input_name: fs
+    placeholder: "Auf Geizhals suchen …"
+    title: "Durchsuche Geizhals [z]"
+
+  - id: amazon
+    label: Amazon
+    icon: "fa fa-shopping-cart"
+    accesskey: a
+    action: https://www.amazon.de/s
+    method: get
+    input_name: k
+    placeholder: "Auf Amazon suchen …"
+    title: "Durchsuche Amazon [a]"
+    hidden:
+      __mk_de_DE: "ÅMÅŽÕÑ"
+
+  - id: pons
+    label: Pons
+    icon: "fa fa-language"
+    accesskey: p
+    action: https://de.pons.com/übersetzung
+    method: get
+    input_name: q
+    placeholder: "Auf Pons übersetzen …"
+    title: "Durchsuche Pons [p]"
+    hidden:
+      l: deen
+      lf: de
+
+  - id: adobe_stock
+    label: Adobe Stock
+    icon: "fa fa-image"
+    accesskey: s
+    action: https://stock.adobe.com/de/search
+    method: get
+    input_name: k
+    placeholder: "Auf Adobe Stock suchen …"
+    title: "Durchsuche Adobe Stock [s]"
+    hidden:
+      "filters[content_type:photo]": "1"
