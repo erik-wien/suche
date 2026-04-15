@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Composer
+vendor/
+composer.phar
+
+# mcp-generated per-app config (credentials live in ~/Git/mcp/config.yaml)
+/config.yaml
+
+# Runtime caches
+/data/cache/
+
+# Legacy files with hardcoded credentials (see CLAUDE.md)
+/db/connection.php
+/login/includes/config.php
+/deprecated/db/connection.php
+/deprecated/login/includes/config.php
+
+# Editor/OS cruft
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

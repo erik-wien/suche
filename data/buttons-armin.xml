@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buttons>
+	<button>
+		<url>https://www.tuv-akademie.at/kursprogramm/detail/back/13/p/608.098/event/e-learning-die-iso-90012015.html</url>
+		<title>Kurse</title>
+		<img>pix/tuv-haken.png</img>
+		<icon></icon>
+		<class>btn-danger</class>
+	</button>
+	<button>
+		<url>https://360.articulate.com/</url>
+		<title>Articulate 360</title>
+		<img>pix/articulate.png</img>
+		<icon></icon>
+		<class>btn-primary</class>
+	</button>
+	<button>
+		<url>https://www.ris.bka.gv.at/Bundesrecht/</url>
+		<title>RIS</title>
+		<img>pix/ris.gif</img>
+		<icon></icon>
+		<class>btn-default</class>
+	</button>
+</buttons>

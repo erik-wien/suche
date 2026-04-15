@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <default>
+        <includes>
+            <!--
+                Path to css and js files into plugins folder.
+                If your files are not in plugins folder, use absolute paths.
+            -->
+            <css>
+                <file>formvalidation/dist/css/formValidation.min.css</file>
+            </css>
+            <js>
+                <file>formvalidation/dist/js/formValidation.min.js</file>
+                <file>formvalidation/dist/js/framework/bootstrap.min.js</file>
+            </js>
+        </includes>
+        <js_code>
+<![CDATA[
+
+    if($("%selector%").hasClass('material-form')) {
+
+        // Real time validation - Material Form
+        $("%selector%").formValidation({
+            framework: 'bootstrap',
+            row: {
+                selector: '.input-field',
+                valid: 'has-success',
+                invalid: 'has-error'
+            },
+            excluded: ['.hidden-wrapper:not(.on)'],
+            onPreValidate: function(e) {
+
+               // console.log('PreValidate');
+            },
+            onError: function(e) {
+
+                // if accordion, collapse in first one with error
+                if($('.panel-collapse')[0] && $('.form-group.has-error')[0]) {
+                    var accordionError = $('.has-error')[0].closest('.panel-collapse');
+                    $(accordionError).addClass('in');
+                }
+
+                // console.log('jQuery Validation Error');
+            },
+            onSuccess: function(e) {
+
+                // console.log($(e.target).data('formValidation'));
+            }
+        });
+    } else {
+        $("%selector%").formValidation({
+
+            // Real time validation - Bootstrap Form
+            framework: 'bootstrap',
+            excluded: ['.hidden-wrapper:not(.on)'],
+            onPreValidate: function(e) {
+
+               // console.log('PreValidate');
+            },
+            onError: function(e) {
+
+                // if accordion, collapse in first one with error
+                if($('.panel-collapse')[0] && $('.form-group.has-error')[0]) {
+                    var accordionError = $('.has-error')[0].closest('.panel-collapse');
+                    $(accordionError).addClass('in');
+                }
+
+                // console.log('jQuery Validation Error');
+            },
+            onSuccess: function(e) {
+
+                // console.log($(e.target).data('formValidation'));
+            }
+        });
+
+        // transmit iCheck events to Validator
+        if($('.iCheck-helper')[0]) {
+            $('input[type="radio"], input[type="checkbox"]').on('ifChanged', function(e) {
+                $("%selector%").data('formValidation').revalidateField($(e.target).attr('name'));
+            });
+        }
+    }]]>
+        </js_code>
+    </default>
+    <french>
+        <includes>
+            <!--
+                Path to css and js files into plugins folder.
+                If your files are not in plugins folder, use absolute paths.
+            -->
+            <css>
+                <file>formvalidation/dist/css/formValidation.min.css</file>
+            </css>
+            <js>
+                <file>formvalidation/dist/js/formValidation.min.js</file>
+                <file>formvalidation/dist/js/framework/bootstrap.min.js</file>
+                <file>formvalidation/i18n/dist/i18n.min.js</file>
+                <file>formvalidation/dist/js/language/fr_FR.js</file>
+            </js>
+        </includes>
+        <js_code>
+<![CDATA[   if($("%selector%").hasClass('material-form')) {
+
+        // Real time validation - Material Form
+        $("%selector%").formValidation({
+            framework: 'bootstrap',
+            row: {
+                selector: '.input-field',
+                valid: 'has-success',
+                invalid: 'has-error'
+            },
+            excluded: ['.hidden-wrapper:not(.on)'],
+            onPreValidate: function(e) {
+
+               // console.log('PreValidate');
+            },
+            onError: function(e) {
+
+                // if accordion, collapse in first one with error
+                if($('.panel-collapse')[0] && $('.form-group.has-error')[0]) {
+                    var accordionError = $('.has-error')[0].closest('.panel-collapse');
+                    $(accordionError).addClass('in');
+                }
+
+                // console.log('jQuery Validation Error');
+            },
+            onSuccess: function(e) {
+
+                // console.log($(e.target).data('formValidation'));
+            },
+            addOns: {
+                i18n: {}
+            },
+            locale: 'fr_FR'
+        });
+    } else {
+        $("%selector%").formValidation({
+
+            // Real time validation - Bootstrap Form
+            framework: 'bootstrap',
+            excluded: ['.hidden-wrapper:not(.on)'],
+            onPreValidate: function(e) {
+
+               // console.log('PreValidate');
+            },
+            onError: function(e) {
+
+                // if accordion, collapse in first one with error
+                if($('.panel-collapse')[0] && $('.form-group.has-error')[0]) {
+                    var accordionError = $('.has-error')[0].closest('.panel-collapse');
+                    $(accordionError).addClass('in');
+                }
+
+                // console.log('jQuery Validation Error');
+            },
+            onSuccess: function(e) {
+
+                // console.log($(e.target).data('formValidation'));
+            },
+            addOns: {
+                i18n: {}
+            },
+            locale: 'fr_FR'
+        });
+
+        // transmit iCheck events to Validator
+        if($('.iCheck-helper')[0]) {
+            $('input[type="radio"], input[type="checkbox"]').on('ifChanged', function(e) {
+                $("%selector%").data('formValidation').revalidateField($(e.target).attr('name'));
+            });
+        }
+    }]]>
+        </js_code>
+    </french>
+</root>

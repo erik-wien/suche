@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<menuItem>
+		<subtitle>Akademie</subtitle>
+		<title>Kursprogramm</title>
+		<url>https://www.tuv-akademie.at/kursprogramm/detail/back/13/p/608.098/event/e-learning-die-iso-90012015.html</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title>Sharepoint</title>
+		<url>http://portal.tuev.at/teambox/home/Seiten/TeamboxHomepage.aspx</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title>IMS</title>
+		<url>https://edasapp1.wien.tuev.at/start/browse/Webseiten/Konzernhandbuch/AKADEMIE%20GMBH/IMS-System/</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<subtitle>E-Learning</subtitle>
+		<title>Articulate 360</title>
+		<url>https://360.articulate.com/</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title>Surveys </title>
+		<url>https://www.tuv-elearning.at/survey/admin/</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<subtitle>Holding</subtitle>
+		<title>Intranet</title>
+		<url>https://intranet.tuev.at/</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title>Helpdesk</title>
+		<url>http://servicedesk.tuev.at/</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title>Cloud</title>
+		<url>https://filetransfer.tuev.at/login</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title>InnovaTÜV</title>
+		<url>https://innovatuv.tuv.at/de/n_admin_stagegate</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title>Outlook</title>
+		<url>https://prderp.tuev.at/sap/bc/ui2/nwbc/tuev/?sap-client=100&amp;sap-language=DE&amp;sap-nwbc-node=root&amp;sap-theme=sap_corbu</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title> Progress</title>
+		<url> https://linlb.tuev.at/progress_menu/</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<subtitle>W-LAN</subtitle>
+		<title> Keys </title>
+		<url>https://intranet.tuev.at/fileadmin/wlan-keys/index.php</url>
+		<category>TÜV</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="glyphicon glyphicon-play-circle"></span> GIF-Creator</title>
+		<url>http://gifcreator.me/</url>
+		<category>Dev</category>
+	</menuItem>
+	<menuItem>
+		<title> <span class="glyphicon glyphicon-qrcode"></span> QR-Code Designer</title>
+		<url>https://www.unitag.io/qrcode</url>
+		<category>Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="glyphicon glyphicon-calendar"></span> Doodle</title>
+		<url> https://doodle.com/</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<subtitle>HTML</subtitle>
+		<title><span class="fa fa-globe"></span> W3 Schools</title>
+		<url> https://www.w3schools.com/bootstrap/</url>
+		<category>Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-rocket"></span> Icons Reference</title>
+		<url>https://www.w3schools.com/icons/icons_reference.asp</url>
+		<category>Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-globe"></span> Bootstrap customize</title>
+		<url> http://getbootstrap.com/customize</url>
+		<category>Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-globe"></span> Form Validator</title>
+		<url> http://www.formvalidator.net/</url>
+		<category>Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-code"></span> Dirty Markup</title>
+		<url> https://dirtymarkup.com/</url>
+		<category>Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-dropbox"></span> Dropbox</title>
+		<url>https://www.dropbox.com/home/_Austausch/TUEV</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<subtitle>Privat</subtitle>
+		<title><span class="fa fa-globe"></span> jardyx.com</title>
+		<url>http://jardyx.com</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-server"></span> jardyx.net</title>
+		<url>https://www.jardyx.net</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-bolt"></span> VPN</title>
+		<url>https://jardyx.net:443</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-dashboard"></span> Jardyx Speedtest</title>
+		<url>http://jardyx.net/speedtest</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-mobile-phone"></span> Files</title>
+		<url>http://iphone.jardyx.com/</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-mobile-phone"></span> World4You</title>
+		<url>https://my.world4you.com/</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-mobile-phone"></span> W4U Cloud</title>
+		<url>https://cloudlogin.world4you.com/</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-flickr"></span> Flickr Photos</title>
+		<url>https://www.flickr.com/people/2meorg/</url>
+		<category>Social</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-twitter"></span> Twitter</title>
+		<url>https://www.twitter.com/erikwien</url>
+		<category>Social</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-xing"></span> Xing</title>
+		<url>https://www.xing.com/profile/ErikR_AccartHuemer</url>
+		<category>Social</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-linkedin"></span> LinkedIn</title>
+		<url>https://at.linkedin.com/in/erikaccarthuemer</url>
+		<category>Social</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-industry"></span> TÜV AUSTRIA Akademie</title>
+		<url>https://www.tuv-akademie.at/kontakt/ansprechpartnerinnen/huemer.html</url>
+		<category>Social</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-edit"></span>Blog</title>
+		<url>http://blog.2me.org</url>
+		<category>Social</category>
+	</menuItem>
+</menu>

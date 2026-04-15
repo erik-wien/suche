@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jardyx.com/s/menue.xsl"?>
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<header>
+		<cattitle>Akademie</cattitle>
+	</header>
+	<category>
+		<item>
+			<title>Kursprogramm </title>
+			<url>https://www.tuv-akademie.at/kursprogramm/detail/back/13/p/608.098/event/e-learning-die-iso-90012015.html</url>
+		</item>
+		<item>
+			<title>Sharepoint</title>
+			<url>http://portal.tuev.at/teambox/home/Seiten/TeamboxHomepage.aspx</url>
+		</item>
+		<item>
+			<title>Articulate 360</title>
+			<url>https://360.articulate.com/</url>
+		</item>
+	</category>
+	<category>
+		<cattitle>TÜV</cattitle>
+		<item>
+			<title>Intranet</title>
+			<url>https://intranet.tuev.at/</url>
+		</item>
+		<item>
+			<title>Helpdesk</title>
+			<url>http://servicedesk.tuev.at/</url>
+		</item>
+		<item>
+			<title>InnovaTÜV</title>
+			<url>https://innovatuv.tuv.at/de/n_admin_stagegate</url>
+		</item>
+		<item>
+			<title>SAP</title>
+			<url>https://prderp.tuev.at/sap/bc/ui2/nwbc/tuev/?sap-client=100&amp;sap-language=DE&amp;sap-nwbc-node=root&amp;sap-theme=sap_corbu</url>
+		</item>
+		<item>
+			<title> Progress</title>
+			<url> https://linlb.tuev.at/progress_menu/</url>
+		</item>
+	</category>
+	<category>
+		<cattitle>Dev</cattitle>
+		<item>
+			<title><span class="glyphicon glyphicon-play-circle"></span> GIF-Creator </title>
+			<url>http://gifcreator.me/ </url>
+		</item>
+		<item>
+			<title> <span class="glyphicon glyphicon-qrcode"></span> QR-Code Designer</title>
+			<url>https://www.unitag.io/qrcode</url>
+		</item>
+		<item>
+			<title><span class="glyphicon glyphicon-calendar"></span> Doodle </title>
+			<url> https://doodle.com/</url>
+		</item>
+	</category>
+	<category>
+		<cattitle>Cloud</cattitle>
+		<item>
+			<title><span class="fa fa-dropbox"></span> Dropbox</title>
+			<url>https://www.dropbox.com/home/_Austausch/TUEV</url>
+		</item>
+		<item>
+			<title><span class="fa fa-globe"></span> jardyx.com</title>
+			<url>http://jardyx.com</url>
+		</item>
+		<item>
+			<title><span class="fa fa-server"></span> jardyx.net</title>
+			<url>https://www.jardyx.net</url>
+		</item>
+		<item>
+			<title><span class="fa fa-bolt"></span> VPN</title>
+			<url>https://jardyx.net:443</url>
+		</item>
+		<item>
+			<title><span class="fa fa-mobile-phone"></span> Files</title>
+			<url>http://www.jardyx.com/files</url>
+		</item>
+	</category>
+	<category>
+		<cattitle>Social</cattitle>
+		<item>
+			<title><span class="fa fa-flickr"></span> Flickr Photos</title>
+			<url>https://www.flickr.com/people/2meorg/</url>
+		</item>
+		<item>
+			<title><span class="fa fa-twitter"></span> Twitter</title>
+			<url>https://www.twitter.com/erikwien</url>
+		</item>
+		<item>
+			<title><span class="fa fa-xing"></span> Xing</title>
+			<url>https://www.xing.com/profile/ErikR_AccartHuemer</url>
+		</item>
+		<item>
+			<title><span class="fa fa-linkedin"></span> LinkedIn</title>
+			<url>https://at.linkedin.com/in/erikaccarthuemer</url>
+		</item>
+		<item>
+			<title><span class="fa fa-industry"></span> TÜV AUSTRIA Akademie</title>
+			<url>https://www.tuv-akademie.at/kontakt/ansprechpartnerinnen/huemer.html</url>
+		</item>
+	</category>
+</items>
+	

@@ -1,0 +1,368 @@
+:root {
+	color-scheme: light dark;
+}
+
+/* @group Themes */
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) { 
+
+	body {
+		background-color: #000;
+		} 
+		
+	.navbar-light .navbar-brand {
+	  color: #fff;
+	}
+	
+	.navbar-light .navbar-brand:hover, .navbar-light .navbar-brand:focus {
+	  color: #fff;
+	}
+	
+	.navbar-light .navbar-nav .nav-link {
+	  color: rgba(255, 255, 255, 0.5);
+	}
+	
+	.navbar-light .navbar-nav .nav-link:hover, .navbar-light .navbar-nav .nav-link:focus {
+	  color: white;
+	}
+	
+	.navbar-light .navbar-nav .nav-link.disabled {
+	  color: rgba(255, 255, 255, 0.25);
+	}
+	
+	.navbar-light .navbar-nav .show > .nav-link,
+	.navbar-light .navbar-nav .active > .nav-link,
+	.navbar-light .navbar-nav .nav-link.show,
+	.navbar-light .navbar-nav .nav-link.active {
+	  color: #fff;
+	}
+	
+	.navbar-light .navbar-toggler {
+	  color: rgba(255, 255, 255, 0.5);
+	  border-color: rgba(255, 255, 255, 0.1);
+	}
+	
+	.navbar-light .navbar-toggler-icon {
+	  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+	}
+	
+	.navbar-light .navbar-text {
+	  color: rgba(255, 255, 255, 0.5);
+	}
+	
+	.navbar-light .navbar-text a {
+	  color: #fff;
+	}
+	
+	.navbar-light .navbar-text a:hover, .navbar-light .navbar-text a:focus {
+	  color: #fff;
+	}
+	
+	.table-light,
+	.table-light > th,
+	.table-light > td {
+	  background-color: #c7c8c8;
+	}
+	
+	.table-light th,
+	.table-light td,
+	.table-light thead th,
+	.table-light tbody + tbody {
+	  border-color: #97999a;
+	}
+	
+	.table-hover .table-light:hover {
+	  background-color: #babbbb;
+	}
+	
+	.table-hover .table-light:hover > td,
+	.table-hover .table-light:hover > th {
+	  background-color: #babbbb;
+	}
+	
+	.bg-light {
+	  background-color: #222 !important;
+	}
+	
+	a.bg-light:hover, a.bg-light:focus,
+	button.bg-light:hover,
+	button.bg-light:focus {
+	  background-color: #222 !important;
+	}
+	
+	.bg-dark {
+	  background-color: #666 !important;
+	}
+	
+	a.bg-dark:hover, a.bg-dark:focus,
+	button.bg-dark:hover,
+	button.bg-dark:focus {
+	  background-color: #666 !important;
+	}
+	
+	.text-light {
+		color: #f8f9fa !important;
+	}
+	
+	.text-body {
+		color: #f8f9fa !important;
+	}
+
+	a.text-light:hover, a.text-light:focus {
+		color: #cbd3da !important;
+	}
+	
+	
+	.btn-default {
+		background-color: #555;
+		color: #aaa;
+	}
+	
+	
+	.input-group {
+
+	}
+	
+	.input-group-text {
+		background-color: #555;
+		color: #aaa;
+		border: 0px;
+	}
+	
+	.input-group-prepend,
+	.input-group-append {
+
+	}
+	
+	.form-control {
+		background-color: #ccc;
+		color: #333;
+	}
+	
+	.card {
+		background-color: #555;
+	}
+	
+	.bg-light .dopdown-menu
+	
+}
+	//@import "bootstrap/css/bootstrap_darkly.min.css" (prefers-color-scheme: dark);
+		
+	/* @end group themes */
+	
+	
+	
+	/* @group HTML Basics */
+		@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+		body {
+			font- family: "San Francisco", "Open Sans", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+		}
+		
+		
+		h1, h2, h3 {
+			font-weight: 600;
+		}
+
+		h4, h5, h6 {
+			font-weight: 700;
+		}
+
+	/* @end Basics */
+
+	/* @group Bootstrap */
+	
+		.card {
+			overflow: hidden;
+			margin: 0.5em auto;
+			padding: 0; 
+			clear: both;
+		}
+		
+		.jumbotron {
+			padding: 15px;
+		}
+		
+		#googleSearch input {
+
+		}
+
+	/* @end Bootstrap */
+
+
+
+	/* @group Structure */
+	
+
+	.navbar .navbar-nav .nav-link {
+		margin: 0 0.25em;
+	}
+	
+	
+	.nav-item {
+		white-space: nowrap;
+		background-color: rgb(128,128,128) !important;
+		}
+			
+	.nav-item a {
+			box-shadow: 2px -2px 5px rgba(0,0,0,0.1) !important;
+			border: 1px solid rgba(0,0,0,0.3) !important;
+			color: rgba(255,255,255,0.5);
+		}
+		
+	.nav-item a:hover {
+			box-shadow: 2px -1px 6px rgba(255,255,255,0.5) !important;
+			border: 1px solid rgba(255,255,255,0.2) !important;
+			color: white;
+		}
+		
+
+		.dropdown-header {
+		    font-size: .92rem;
+		    border-bottom: 1px dotted #aaa;
+		}
+		
+		#loginForm .input-group-addon{
+			min-width:2em;
+		}
+		
+		.divider {
+			margin:0;
+		}
+
+		@media screen and (min-width: 768px) {
+	    .modal-dialog {
+	        margin-top:5em;
+	    	}
+		}
+		
+		#footer {
+			font-size: 82%;
+			padding: 7px; 
+			position: fixed;
+			bottom: 0px;
+		}
+			
+	/* @end structure */
+
+
+	/* @group SearchForms */
+	
+		input[type="text"]:focus{
+			box-shadow: 1px 1px 15px -1px rgba(0,85,153,0.5);
+			-webkit-box-shadow: 1px 1px 15px -1px rgba(0,85,153,0.5);
+			-moz-box-shadow: 1px 1px 15px -1px rgba(0,85,153,0.5);
+			outline: none;
+			}
+			
+		.input-group-prepend .input-group-text, 
+		.input-group-append .input-group-text {
+			width: 3rem;
+			height: calc(2.25rem + 2px);
+		}
+
+			
+	/* @end Form */
+	
+	
+	/* @group buttons */
+
+		#buttons {
+			
+			margin: 25px auto;
+			clear: both;
+		}
+			
+		.button {
+			margin: 0.5em 0 0  1em;
+			min-width: 9.5rem;
+			min-height: 4em;
+			/* -webkit-box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.25);
+			-moz-box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.25);
+			box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.25);
+			white-space: nowrap; */
+			overflow:hidden;
+			text-align: middle;
+			vertical-align: middle;
+		}
+		
+		.button img.img-responsive {
+			max-height: 1.2em; 
+			max-width: 1.2em;
+			margin: 0 0.25em 0 0;
+			display: inline;
+
+			/* vertical-align: middle;
+			float: left; clear: none; */
+		}
+	
+
+		#topBtn {
+		  display: none; /* Hidden by default */
+		  position: fixed; /* Fixed/sticky position */
+		  bottom: 100px; /* Place the button at the bottom of the page */
+		  right: 30px; /* Place the button 30px from the right */
+		  z-index: 99; /* Make sure it does not overlap */
+		  border: none; /* Remove borders */
+		  outline: none; /* Remove outline */
+		  background-color: rgba(0, 0, 0, 0.3); /* Set a background color */
+		  color: rgba(255, 255, 255, 0.3); /* Text color */
+		  cursor: pointer; /* Add a mouse pointer on hover */
+		  padding: 5px 13px; /* Some padding */
+		  border-radius: 60px; /* Rounded corners */
+		  font-size: 30px; /* Increase font size */
+		}
+
+		#topBtn:hover {
+		  background-color: #555; /* Add a dark-grey background on hover */
+		}
+
+	/* @end buttons */
+
+
+	/* @group RSS Feed */
+
+		#rss-feed {
+			
+			overflow: hidden;
+			margin: 0px auto 50px;
+			clear: both;
+			text-align: left;
+		}
+		
+		
+		h1.feedTitle {
+			font-size: 1.5em;
+			margin: 0px;
+			line-height: 1.5em;
+		}
+		
+		h2.feedTitle {
+			font-size: 1.2em;
+			margin: 0px;
+			line-height: 1.5em;
+		}
+			
+		h2.feedTitle a {
+			text-decoration: none;
+		}
+
+		h2.feedTitle a:hover {
+			text-shadow: 0 0 10px rgba(238,0,34,0.4);
+		}
+
+		#rss-feed p {
+			margin: 0 0 1em;
+			line-height: 1.5em;
+		}
+		#item img {
+			max-width:33%; height:auto;
+			float:right;
+		}
+	
+	
+	/* @end RSS Feed */
+	
+	
+	

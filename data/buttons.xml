@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buttons>
+	<button>
+		<url>http://www.derstandard.at</url>
+		<title>Standard</title>
+		<img></img>
+		<icon>fa fa-newspaper-o</icon>
+		<class>btn-warning</class>
+	</button>
+	<button>
+		<url>http://www.zeit.de</url>
+		<title>Die Zeit</title>
+		<img>http://img.zeit.de/static/img/ZO-ipad-114x114.png</img>
+		<icon></icon>
+		<class>btn-default</class>
+	</button>
+	<button>
+		<url>https://tuv.cnpview.com/</url>
+		<title>Übersiedlung</title>
+		<img>pix/tuv-haken.png</img>
+		<class>btn-info</class>
+	</button>
+	<button>
+		<url>https://www.ris.bka.gv.at/Bundesrecht/</url>
+		<title>RIS</title>
+		<img></img>
+		<icon> fa fa-bank </icon>
+		<class>btn-default</class>
+	</button>
+</buttons>

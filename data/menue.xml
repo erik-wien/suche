@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<menuItem>
+		<title><span class="glyphicon glyphicon-play-circle"></span> GIF-Creator </title>
+		<url>http://gifcreator.me/ </url>
+		<category> Dev</category>
+	</menuItem>
+	<menuItem>
+		<title> <span class="glyphicon glyphicon-qrcode"></span> QR-Code Designer</title>
+		<url>https://www.unitag.io/qrcode</url>
+		<category> Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="glyphicon glyphicon-calendar"></span> Doodle </title>
+		<url> https://doodle.com/</url>
+		<category> Dev</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-dropbox"></span> Dropbox</title>
+		<url>https://www.dropbox.com/home/_Austausch/TUEV</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-globe"></span> jardyx.com</title>
+		<url>http://jardyx.com</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-server"></span> jardyx.net</title>
+		<url>https://www.jardyx.net</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-bolt"></span> VPN</title>
+		<url>https://jardyx.net:443</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-mobile-phone"></span> Files</title>
+		<url>http://www.jardyx.com/files</url>
+		<category>Cloud</category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-flickr"></span> Flickr Photos</title>
+		<url>https://www.flickr.com/people/2meorg/</url>
+		<category>Social </category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-twitter"></span> Twitter</title>
+		<url>https://www.twitter.com/erikwien</url>
+		<category>Social </category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-xing"></span> Xing</title>
+		<url>https://www.xing.com/profile/ErikR_AccartHuemer</url>
+		<category>Social </category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-linkedin"></span> LinkedIn</title>
+		<url>https://at.linkedin.com/in/erikaccarthuemer</url>
+		<category>Social </category>
+	</menuItem>
+	<menuItem>
+		<title><span class="fa fa-industry"></span> TÜV AUSTRIA Akademie</title>
+		<url>https://www.tuv-akademie.at/kontakt/ansprechpartnerinnen/huemer.html</url>
+		<category>Social </category>
+	</menuItem>
+</menu>

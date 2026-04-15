@@ -1,0 +1,14 @@
+# Disabled pending rewrite — this directory contained an unauthenticated
+# SQL-injection CRUD endpoint (response.php) and a bootgrid admin UI.
+# Replacement lives in the new admin.php per the Chapter 2 rewrite.
+#
+# Apache 2.4+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Apache 2.2 fallback
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>

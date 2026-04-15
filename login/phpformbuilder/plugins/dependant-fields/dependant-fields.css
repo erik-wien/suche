@@ -1,0 +1,17 @@
+.hidden-wrapper {
+    -webkit-transition: all 400ms ease-in;
+    -moz-transition: all 400ms ease-in;
+    -ms-transition: all 400ms ease-in;
+    -o-transition: all 400ms ease-in;
+    transition: all 400ms ease-in;
+}
+.hidden-wrapper.off {
+    overflow: hidden;
+    height: auto;
+    max-height: 0;
+    opacity: 0;
+}
+.hidden-wrapper:not(.off) {
+    max-height: 10000px;
+    opacity: 1;
+}

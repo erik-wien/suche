@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+			Leer		Grau
+			default     Weiss
+			primary	    Dunkelblau
+			success	    Grün
+			info		HellBlau
+			warning	    Orange
+			danger		Rot
+			link		Link
+-->
+<buttons>
+	<button>
+		<url>https://www.a-trust.at/pdfsign/</url>
+		<title>PDF Sign</title>
+		<img></img>
+		<icon>fa fa-file-pdf-o text-white</icon>
+		<class>danger</class>
+	</button>
+	<button>
+		<url>https://www.ris.bka.gv.at/Bundesrecht/</url>
+		<title>RIS</title>
+		<img>pix/ris.gif</img>
+		<icon></icon>
+		<class>danger</class>
+	</button>
+	<button>
+		<url>https://jardyx.com/wlmonitor/watch.php?rbl=5935,5907</url>
+		<title>SCS</title>
+		<img>https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wiener_Linien_Icon.svg/640px-Wiener_Linien_Icon.svg.png</img>
+		<icon></icon>
+		<class>primary</class>
+	</button>
+	<button>
+		<url>https://abfahrt.wlb.at/monitor/490010301</url>
+		<title>WLB Assmayergasse</title>
+		<img></img>
+		<icon>fa fa-subway text-dark</icon>
+		<class>primary</class>
+	</button>
+	<button>
+		<url>https://jardyx.com/wlmonitor/watch.php?rbl=1749</url>
+		<title>In die Stadt</title>
+		<img>https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wiener_Linien_Icon.svg/640px-Wiener_Linien_Icon.svg.png</img>
+		<icon></icon>
+		<class>primary</class>
+	</button>
+	<button>
+		<url>https://jardyx.com/wlmonitor/watch.php?rbl=471</url>
+		<title>Von Meidling Bhf</title>
+		<img>https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wiener_Linien_Icon.svg/640px-Wiener_Linien_Icon.svg.png</img>
+		<icon></icon>
+		<class>primary</class>
+	</button>
+	<button>
+		<url>https://jardyx.com/oebb/</url>
+		<title>ÖBB Fahrpläne</title>
+		<img>https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Logo_%C3%96BB.svg/640px-Logo_%C3%96BB.svg.png</img>
+		<icon></icon>
+		<class></class>
+	</button>
+	<button>
+		<url>https://jardyx.com/wlmonitor/watch.php?rbl=1718,1692</url>
+		<title>Assmayergasse</title>
+		<img>https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wiener_Linien_Icon.svg/640px-Wiener_Linien_Icon.svg.png</img>
+		<icon></icon>
+		<class>primary</class>
+	</button>
+	<button>
+		<url>https://campus21.at/wp-content/uploads/2019/06/Fahrplan_Shuttlebus.pdf</url>
+		<title>C21 Bus</title>
+		<img></img>
+		<icon>fas fa-bus-alt fa fa-bus text-success</icon>
+		<class>warning</class>
+	</button>
+	<button>
+		<url>http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&amp;evaId=317361&amp;boardType=dep&amp;productsFilter=1111111111111111&amp;dirInput=&amp;tickerID=dep&amp;start=yes&amp;eqstops=false&amp;showJourneys=12&amp;additionalTime=0</url>
+		<title>VOR Busse</title>
+		<img></img>
+		<icon>fas fa fa-bus text-dark</icon>
+		<class></class>
+	</button>
+</buttons>

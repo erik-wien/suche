@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Intranet</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+	
+	<link rel="stylesheet" 							href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+	
+	<style type="text/css" media="screen">
+		h1{ margin-top: 1.5rem;}
+	</style>
+	
+</head>
+	  
+<body>
+<div class="jumbotron">
+	<h1>Intranet 1</h1> 
+	<p>Lokale Rechner</p> 
+</div>
+	      
+<div class="container">
+	<h1>WLED</h1>
+	<div class="list-group list-group-flush">
+		<a href="http://10.10.0.64" class="list-group-item list-group-item-action" target="in"><span id="66" class="fas fa-ellipsis-h"></span> Lavalampe (64)</a>
+		<a href="http://10.10.0.69" class="list-group-item list-group-item-action" target="in"><span id="69" class="fas fa-ellipsis-h"></span> Werkstatt Türe (69)</a>
+		<a href="http://10.10.0.72" class="list-group-item list-group-item-action" target="in"><span id="72" class="fas fa-ellipsis-h"></span> Werkstatt Wand (72)</a>
+		<a href="http://10.10.0.74" class="list-group-item list-group-item-action" target="in"><span id="74" class="fas fa-ellipsis-h"></span> Nachtkastl (74)</a>
+		<a href="http://10.10.0.75" class="list-group-item list-group-item-action" target="in"><span id="75" class="fas fa-ellipsis-h"></span> Kredenz (75)</a>
+		<a href="http://10.10.0.76" class="list-group-item list-group-item-action" target="in"><span id="76" class="fas fa-ellipsis-h"></span> Loggia (76)</a>
+	</div>
+	
+	<h1>Cameras</h1>
+	<div class="list-group list-group-flush">
+		<a href="http://10.10.0.52" class="list-group-item list-group-item-action" target="in"><span id="52" class="fas fa-ellipsis-h"></span> Raspi Cam 1 (52)</a>
+		<a href="http://10.10.0.53" class="list-group-item list-group-item-action" target="in"><span id="53" class="fas fa-ellipsis-h"></span> Raspi Cam 2 (53)</a>
+		<a href="http://10.10.0.54" class="list-group-item list-group-item-action" target="in"><span id="54" class="fas fa-ellipsis-h"></span> Raspi Cam 3 (54)</a>
+	</div>
+	
+	<h1>Andere</h1>
+	<div class="list-group list-group-flush">
+		<a href="http://10.10.0.60" class="list-group-item list-group-item-action" target="in"><span id="60" class="fas fa-ellipsis-h"></span> Laufband (60)</a>
+		<a href="http://10.10.0.61" class="list-group-item list-group-item-action" target="in"><span id="61" class="fas fa-ellipsis-h"></span> Temperatur Sensor (61)</a>
+		<a href="http://10.10.0.73" class="list-group-item list-group-item-action" target="in"><span id="73" class="fas fa-ellipsis-h"></span> Neomatrix Scrolling Text (73)</a>
+	</div>
+	
+	<h1>Netzwerk</h1>
+	<div class="list-group list-group-flush">
+		<a href="http://10.10.0.1"  class="list-group-item list-group-item-action" target="in"> Router (01)</a>
+		<a href="http://10.10.0.2"  class="list-group-item list-group-item-action" target="in"> Jardyx (02)</a>
+		<a href="http://10.10.0.3"  class="list-group-item list-group-item-action" target="in"> Fritz Repeater (03)</a>
+		<a href="http://10.10.0.5"  class="list-group-item list-group-item-action" target="in"> HP Switch (05)</a>
+		<a href="http://10.10.0.7"  class="list-group-item list-group-item-action" target="in"> Devolo Wohnzimmer (07)</a>
+		<a href="http://10.10.0.8"  class="list-group-item list-group-item-action" target="in"> Devolo Werkstatt (08)</a>
+		<a href="http://10.10.0.9"  class="list-group-item list-group-item-action" target="in"> Devolo Büro (09)</a>
+		<a href="http://10.10.0.56" class="list-group-item list-group-item-action" target="in"><span id="56" class="fas fa-ellipsis-h"></span>  Pi-Hole ETH (56)</a>
+	</div>
+	
+	<h1>Smart Home</h1>
+	<div class="list-group list-group-flush">
+		<a href="http://10.10.0.4"  class="list-group-item list-group-item-action" target="in"> IKEA Gateway (04)</a>
+		<a href="http://10.10.0.6"  class="list-group-item list-group-item-action" target="in"> Philips Hue Gateway (06)</a>
+		<a href="http://10.10.0.10" class="list-group-item list-group-item-action" target="in"> Bosch Gateway (10)</a>
+		<a href="http://10.10.0.51" class="list-group-item list-group-item-action" target="in"><span id="51" class="fas fa-ellipsis-h"></span>  Phoscon Gateway (51)</a>
+	</div>
+</div>
+			      
+<!-- jQuery library -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+for (let i = 50; i < 80; i++) { 
+  if ( $( "#"+i ).length ) {
+  	checkOnline(i);
+  }
+}
+
+function checkOnline(ipAddress) {
+
+	console.log("Checking 10.10.0." + ipAddress);
+	
+	$.ajax({url: "http://10.10.0." + ipAddress,
+	        headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+		    },
+		    type: "POST", /* or type:"GET" or type:"PUT" */
+		    dataType: "json",
+		    data: {
+		    },
+	        timeout:1000,
+	        statusCode: {
+	            200: function (response) {
+	                $("#" + ipAddress).removeClass().addClass("fas fa-check-circle text-success");
+	            },
+	            400: function (response) {
+	                $("#" + ipAddress).removeClass().addClass("fas fa-exclamation-triangle text-danger");
+	            },
+	            0: function (response) {
+	                $("#" + ipAddress).removeClass().addClass("fas fa-times-circle text-secondary");
+	            }              
+	        },
+	        error: function (response) {
+	            $("#" + ipAddress).removeClass().addClass("fas fa-times-circle text-secondary");
+	            console.log("10.10.0." + ipAddress + " has an error: " + response);
+
+	        }
+	 });
+ }
+</script>
+
+</body>
+</html>
+				      
+				      

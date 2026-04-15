@@ -1,0 +1,459 @@
+<!doctype html>
+<html itemscope="" itemtype="https://schema.org/WebPage" lang="de-AT">
+<head>
+
+	<title>Links</title> 
+	
+	<meta content="IE=edge" http-equiv="X-UA-Compatible">
+	<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+	
+	<link rel="apple-touch-icon" sizes="57x57" href="pix/favicon/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="pix/favicon/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="pix/favicon/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="pix/favicon/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="pix/favicon/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="pix/favicon/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="pix/favicon/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="pix/favicon/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="pix/favicon/apple-icon-180x180.png">
+	<link rel="icon" 			sizes="192x192"  type="image/png" href="pix/favicon/android-icon-192x192.png">
+	<link rel="icon" 			sizes="32x32" 	type="image/png" href="pix/favicon/favicon-32x32.png">
+	<link rel="icon" 			sizes="96x96" 	type="image/png" href="pix/favicon/favicon-96x96.png">
+	<link rel="icon" 			sizes="16x16" 	type="image/png" href="pix/favicon/favicon-16x16.png">
+	<link rel="manifest" 										href="pix/favicon/manifest.json">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="pix/favicon/ms-icon-144x144.png">
+	<meta name="theme-color" 			content="#ffffff">
+	
+	<base target="_blank" />
+
+	<!-- Bootstrap -->
+	<meta name="viewport" 				content="width=device-width, initial-scale=1">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+	<link re l="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.1.3/darkly/bootstrap.min.css" integrity="sha384-w+yWASP3zYNxxvwoQBD5fUSc1tctKq4KUiZzxgkBSJACiUp+IbweVKvsEhMI+gz7" crossorigin="anonymous">    
+	    
+	<!-- Icons -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+
+	<!-- private -->
+	<link rel="stylesheet" href="lib/suche.css">
+	
+
+	<!--
+	Konfiguration
+	===========================
+
+		// Navigation: menue.xml
+		
+		
+		// Buttons: buttons.xml
+			Button Farben:
+			Leer 			Grau
+			.btn-default 	Weiss
+			.btn-primary	Dunkelblau
+			.btn-success	Grün
+			.btn-info		HellBlau
+			.btn-warning	Orange
+			.btn-danger		Rot
+			.btn-link		Link
+			
+		// User: suche.js
+			
+	-->
+	
+	<body id="myPage">
+
+	<div class="jumbotron text-center" id="googleSearch">
+	<nav id="navbar" class="navbar navbar-expand-md navbar navbar-default navbar-fixed-top">
+			
+		<!-- Titel der Navigation -->	
+		<a id="navbar-brand" class="navbar-brand col-md-1 col-sm-1" href="https://jardyx.com/s" target="_self">
+			<span class="fas fa-home"></span></a>
+
+ 		<!-- Toggler/collapsibe Button -->
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+
+		<!-- actually navigation starts here-->
+		<div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+			<!-- Menüleiste: wird von Script befüllt -->
+			<ul class="navbar-nav col-md-8" id="myNavbar">
+			
+				<!-- Login Menue -->
+				<li class="nav-item dropdown col-md-2" style="order: 999;">
+
+					<a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="currentUser">
+						Login <span class="caret"></span></a>	
+			
+					<div class="dropdown-menu">
+
+						<div class="dropdown-header"><span >Login</span></div>
+						
+						<a class="dropdown-item" onclick="changeUser('erik')">	<span class="far fa-user"></span> Erik</a>
+						<a class="dropdown-item" onclick="changeUser('armin')">	<span class="far fa-user"></span> Armin</a>
+						<a class="dropdown-item" onclick="changeUser('')">		<span class="fas fa-user-alt-slash"></span> logout</a>
+						
+						
+						<div class="divider"></div>
+						<div class="dropdown-header">Status</div>
+						
+						<div class="dropdown-item">
+							<img src="https://www.tuv-elearning.at/online.gif" onerror="this.src='pix/offline.gif'" /> <span id="siteStatus"> </span> </div>
+						
+						<div class="dropdown-item">
+							<span class="far fa-clock"></span> <span id="lastLogin"> auth: not loaded</span></div>
+						
+							
+
+						<div class="divider"></div>
+						<div class="dropdown-header">Acknowledgements</div>
+
+						<a class="dropdown-item" href="https://rss2json.com/">		<span class="fas fa-rss"  ></span> rss2json.com (RSS Reader)</a>
+						<a class="dropdown-item" href="https://getbootstrap.com/">	<span class="fab fa-css3" ></span> Bootstrap</a>
+						<a class="dropdown-item" href="https://www.w3schools.com/">	<span class="fas fa-university"  ></span> W3Schools</a>
+						<a class="dropdown-item" href="https://apple.com" >		<span class="fab fa-apple"></span> apple.com</a>
+
+
+						<div class="divider"></div>
+
+						<div class="dropdown-header">Help</div>
+						<a class="dropdown-item" href="#" data-toggle="modal" data-target="#modalHelp"><span class="far fa-question-circle"></span> Help</a>
+						<a class="dropdown-item" href="#" data-toggle="modal" data-target="#modalAbout"><span class="far fa-envelope"></span> About</a>
+					</div>
+				</li>
+
+
+			</ul>
+		</div>
+		
+	</nav>	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- Suchfelder -->
+		<!--div class="card card-default shadow col-lg-6 col-md-8 col-sm-10 col-12"  id="suche"-->
+
+			<!-- Google -->
+			<form action="https://www.google.com/search" method="get" accept-charset="iso-8859-1" id="googlesearch" class="form-horizontal"> 
+			
+				<div class="input-group">
+    					<div class="input-group-prepend ">
+							<div class="input-group-text">
+								<span class="fab fa-google m-auto"></span>
+							</div>
+						</div>
+
+						<input type="text" name="q" id="q" class="form-control" value="" accesskey="g" title="Durchsuche Google [g]" placeholder="Auf Google suchen ..." autocomplete="on" autofocus="on" /> 
+
+      					<div class="input-group-append">
+        					<span class="input-group-text"><button class="btn" type="submit"><span class="fas fa-search"></span></button></span>
+						</div>
+				</div>
+
+				<br />
+
+				<div  id="googlesearchDomains">	
+					
+		
+					<div class="input-group-text">
+						<div class="custom-control custom-radio custom-control-inline">
+							<input type="radio" name="sitesearch" id="siteSearch" class="custom-control-input" value="" CHECKED="checked" />
+							<label class="custom-control-label" for="siteSearch"> web </label> 
+						</div>
+						
+						<div class="custom-control custom-radio custom-control-inline">
+							<input type="radio" name="sitesearch" id="siteSearch2" class="custom-control-input" value="tuv-akademie.at" />
+							<label class="custom-control-label" for="siteSearch2"> Akademie </label>
+						</div> 
+						
+						<div class="custom-control custom-radio custom-control-inline">
+							<input type="radio" name="sitesearch" id="siteSearch1" class="custom-control-input" value="w3schools.com" />
+							<label class="custom-control-label" for="siteSearch1"> W3 School <span class="badge badge-warning">New</span></label> 
+						</div>
+					</div>
+				</div>	
+			</form>		
+		<!--/div-->
+		
+		<div class="container-fluid">
+
+
+		<!-- Wikipedia-->
+		<form name="searchform" id="wikipediasearch" action="https://de.wikipedia.org/wiki/Spezial:Suche" method="get" accept-charset="iso-8859-1" class="form-horizontal" > 
+			<div class="input-group">
+    				<div class="input-group-prepend">
+						<span class="input-group-text"><span class="fab fa-wikipedia-w m-auto"></span></span>
+					</div>
+
+					<input name="search" type="text" class="form-control" id="InputWikipedia" accesskey="w" title="Durchsuche die Wikipedia [w]" value="" placeholder="Auf Wikipedia suchen ..." autocomplete="on" /> 
+
+      				<div class="input-group-append">
+        				<span class="input-group-text"><button class="btn" type="submit"><span class="fas fa-search"></span></button></span>
+        			</div>
+
+			</div>
+		</form>
+
+
+		<!-- Geizhals -->
+		<form name="sform" id="geizhalssearch" action="https://geizhals.at/" method="get" accept-charset="iso-8859-1" class="form-horizontal" >
+			<div class="input-group">
+    				<div class="input-group-prepend">
+					<span class="input-group-text"><span class="m-auto" style="font-weight:bolder;">G</span></span></div>
+				 
+				<input class="form-control" name="fs" id="fs" type="text" size="35" accesskey="z" title="Durchsuche Geizhals [z]" placeholder="Auf Geizhals suchen ..." value="" autocomplete="on" />
+				
+  				<div class="input-group-append">
+    					<span class="input-group-text"><button class="btn" type="submit"><span class="fas fa-search"></span></button></span>
+    			</div>
+    		</div>
+		</form>
+
+
+		<!-- Amazon -->
+		<form name="site-search" id="amazonsearch" role="search" action="https://amazon.de/s/ref=nb_sb_noss" method="GET" accept-charset="utf-8" class="form-horizontal" >
+			<div class="input-group">
+    			<div class="input-group-prepend"><span class="input-group-text"><span class="fab fa-amazon ml-auto mr-auto"></span></span></div>
+				
+				<input class="form-control" name="field-keywords" id="twotabsearchtextbox" type="text" accesskey="a" title="Durchsuche Amazon [a]" placeholder="Auf Amazon suchen ..." value="" autocomplete="off" />
+				
+				<div class="input-group-append">
+					<span class="input-group-text"><button class="btn" type="submit"><span class="fas fa-search"></span></button></span>
+				</div>
+			</div>
+				
+				<input name="__mk_de_DE" type="hidden" value="ÅMÅŽÕÑ" />
+		</form>
+			
+
+		<!-- Pons -->
+		<form action="https://de.pons.com/übersetzung" id="ponssearch" role="search" method="get" accept-charset="utf-8" class="form-horizontal" >
+			<div class="input-group">
+    			<div class="input-group-prepend">
+					<span class="input-group-text"><span class="far fa-comment m-auto"></span></span></div>
+					
+				<input class="form-control" name="q" id="q" type="text" placeholder="Mit Pons übersetzen ..." value="" autocomplete="off" accesskey="p" title="Mit Pons übersetzen [p]"/>
+      			
+				<div class="input-group-append">
+					<span class="input-group-text"><button class="btn" type="submit"><span class="fas fa-search"></span></button></span>
+				</div>
+   			</div>
+
+				<input name="l" type="hidden" value="deen" />
+				<input name="lf" type="hidden" value="de" />
+		</form>
+
+
+		<!-- fotolia -->
+		<form action="https://de.fotolia.com/search" id="fotoliasearch" role="search" method="post" accept-charset="utf-8" class="form-horizontal" >
+			<div class="input-group">
+    			<div class="input-group-prepend">
+					
+					<div class="input-group-text">
+						<svg viewBox="5 10 95 90" height="30" width="30" class="ml-auto mr-auto">
+							<image xlink:href="pix/iconfinder_Stock_2530777.svg" height="100" width="100" ></image> 
+						</svg>
+					</div>
+				</div>
+					
+				<input class="form-control" name="k" id="search-1-k" type="text" accesskey="f" placeholder="Auf Adobe Stock suchen ..." title="Auf Adobe Stock suchen [f]" value="" autocomplete="on" />
+				
+				<div class="input-group-append">
+					<span class="input-group-text"><button class="btn" type="submit"><span class="fas fa-search"></span></button></span>
+				</div>
+			</div>
+				
+				<input name="filters[content_type:all]" id="search-1:content_type:all" type="hidden" checked="checked" value="1" data-content_type="all" />
+		</form>
+		
+		</div>
+
+	</div>
+
+	
+	
+	
+	
+	
+	
+
+	<!-- Link-Buttons -->
+	<div class="card-columns card shadow col-lg-6 col-md-8 col-sm-10 col-12 mb-4 pb-3" >
+		<div class="card-body p-0 m-0" id="buttons">
+			<!--button class="button btn btn-primary btn-danger " onclick="openWin('https://www.tuv-elearning.at/')">	
+				<img class="img-responsive" src="pix/moodle.png">
+				Moodle
+			</button-->
+		</div>
+	</div>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- RSS Feed -->
+	<div class="card card-info shadow col-lg-6 col-md-8 col-sm-10 col-12 mb-4" id="rss-feed">
+
+		<div class="btn-group">
+			<button type="button" class="btn btn-secondary border border-right-1 border-white" onclick="changeRSS(defaultRSSFeedUrl)">				<i class="fas fa-rss"></i> My Feed</button>
+			<button type="button" class="btn btn-secondary border border-right-1 border-white" onclick="changeRSS('http://derStandard.at/?page=rss&ressort=Seite1')"><i class="fas fa-globe-americas"></i> Schlagzeilen</button>
+			<button type="button" class="btn btn-secondary border border-right-1 border-white" onclick="changeRSS('http://derStandard.at/?page=rss&ressort=Web')">	<i class="fas fa-tv"></i> WebStandard</button>
+			<button type="button" class="btn btn-secondary border border-right-1 border-white" onclick="changeRSS('https://rss.orf.at/science.xml')">		<i class="fas fa-bong"></i> Science</button>
+			<button type="button" class="btn btn-secondary border border-right-1 border-white" onclick="changeRSS('http://feeds.macrumors.com/MacRumors-All')">	<i class="fab fa-apple"></i> MacRumors</button>
+			<span class="badge badge-warning mb-3">New</span>
+
+		</div>
+	
+		<div class="card-header"  id="feed">
+			<h3 id="feedTitle"></h3>
+			<p id="feedDescription"></p>
+			<p id="feedSync" class="text-right small"></p>
+		</div>
+		
+		<div class="card-body" id="feedItems">
+			<div class="item">
+				<h1></h1>
+				<p><br />
+				<i></i></p>
+			</div>
+		</div>
+	</div>
+	
+
+	
+	<!-- Go Back Top Button-->
+	<button onclick="topFunction()" id="topBtn" title="Go to top"><span class="fas fa-arrow-alt-circle-up"></span></button>
+
+	
+	
+	
+	
+	<nav class="navbar navbar-expand-sm bg-dark text-light navbar-dark fixed-bottom" style="text-align: center;" id="footer">
+		<div class="col-md-6 text-left">V.3.0 &copy; 2016-2017 Erik R. Huemer </div>
+		<div class="col-md-6 text-right"><a class="text-light" href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;%65%72%69%6B%2E%68%75%65%6D%65%72%40%74%75%76%2E%61%74 " title="&#x45;&#x2d;&#x4d;&#x61;&#x69;&#x6c;">&#x65;&#x72;&#x69;&#x6b;&#x2e;&#x68;&#x75;&#x65;&#x6d;&#x65;&#x72;&#x40;&#x74;&#x75;&#x76;&#x2e;&#x61;&#x74;</a></div>
+	</nav>
+
+
+
+	<!-- Modal About Box-->
+	<div id="modalAbout" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+			
+				<div class="modal-header">
+					<h4 class="modal-title">Über</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				
+				<div class="modal-body">
+					<p>Erik R. Huemer <br />
+						Human Ressources Development<br />
+										E-Learning - Recruiting - Knowledge Development</p>
+					<p>
+						<span class="fas fa-home"></span>		1190 Wien, Gymnasiumstrasse 52, Austria <br />
+						<span class="far fa-address-card"></span>	https://about.me/erik.accart-huemer </span><br />
+						<span class="far fa-envelope"></span>		info &lt;at> 2me &lt;dot> org </span></p>
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<!-- Modal Help Box-->
+	<div id="modalHelp" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+			
+				<div class="modal-header">
+					<h4 class="modal-title">Hilfe</h4> 
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				
+				<div class="modal-body">
+					<p>Diese Suchseite ist ein eher privates Projekt von mir. Deswegen gibts kein echtes Login, sondern nur zwei fix eingerichtete User.</p>
+					<p>Die Suchformulare sind derzeit (noch) fix eingerichtet, Die Buttons und der erste RSS Feed ("My Feed") können mit XML-Dateien konfiguriert werden.</p>
+					<p>Die ganze Seite (!) läuft lokal mit HTML, CSS (Bootstrap) und Javascript (jQuery). Bei Interesse, bitte Mail an <kbd>suchseite (at) 2me (dot) org</kbd>.</p>
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- load javaScript libraries-->
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- Popper JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+	<!-- Latest compiled bootstrap 4 -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>	
+
+	<!-- https://momentjs.com Konvertieren von Datum -->
+	<script src="lib/moment.min.js"></script> 
+	
+	<!-- cookies.js -->
+	<script src="lib/jquery.cookie.js"></script>
+	
+	<!-- https://github.com/sdepold/jquery-rss Auslesen und Anzeigen von RSS-Feeds -->
+	<script src="lib/jquery.rss.js"></script> 
+
+	<!-- private javaScript -->
+	<script src="lib/suche.js"></script>
+
+	<!-- load RSS feed
+	Generate menue, buttons and RSS Feed  -->
+	<script>
+	
+		$(document).ready(function(){
+		// Add Buttons from XML
+
+			// var ButtonReady = loadButtons(xmlButtons);
+			
+			// load RSS and set automatic refresh to 10 mins
+			// var RSSready = loadRSS(RSSFeedUrl);
+			
+			// setInterval(function(){RSSready = loadRSS(RSSFeedUrl);},600000);
+
+		// Show Button  "Top"
+		// when the user scrolls down 20px from the top of the document
+		window.onscroll = function() {scrollFunction()};
+
+
+			
+		});
+	</script>
+
+	</body>
+</html>					
