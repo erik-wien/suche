@@ -1,0 +1,84 @@
+/* app.css — suche-specific overrides.
+   Shared theme/reset/layout/components come from web/css/shared/.
+   Load order (set in inc/layout.php):
+     theme.css → reset.css → layout.css → components.css → app.css
+*/
+
+/* Body reserves room for fixed header + fixed footer per design rules §12/§13. */
+body {
+  padding-top: 64px;   /* .app-header ≈ 56px + breathing room */
+  padding-bottom: 44px; /* .app-footer ≈ 32px + breathing room */
+}
+
+/* Three-column footer per design rule §13 (overrides shared centered default). */
+.app-footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  justify-items: stretch;
+  align-items: center;
+}
+.app-footer > :nth-child(1) { justify-self: start; }
+.app-footer > :nth-child(2) { justify-self: center; }
+.app-footer > :nth-child(3) { justify-self: end;   }
+
+/* ── Search form row ──────────────────────────────────────────────────────── */
+
+.search-forms {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  margin: 1rem auto;
+  max-width: 720px;
+  padding-inline: 1rem;
+}
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.search-form .search-icon {
+  width: 1.5rem; text-align: center; color: var(--color-muted);
+}
+.search-form input[type="text"],
+.search-form input[type="search"] {
+  flex: 1;
+}
+
+/* ── Button grid ─────────────────────────────────────────────────────────── */
+
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 1rem;
+}
+.button-grid .btn {
+  min-width: 9rem;
+  justify-content: center;
+}
+
+/* ── RSS tabs ─────────────────────────────────────────────────────────────── */
+
+.rss-section { max-width: 1200px; margin: 1rem auto; padding-inline: 1rem; }
+.rss-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.rss-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.rss-card img { width: 100%; height: auto; display: block; }
+.rss-card .rss-body { padding: 0.75rem; font-size: 0.9rem; }
+.rss-card .rss-body h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+.rss-card .rss-body h3 a { color: var(--color-text); text-decoration: none; }
+.rss-card .rss-body h3 a:hover { text-decoration: underline; }
