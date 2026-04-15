@@ -1,0 +1,15 @@
+{
+    "name": "erikr/suche",
+    "description": "Search portal for jardyx.com/s",
+    "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {"type": "path", "url": "../auth"}
+    ],
+    "require": {
+        "php": ">=8.2",
+        "erikr/auth": "*",
+        "symfony/yaml": "^6.4"
+    }
+}
