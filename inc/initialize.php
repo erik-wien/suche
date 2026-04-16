@@ -19,6 +19,14 @@ define('APP_BUILD',   '2026-04-15');
 define('APP_ENV',     $_cfg['app']['env'] ?? 'dev');
 define('APP_SLUG',    'suche');
 
+define('APP_BASE_URL',   rtrim($_cfg['app']['base_url']  ?? '', '/'));
+define('SMTP_HOST',      $_cfg['smtp']['host']           ?? '');
+define('SMTP_PORT',      (int) ($_cfg['smtp']['port']    ?? 587));
+define('SMTP_USER',      $_cfg['smtp']['user']           ?? '');
+define('SMTP_PASS',      $_cfg['smtp']['password']       ?? '');
+define('SMTP_FROM',      $_cfg['smtp']['from']           ?? '');
+define('SMTP_FROM_NAME', $_cfg['smtp']['from_name']      ?? 'Suche');
+
 /**
  * All three new tables live in jardyx_auth alongside the auth tables,
  * so auth calls need no prefix (same as Energie).
