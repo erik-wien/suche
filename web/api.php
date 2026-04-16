@@ -83,7 +83,12 @@ if (
             appendLog($con, 'admin', "Created user {$username} ({$email})", 'suche');
             echo json_encode(['ok' => true]);
         } catch (\mysqli_sql_exception $e) {
-            echo json_encode(['ok' => false, 'error' => 'Benutzername oder E-Mail bereits vergeben.']);
+            if ($e->getCode() === 1062) {
+                echo json_encode(['ok' => false, 'error' => 'Benutzername oder E-Mail bereits vergeben.']);
+            } else {
+                appendLog($con, 'admin', "admin_user_create failed for {$username}: " . $e->getMessage(), 'suche');
+                echo json_encode(['ok' => false, 'error' => 'Datenbankfehler: ' . $e->getMessage()]);
+            }
         }
         exit;
     }
