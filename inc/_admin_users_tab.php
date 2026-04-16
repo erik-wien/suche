@@ -8,7 +8,7 @@
 <div class="card">
     <div class="card-header card-header-split">
         <span>Benutzerverwaltung</span>
-        <button type="button" class="btn btn-primary btn-sm" data-modal-open="createModal">
+        <button type="button" class="btn btn-outline-success btn-sm" data-modal-open="createModal">
             + Benutzer anlegen
         </button>
     </div>
@@ -49,7 +49,7 @@
                         <?php if ($u['debug']): ?><span class="badge">debug</span><?php endif; ?>
                     </td>
                     <td style="white-space:nowrap">
-                        <button type="button" class="btn btn-sm btn-edit"
+                        <button type="button" class="btn btn-outline-secondary btn-sm btn-edit"
                                 data-modal-open="editModal"
                                 data-id="<?= $u['id'] ?>"
                                 data-username="<?= htmlspecialchars($u['username'], ENT_QUOTES, 'UTF-8') ?>"
@@ -59,7 +59,7 @@
                                 data-debug="<?= $u['debug'] ?>">
                             Bearbeiten
                         </button>
-                        <button type="button" class="btn btn-sm btn-reset"
+                        <button type="button" class="btn btn-outline-danger btn-sm btn-reset"
                                 data-id="<?= $u['id'] ?>">
                             Passwort-Reset
                         </button>
