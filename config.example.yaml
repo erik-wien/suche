@@ -1,0 +1,33 @@
+# Config template — copy to config.yaml and fill in your values
+
+target: local
+db:
+  host: localhost
+  socket: /tmp/mysql.sock
+  name: jardyx_auth
+  user: suche
+  password: your_password
+deploy:
+  web_root: /Library/WebServer/Documents
+  dest: /Library/WebServer/Documents/suche
+  sync_dirs:
+  - web
+  - inc
+  - vendor
+auth_db:
+  host: localhost
+  socket: /tmp/mysql.sock
+  name: jardyx_auth
+  user: suche
+  password: your_password
+smtp:
+  host: smtp.world4you.com
+  port: 587
+  user: catchall@jardyx.com
+  password: your_password
+  from: suche@jardyx.com
+  from_name: Suche
+slack:
+  bot_token: your_bot_token
+app:
+  base_url: http://localhost/suche.test
