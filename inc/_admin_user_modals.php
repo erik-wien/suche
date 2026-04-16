@@ -13,6 +13,7 @@
         </div>
         <form id="createForm">
             <div class="modal-body">
+                <div class="modal-alerts"></div>
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
                 <div class="form-group">
                     <label for="createUsername">Benutzername</label>
@@ -47,6 +48,7 @@
         </div>
         <form id="editForm">
             <div class="modal-body">
+                <div class="modal-alerts"></div>
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
                 <input type="hidden" name="id" id="editId">
                 <div class="form-group">

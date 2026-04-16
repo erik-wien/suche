@@ -107,14 +107,19 @@ render_header('Administration', 'admin');
     // Fetch + tab switching come from window.sucheFetch / sucheActivateTab
     // (provided by /js/app.js, loaded by render_footer).
 
-    function showAlert(msg, type) {
-        const box = document.getElementById('adminAlerts');
+    function showAlert(msg, type, targetEl) {
+        const box = targetEl || document.getElementById('adminAlerts');
         if (!box) return;
         const div = document.createElement('div');
         div.className = 'alert alert-' + (type || 'info');
         div.textContent = msg;
         box.appendChild(div);
         setTimeout(() => div.remove(), 5000);
+    }
+
+    /** If `form` is inside a modal, return that modal's inline alert slot. */
+    function modalAlertBox(form) {
+        return form?.closest('.modal')?.querySelector('.modal-alerts') || null;
     }
 
     function openModal(id) {
@@ -170,6 +175,7 @@ render_header('Administration', 'admin');
         const fd = new FormData(form);
         fd.delete('csrf_token');
         const params = Object.fromEntries(fd);
+        const errBox = modalAlertBox(form);
         try {
             const res = await apiPost(action, params);
             if (res && res.ok) {
@@ -177,11 +183,11 @@ render_header('Administration', 'admin');
                 if (onOk) onOk(fd);
                 setTimeout(() => location.reload(), 700);
             } else {
-                showAlert((res && res.error) || 'Unbekannter Fehler.', 'danger');
+                showAlert((res && res.error) || 'Unbekannter Fehler.', 'danger', errBox);
             }
         } catch (err) {
             console.error(action, err);
-            showAlert('Netzwerkfehler: ' + (err && err.message || err), 'danger');
+            showAlert('Netzwerkfehler: ' + (err && err.message || err), 'danger', errBox);
         }
     }
 
