@@ -27,6 +27,7 @@ function render_header(string $title, string $active = ''): void {
     <link rel="icon" type="image/png" sizes="16x16" href="<?= $base ?>/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= $base ?>/favicon-32x32.png">
     <link rel="apple-touch-icon" href="<?= $base ?>/apple-touch-icon.png">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
     <link rel="stylesheet" href="<?= $base ?>/css/shared/theme.css">
     <link rel="stylesheet" href="<?= $base ?>/css/shared/reset.css">
     <link rel="stylesheet" href="<?= $base ?>/css/shared/layout.css">
