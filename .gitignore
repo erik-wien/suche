@@ -10,6 +10,7 @@ composer.phar
 
 # Runtime caches
 /data/cache/
+/data/ratelimit.json
 
 # Legacy files with hardcoded credentials (see CLAUDE.md)
 /db/connection.php

@@ -27,6 +27,8 @@ define('SMTP_PASS',      $_cfg['smtp']['password']       ?? '');
 define('SMTP_FROM',      $_cfg['smtp']['from']           ?? '');
 define('SMTP_FROM_NAME', $_cfg['smtp']['from_name']      ?? 'Suche');
 
+define('RATE_LIMIT_FILE', __DIR__ . '/../data/ratelimit.json');
+
 /**
  * All three new tables live in jardyx_auth alongside the auth tables,
  * so auth calls need no prefix (same as Energie).

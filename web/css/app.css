@@ -86,8 +86,38 @@ body {
   padding-inline: 1rem;
 }
 .button-grid .btn {
-  min-width: 9rem;
+  width: 11rem;
+  height: 2.25rem;
+  padding-inline: 0.75rem;
   justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;          /* text-overflow requires block-level */
+  line-height: calc(2.25rem - 2px); /* vertical centering without flex */
+}
+.button-grid .btn > img,
+.button-grid .btn > i {
+  vertical-align: middle;
+}
+
+/* Preview rendered inside the preferences Links table — identical footprint
+   to a real button on index.php so users can spot truncation before saving. */
+.btn-preview-cell .btn {
+  width: 11rem;
+  height: 2.25rem;
+  padding-inline: 0.75rem;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;
+  line-height: calc(2.25rem - 2px);
+  pointer-events: none;           /* it's a preview, not a link */
+}
+.btn-preview-cell .btn > img,
+.btn-preview-cell .btn > i {
+  vertical-align: middle;
 }
 
 /* ── RSS tabs (caged to match search column) ─────────────────────────────── */

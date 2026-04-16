@@ -66,9 +66,8 @@ render_header('Einstellungen', 'preferences');
                 <table class="table table-sm table-hover" id="buttonsTable">
                     <thead>
                         <tr>
-                            <th>Caption</th>
+                            <th>Vorschau</th>
                             <th>URL</th>
-                            <th>Variant</th>
                             <th style="width:8rem">Reihenfolge</th>
                             <th style="width:8rem">Aktionen</th>
                         </tr>
@@ -80,9 +79,8 @@ render_header('Einstellungen', 'preferences');
                         foreach ($buttons as $b):
                         ?>
                             <tr data-id="<?= (int)$b['id'] ?>">
-                                <td><?= htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td class="btn-preview-cell"><?php render_button($b); ?></td>
                                 <td class="text-muted small"><?= htmlspecialchars($b['url'], ENT_QUOTES, 'UTF-8') ?></td>
-                                <td><code><?= htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8') ?></code></td>
                                 <td>
                                     <button class="btn btn-sm btn-move-up" type="button" title="Nach oben">▲</button>
                                     <button class="btn btn-sm btn-move-down" type="button" title="Nach unten">▼</button>
