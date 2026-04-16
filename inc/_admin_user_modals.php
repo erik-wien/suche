@@ -9,7 +9,7 @@
     <div class="modal-dialog">
         <div class="modal-header">
             <h5 class="modal-title" id="createModalTitle">Benutzer anlegen</h5>
-            <button type="button" class="btn-close" data-modal-close aria-label="Schließen">&times;</button>
+            <button type="button" class="btn-close" data-modal-close aria-label="Schließen"></button>
         </div>
         <form id="createForm">
             <div class="modal-body">
@@ -43,7 +43,7 @@
     <div class="modal-dialog">
         <div class="modal-header">
             <h5 class="modal-title" id="editModalTitle">Benutzer bearbeiten: <span id="editUsername"></span></h5>
-            <button type="button" class="btn-close" data-modal-close aria-label="Schließen">&times;</button>
+            <button type="button" class="btn-close" data-modal-close aria-label="Schließen"></button>
         </div>
         <form id="editForm">
             <div class="modal-body">

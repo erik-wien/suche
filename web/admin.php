@@ -166,37 +166,38 @@ render_header('Administration', 'admin');
         });
     });
 
-    const editForm = document.getElementById('editForm');
-    editForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fd = new FormData(e.target);
+    async function submitViaFetch(form, action, okMsg, onOk) {
+        const fd = new FormData(form);
         fd.delete('csrf_token');
         const params = Object.fromEntries(fd);
-        const res = await apiPost('admin_user_edit', params);
-        if (res.ok) {
-            showAlert('Gespeichert.', 'success');
-            closeModal('editModal');
-            setTimeout(() => location.reload(), 700);
-        } else {
-            showAlert(res.error || 'Fehler beim Speichern.', 'danger');
+        try {
+            const res = await apiPost(action, params);
+            if (res && res.ok) {
+                showAlert(okMsg, 'success');
+                if (onOk) onOk(fd);
+                setTimeout(() => location.reload(), 700);
+            } else {
+                showAlert((res && res.error) || 'Unbekannter Fehler.', 'danger');
+            }
+        } catch (err) {
+            console.error(action, err);
+            showAlert('Netzwerkfehler: ' + (err && err.message || err), 'danger');
         }
+    }
+
+    const editForm = document.getElementById('editForm');
+    editForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitViaFetch(e.target, 'admin_user_edit', 'Gespeichert.', () => closeModal('editModal'));
     });
 
     const createForm = document.getElementById('createForm');
-    createForm?.addEventListener('submit', async (e) => {
+    createForm?.addEventListener('submit', (e) => {
         e.preventDefault();
-        const fd = new FormData(e.target);
-        fd.delete('csrf_token');
-        const params = Object.fromEntries(fd);
-        const res = await apiPost('admin_user_create', params);
-        if (res.ok) {
-            showAlert('Einladung versandt an ' + fd.get('email') + '.', 'success');
-            closeModal('createModal');
-            e.target.reset();
-            setTimeout(() => location.reload(), 700);
-        } else {
-            showAlert(res.error || 'Unbekannter Fehler.', 'danger');
-        }
+        const email = e.target.email.value;
+        submitViaFetch(e.target, 'admin_user_create',
+            'Einladung versandt an ' + email + '.',
+            () => { closeModal('createModal'); e.target.reset(); });
     });
 
     document.querySelectorAll('.btn-reset').forEach((btn) => {
