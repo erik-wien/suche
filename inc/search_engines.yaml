@@ -4,7 +4,7 @@
 engines:
   - id: google
     label: Google
-    icon: "fa fa-search"
+    icon_text: "🔍"
     accesskey: g
     action: https://www.google.com/search
     method: get
@@ -20,7 +20,7 @@ engines:
 
   - id: wikipedia
     label: Wikipedia
-    icon: "fa fa-book"
+    icon_text: "📖"
     accesskey: w
     action: https://de.wikipedia.org/wiki/Spezial:Suche
     method: get
@@ -40,7 +40,7 @@ engines:
 
   - id: amazon
     label: Amazon
-    icon: "fa fa-shopping-cart"
+    icon_text: "🛒"
     accesskey: a
     action: https://www.amazon.de/s
     method: get
@@ -52,7 +52,7 @@ engines:
 
   - id: pons
     label: Pons
-    icon: "fa fa-language"
+    icon_text: "🌐"
     accesskey: p
     action: https://de.pons.com/übersetzung
     method: get
@@ -65,7 +65,7 @@ engines:
 
   - id: adobe_stock
     label: Adobe Stock
-    icon: "fa fa-image"
+    icon_text: "🖼️"
     accesskey: s
     action: https://stock.adobe.com/de/search
     method: get

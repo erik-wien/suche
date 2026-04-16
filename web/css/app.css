@@ -21,6 +21,10 @@ body {
 .app-footer > :nth-child(2) { justify-self: center; }
 .app-footer > :nth-child(3) { justify-self: end;   }
 
+/* ── Shared column width for the three main blocks ───────────────────────── */
+
+:root { --suche-col: 720px; }
+
 /* ── Search form row ──────────────────────────────────────────────────────── */
 
 .search-forms {
@@ -28,39 +32,67 @@ body {
   gap: 0.75rem;
   grid-template-columns: 1fr;
   margin: 1rem auto;
-  max-width: 720px;
+  max-width: var(--suche-col);
   padding-inline: 1rem;
 }
 .search-form {
   display: flex;
   gap: 0.5rem;
-  align-items: center;
+  align-items: stretch;
+}
+/* All controls share the same height so input/select/button line up. */
+.search-form .form-control,
+.search-form .form-select,
+.search-form .btn {
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+/* Fix Safari's non-standard search-input box. */
+.search-form input[type="search"] {
+  -webkit-appearance: none;
+  appearance: none;
 }
 .search-form .search-icon {
-  width: 1.5rem; text-align: center; color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  flex: 0 0 auto;
+  color: var(--color-muted);
 }
-.search-form input[type="text"],
-.search-form input[type="search"] {
-  flex: 1;
+.search-form .form-control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.search-form .form-select {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 10rem;
+}
+.search-form .btn {
+  flex: 0 0 auto;
+  min-width: 6.5rem;
 }
 
-/* ── Button grid ─────────────────────────────────────────────────────────── */
+/* ── Button grid (caged to match search column) ──────────────────────────── */
 
 .button-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
-  padding: 1rem;
+  max-width: var(--suche-col);
+  margin: 1rem auto;
+  padding-inline: 1rem;
 }
 .button-grid .btn {
   min-width: 9rem;
   justify-content: center;
 }
 
-/* ── RSS tabs ─────────────────────────────────────────────────────────────── */
+/* ── RSS tabs (caged to match search column) ─────────────────────────────── */
 
-.rss-section { max-width: 1200px; margin: 1rem auto; padding-inline: 1rem; }
+.rss-section { max-width: var(--suche-col); margin: 1rem auto; padding-inline: 1rem; }
 .rss-cards {
   display: grid;
   gap: 1rem;
