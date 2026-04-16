@@ -49,6 +49,7 @@ function render_header(string $title, string $active = ''): void {
         <div class="user-menu">
             <button class="user-btn" type="button">
                 <span><?= $username ?></span>
+                <img src="<?= $base ?>/avatar.php" class="avatar" width="26" height="26" alt="">
                 <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M2 4l4 4 4-4"/>
                 </svg>

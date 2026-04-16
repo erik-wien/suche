@@ -185,11 +185,11 @@ function render_button(array $b): void {
     ?>
     <a class="btn <?= $variant ?>" href="<?= $url ?>" target="<?= $target ?>" rel="noopener noreferrer">
         <?php if ($img): ?>
-            <img src="<?= $img ?>" alt="" style="height:1rem;vertical-align:middle;margin-right:0.35rem">
+            <img src="<?= $img ?>" alt="" style="height:1rem;flex:0 0 auto">
         <?php elseif ($icon): ?>
-            <i class="<?= $icon ?>" aria-hidden="true"></i>
+            <i class="<?= $icon ?>" aria-hidden="true" style="flex:0 0 auto"></i>
         <?php endif; ?>
-        <?= $caption ?>
+        <span class="btn-label"><?= $caption ?></span>
     </a>
     <?php
 }

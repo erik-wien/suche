@@ -23,7 +23,7 @@ body {
 
 /* ── Shared column width for the three main blocks ───────────────────────── */
 
-:root { --suche-col: 720px; }
+:root { --suche-col: min(92vw, 1024px); }
 
 /* ── Search form row ──────────────────────────────────────────────────────── */
 
@@ -85,39 +85,26 @@ body {
   margin: 1rem auto;
   padding-inline: 1rem;
 }
-.button-grid .btn {
-  width: 11rem;
-  height: 2.25rem;
-  padding-inline: 0.75rem;
-  justify-content: center;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display: inline-block;          /* text-overflow requires block-level */
-  line-height: calc(2.25rem - 2px); /* vertical centering without flex */
-}
-.button-grid .btn > img,
-.button-grid .btn > i {
-  vertical-align: middle;
-}
-
-/* Preview rendered inside the preferences Links table — identical footprint
-   to a real button on index.php so users can spot truncation before saving. */
+.button-grid .btn,
 .btn-preview-cell .btn {
-  width: 11rem;
-  height: 2.25rem;
+  width: 12rem;
+  height: 2.5rem;              /* matches search-row controls */
   padding-inline: 0.75rem;
+  display: inline-flex;        /* flex centers vertically cleanly */
+  align-items: center;
   justify-content: center;
+  gap: 0.35rem;
+  overflow: hidden;            /* clip the ellipsized caption span */
+}
+.button-grid .btn .btn-label,
+.btn-preview-cell .btn .btn-label {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  display: inline-block;
-  line-height: calc(2.25rem - 2px);
-  pointer-events: none;           /* it's a preview, not a link */
+  min-width: 0;                /* let the flex child actually shrink */
 }
-.btn-preview-cell .btn > img,
-.btn-preview-cell .btn > i {
-  vertical-align: middle;
+.btn-preview-cell .btn {
+  pointer-events: none;        /* preview, not a real link */
 }
 
 /* ── RSS tabs (caged to match search column) ─────────────────────────────── */
