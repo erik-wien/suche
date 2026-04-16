@@ -19,7 +19,7 @@ if (!csrf_verify()) {
     exit;
 }
 
-$uid    = (int) ($_SESSION['uid'] ?? 0);
+$uid    = (int) ($_SESSION['id'] ?? 0);
 $action = $_POST['action'] ?? '';
 
 try {

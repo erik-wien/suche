@@ -8,7 +8,7 @@ require_once __DIR__ . '/../inc/rss.php';
 
 auth_require();
 
-$uid     = (int) ($_SESSION['uid'] ?? 0);
+$uid     = (int) ($_SESSION['id'] ?? 0);
 $engines = search_engines_load();
 
 render_header('Start', 'home');

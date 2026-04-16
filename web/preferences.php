@@ -4,7 +4,7 @@ require_once __DIR__ . '/../inc/layout.php';
 
 auth_require();
 
-$uid      = (int) ($_SESSION['uid'] ?? 0);
+$uid      = (int) ($_SESSION['id'] ?? 0);
 $username = $_SESSION['username'] ?? '';
 
 // ── Handle theme persistence POST ────────────────────────────────────────────
