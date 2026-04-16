@@ -82,3 +82,8 @@ body {
 }
 .rss-card .rss-body h3 a { color: var(--color-text); text-decoration: none; }
 .rss-card .rss-body h3 a:hover { text-decoration: underline; }
+
+/* ── Modal visibility (shared components.css uses .modal.show; we toggle .open) */
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; padding: 2rem; }
+.modal.open { display: block; }
+.modal-dialog { max-width: 560px; margin: 2rem auto; }
