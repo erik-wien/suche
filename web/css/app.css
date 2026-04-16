@@ -107,6 +107,17 @@ body {
   pointer-events: none;        /* preview, not a real link */
 }
 
+/* .btn-default isn't defined in shared/components.css, so the base .btn
+   transparent background leaves it visually floating. Give it a grey
+   outline so it reads as a button against both light and dark page bg. */
+.btn.btn-default {
+  border-color: #808080;
+  color: var(--color-text);
+}
+.btn.btn-default:hover {
+  background: var(--color-surface-alt);
+}
+
 /* ── RSS tabs (caged to match search column) ─────────────────────────────── */
 
 .rss-section { max-width: var(--suche-col); margin: 1rem auto; padding-inline: 1rem; }
