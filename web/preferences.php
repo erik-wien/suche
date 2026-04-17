@@ -7,6 +7,13 @@ auth_require();
 $uid      = (int) ($_SESSION['id'] ?? 0);
 $username = $_SESSION['username'] ?? '';
 
+// ── Enumerate local icons for the Bild dropdown ──────────────────────────────
+$iconFiles = [];
+foreach (glob(__DIR__ . '/icons/*.{jpg,jpeg,png,svg}', GLOB_BRACE) as $f) {
+    $iconFiles[] = basename($f);
+}
+usort($iconFiles, 'strcasecmp');
+
 // ── Handle theme persistence POST ────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'change_theme') {
     if (!csrf_verify()) {
@@ -60,16 +67,16 @@ render_header('Einstellungen', 'preferences');
         <div class="card mt-3">
             <div class="card-header card-header-split">
                 <h3>Links</h3>
-                <button type="button" class="btn btn-primary btn-sm" data-modal-open="buttonModal" id="btnAddButton">Neuer Link</button>
+                <button type="button" class="btn btn-outline-success btn-sm" data-modal-open="buttonModal" id="btnAddButton">Neuer Link</button>
             </div>
             <div class="card-body">
                 <table class="table table-sm table-hover" id="buttonsTable">
                     <thead>
                         <tr>
-                            <th>Vorschau</th>
+                            <th style="width:1%">Vorschau</th>
                             <th>URL</th>
-                            <th style="width:8rem">Reihenfolge</th>
-                            <th style="width:8rem">Aktionen</th>
+                            <th style="width:6rem">Reihenfolge</th>
+                            <th style="width:1%;white-space:nowrap">Aktionen</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,16 +92,23 @@ render_header('Einstellungen', 'preferences');
                                     <button class="btn btn-sm btn-move-up" type="button" title="Nach oben">▲</button>
                                     <button class="btn btn-sm btn-move-down" type="button" title="Nach unten">▼</button>
                                 </td>
-                                <td>
+                                <td style="white-space:nowrap">
                                     <button class="btn btn-sm btn-edit-button" type="button"
+                                            title="Bearbeiten"
                                             data-id="<?= (int)$b['id'] ?>"
                                             data-caption="<?= htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8') ?>"
                                             data-url="<?= htmlspecialchars($b['url'], ENT_QUOTES, 'UTF-8') ?>"
                                             data-variant="<?= htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8') ?>"
-                                            data-icon="<?= htmlspecialchars($b['icon'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                                            data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>">Bearbeiten</button>
+data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><span class="ui-icon ui-icon-edit" aria-hidden="true"></span></button>
+                                    <button class="btn btn-sm btn-copy-button" type="button"
+                                            title="Kopieren"
+                                            data-caption="<?= htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-url="<?= htmlspecialchars($b['url'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-variant="<?= htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8') ?>"
+data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>">⧉</button>
                                     <button class="btn btn-sm btn-danger btn-delete-button" type="button"
-                                            data-id="<?= (int)$b['id'] ?>">Löschen</button>
+                                            title="Löschen"
+                                            data-id="<?= (int)$b['id'] ?>"><span class="ui-icon ui-icon-delete" aria-hidden="true"></span></button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -108,7 +122,7 @@ render_header('Einstellungen', 'preferences');
         <div class="card mt-3">
             <div class="card-header card-header-split">
                 <h3>Feeds</h3>
-                <button type="button" class="btn btn-primary btn-sm" id="btnAddFeed">Neuer Feed</button>
+                <button type="button" class="btn btn-outline-success btn-sm" id="btnAddFeed">Neuer Feed</button>
             </div>
             <div class="card-body">
                 <table class="table table-sm table-hover" id="feedsTable">
@@ -137,12 +151,15 @@ render_header('Einstellungen', 'preferences');
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-edit-feed" type="button"
+                                            title="Bearbeiten"
                                             data-id="<?= (int)$f['id'] ?>"
                                             data-title="<?= htmlspecialchars($f['title'], ENT_QUOTES, 'UTF-8') ?>"
                                             data-url="<?= htmlspecialchars($f['url'], ENT_QUOTES, 'UTF-8') ?>"
-                                            data-enabled="<?= (int)$f['enabled'] ?>">Bearbeiten</button>
+                                            data-img-url="<?= htmlspecialchars($f['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                            data-enabled="<?= (int)$f['enabled'] ?>"><span class="ui-icon ui-icon-edit" aria-hidden="true"></span></button>
                                     <button class="btn btn-sm btn-danger btn-delete-feed" type="button"
-                                            data-id="<?= (int)$f['id'] ?>">Löschen</button>
+                                            title="Löschen"
+                                            data-id="<?= (int)$f['id'] ?>"><span class="ui-icon ui-icon-delete" aria-hidden="true"></span></button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -162,6 +179,9 @@ render_header('Einstellungen', 'preferences');
             <form id="buttonForm">
                 <input type="hidden" name="id" id="bf-id" value="">
                 <div class="modal-body">
+                    <div id="bf-preview-wrap" style="display:flex;align-items:center;justify-content:center;min-height:3.5rem;margin-bottom:1rem;padding:.75rem;background:var(--color-surface-alt);border:1px solid var(--color-border);border-radius:var(--radius)">
+                        <div id="bf-preview"></div>
+                    </div>
                     <div class="form-group">
                         <label for="bf-caption">Caption</label>
                         <input type="text" class="form-control" id="bf-caption" name="caption" required maxlength="64">
@@ -184,17 +204,41 @@ render_header('Einstellungen', 'preferences');
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="bf-icon">Icon-Klasse (optional)</label>
-                        <input type="text" class="form-control" id="bf-icon" name="icon" placeholder="fa fa-link">
-                    </div>
-                    <div class="form-group">
-                        <label for="bf-img-url">Bild-URL (optional, überschreibt Icon)</label>
-                        <input type="url" class="form-control" id="bf-img-url" name="img_url">
+                        <label for="bf-img-trigger">Bild (optional, überschreibt Icon)</label>
+                        <div class="icon-picker">
+                            <button type="button" class="icon-picker-trigger" id="bf-img-trigger"
+                                    aria-haspopup="listbox" aria-expanded="false">
+                                <span class="icon-picker-preview" id="bf-img-preview"></span>
+                                <span class="icon-picker-name" id="bf-img-name">— kein Bild —</span>
+                                <span class="icon-picker-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="icon-picker-list" role="listbox" id="bf-img-list" hidden>
+                                <div class="icon-picker-opt" role="option" data-value="" aria-selected="true">
+                                    <span class="icon-picker-thumb-gap"></span>
+                                    — kein Bild —
+                                </div>
+                                <?php foreach ($iconFiles as $iconFile):
+                                    $pickerVal = 'icons/' . $iconFile;
+                                    $pickerSrc = $base . '/' . $pickerVal;
+                                ?>
+                                <div class="icon-picker-opt" role="option"
+                                     data-value="<?= htmlspecialchars($pickerVal, ENT_QUOTES, 'UTF-8') ?>"
+                                     aria-selected="false">
+                                    <img class="icon-picker-thumb"
+                                         src="<?= htmlspecialchars($pickerSrc, ENT_QUOTES, 'UTF-8') ?>"
+                                         alt=""
+                                         style="width:1.2em;height:1.2em;object-fit:contain;flex-shrink:0">
+                                    <?= htmlspecialchars($iconFile, ENT_QUOTES, 'UTF-8') ?>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <input type="hidden" name="img_url" id="bf-img">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn" data-modal-close>Abbrechen</button>
-                    <button type="submit" class="btn btn-primary">Speichern</button>
+                    <button type="submit" class="btn btn-outline-success">Speichern</button>
                 </div>
             </form>
         </div>
@@ -208,8 +252,108 @@ render_header('Einstellungen', 'preferences');
     const title      = document.getElementById('buttonModalTitle');
     const tableBody  = document.querySelector('#buttonsTable tbody');
 
+    // ── Icon picker ───────────────────────────────────────────────────────────
+    const pickerTrigger = document.getElementById('bf-img-trigger');
+    const pickerList    = document.getElementById('bf-img-list');
+    const pickerInput   = document.getElementById('bf-img');
+    const pickerName    = document.getElementById('bf-img-name');
+    const pickerPreview = document.getElementById('bf-img-preview');
+
+    function setIconPicker(value) {
+        pickerInput.value = value;
+        let selOpt = null;
+        pickerList.querySelectorAll('.icon-picker-opt').forEach((o) => {
+            const selected = o.dataset.value === value;
+            o.setAttribute('aria-selected', selected ? 'true' : 'false');
+            if (selected) selOpt = o;
+        });
+        pickerPreview.replaceChildren();
+        if (selOpt && value) {
+            pickerName.textContent = value.replace(/^icons\//, '');
+            const srcImg = selOpt.querySelector('img');
+            if (srcImg) {
+                const img = document.createElement('img');
+                img.src = srcImg.src;   // resolved URL from server-rendered DOM element
+                img.alt = '';
+                img.style.cssText = 'width:1.2em;height:1.2em;object-fit:contain;display:block';
+                pickerPreview.appendChild(img);
+            }
+        } else {
+            pickerName.textContent = '— kein Bild —';
+        }
+        updatePreview();
+    }
+
+    // ── Button preview ────────────────────────────────────────────────────────
+    const previewEl = document.getElementById('bf-preview');
+
+    function updatePreview() {
+        const caption = document.getElementById('bf-caption').value || '…';
+        const variant = document.getElementById('bf-variant').value || 'btn-default';
+        const imgVal  = pickerInput.value;
+
+        const btn = document.createElement('a');
+        btn.className = 'btn ' + variant;
+        btn.href = '#';
+        btn.setAttribute('aria-hidden', 'true');
+        btn.style.cssText = 'pointer-events:none;width:12rem;height:2.5rem;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding-inline:.75rem;overflow:hidden';
+
+        if (imgVal) {
+            const selOpt = Array.from(pickerList.querySelectorAll('.icon-picker-opt'))
+                .find((o) => o.dataset.value === imgVal);
+            const srcImg = selOpt && selOpt.querySelector('img');
+            if (srcImg) {
+                const img = document.createElement('img');
+                img.src = srcImg.src;
+                img.alt = '';
+                img.style.cssText = 'width:1.2em;height:1.2em;object-fit:contain;flex-shrink:0';
+                btn.appendChild(img);
+            }
+        }
+
+        const span = document.createElement('span');
+        span.className = 'btn-label';
+        span.style.cssText = 'overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0';
+        span.textContent = caption;
+        btn.appendChild(span);
+
+        previewEl.replaceChildren(btn);
+    }
+
+    document.getElementById('bf-caption').addEventListener('input', updatePreview);
+    document.getElementById('bf-variant').addEventListener('change', updatePreview);
+    // ─────────────────────────────────────────────────────────────────────────
+
+    pickerTrigger.addEventListener('click', () => {
+        const open = !pickerList.hidden;
+        pickerList.hidden = open;
+        pickerTrigger.setAttribute('aria-expanded', String(!open));
+    });
+
+    pickerList.querySelectorAll('.icon-picker-opt').forEach((opt) =>
+        opt.addEventListener('click', () => {
+            setIconPicker(opt.dataset.value);
+            pickerList.hidden = true;
+            pickerTrigger.setAttribute('aria-expanded', 'false');
+            pickerTrigger.focus();
+        })
+    );
+
+    document.addEventListener('click', (e) => {
+        if (!pickerTrigger.closest('.icon-picker').contains(e.target)) {
+            pickerList.hidden = true;
+            pickerTrigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+    // ─────────────────────────────────────────────────────────────────────────
+
     function openModal()  { modal.classList.add('open'); }
-    function closeModal() { modal.classList.remove('open'); form.reset(); document.getElementById('bf-id').value = ''; }
+    function closeModal() {
+        modal.classList.remove('open');
+        form.reset();
+        document.getElementById('bf-id').value = '';
+        setIconPicker('');
+    }
 
     document.getElementById('btnAddButton').addEventListener('click', () => {
         title.textContent = 'Neuer Link';
@@ -220,15 +364,27 @@ render_header('Einstellungen', 'preferences');
     );
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
+    function fillForm(data) {
+        document.getElementById('bf-caption').value = data.caption || '';
+        document.getElementById('bf-url').value     = data.url     || '';
+        document.getElementById('bf-variant').value = data.variant || 'btn-default';
+        setIconPicker(data.imgUrl || '');
+    }
+
     document.querySelectorAll('.btn-edit-button').forEach((btn) =>
         btn.addEventListener('click', () => {
             title.textContent = 'Link bearbeiten';
-            document.getElementById('bf-id').value       = btn.dataset.id;
-            document.getElementById('bf-caption').value  = btn.dataset.caption;
-            document.getElementById('bf-url').value      = btn.dataset.url;
-            document.getElementById('bf-variant').value  = btn.dataset.variant;
-            document.getElementById('bf-icon').value     = btn.dataset.icon;
-            document.getElementById('bf-img-url').value  = btn.dataset.imgUrl;
+            document.getElementById('bf-id').value = btn.dataset.id;
+            fillForm(btn.dataset);
+            openModal();
+        })
+    );
+
+    document.querySelectorAll('.btn-copy-button').forEach((btn) =>
+        btn.addEventListener('click', () => {
+            title.textContent = 'Link kopieren';
+            document.getElementById('bf-id').value = '';   // empty → create on submit
+            fillForm(btn.dataset);
             openModal();
         })
     );
@@ -241,7 +397,6 @@ render_header('Einstellungen', 'preferences');
             caption: form.caption.value,
             url:     form.url.value,
             variant: form.variant.value,
-            icon:    form.icon.value,
             img_url: form.img_url.value,
         };
         if (id) params.id = id;
@@ -296,6 +451,38 @@ render_header('Einstellungen', 'preferences');
                         <input type="text" class="form-control" id="ff-title" name="title" required maxlength="64">
                     </div>
                     <div class="form-group">
+                        <label for="ff-img-trigger">Icon (optional, vor dem Titel)</label>
+                        <div class="icon-picker">
+                            <button type="button" class="icon-picker-trigger" id="ff-img-trigger"
+                                    aria-haspopup="listbox" aria-expanded="false">
+                                <span class="icon-picker-preview" id="ff-img-preview"></span>
+                                <span class="icon-picker-name" id="ff-img-name">— kein Icon —</span>
+                                <span class="icon-picker-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="icon-picker-list" role="listbox" id="ff-img-list" hidden>
+                                <div class="icon-picker-opt" role="option" data-value="" aria-selected="true">
+                                    <span class="icon-picker-thumb-gap"></span>
+                                    — kein Icon —
+                                </div>
+                                <?php foreach ($iconFiles as $iconFile):
+                                    $pickerVal = 'icons/' . $iconFile;
+                                    $pickerSrc = $base . '/' . $pickerVal;
+                                ?>
+                                <div class="icon-picker-opt" role="option"
+                                     data-value="<?= htmlspecialchars($pickerVal, ENT_QUOTES, 'UTF-8') ?>"
+                                     aria-selected="false">
+                                    <img class="icon-picker-thumb"
+                                         src="<?= htmlspecialchars($pickerSrc, ENT_QUOTES, 'UTF-8') ?>"
+                                         alt=""
+                                         style="width:1.2em;height:1.2em;object-fit:contain;flex-shrink:0">
+                                    <?= htmlspecialchars($iconFile, ENT_QUOTES, 'UTF-8') ?>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <input type="hidden" name="img_url" id="ff-img">
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="ff-url">RSS-URL</label>
                         <input type="url" class="form-control" id="ff-url" name="url" required>
                     </div>
@@ -306,7 +493,7 @@ render_header('Einstellungen', 'preferences');
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn" data-modal-close>Abbrechen</button>
-                    <button type="submit" class="btn btn-primary">Speichern</button>
+                    <button type="submit" class="btn btn-outline-success">Speichern</button>
                 </div>
             </form>
         </div>
@@ -320,11 +507,67 @@ render_header('Einstellungen', 'preferences');
     const title = document.getElementById('feedModalTitle');
     const tbody = document.querySelector('#feedsTable tbody');
 
+    // ── Feed icon picker ──────────────────────────────────────────────────────
+    const ffPickerTrigger = document.getElementById('ff-img-trigger');
+    const ffPickerList    = document.getElementById('ff-img-list');
+    const ffPickerInput   = document.getElementById('ff-img');
+    const ffPickerPreview = document.getElementById('ff-img-preview');
+    const ffPickerName    = document.getElementById('ff-img-name');
+
+    function setFeedIconPicker(value) {
+        ffPickerInput.value = value;
+        ffPickerList.querySelectorAll('.icon-picker-opt').forEach((o) => {
+            o.setAttribute('aria-selected', o.dataset.value === value ? 'true' : 'false');
+        });
+        ffPickerPreview.replaceChildren();
+        if (value) {
+            const selOpt = Array.from(ffPickerList.querySelectorAll('.icon-picker-opt'))
+                .find((o) => o.dataset.value === value);
+            const srcImg = selOpt && selOpt.querySelector('img');
+            if (srcImg) {
+                const img = document.createElement('img');
+                img.src = srcImg.src;
+                img.alt = '';
+                img.style.cssText = 'width:1.2em;height:1.2em;object-fit:contain;flex-shrink:0';
+                ffPickerPreview.appendChild(img);
+            }
+            ffPickerName.textContent = value.replace(/^icons\//, '');
+        } else {
+            ffPickerName.textContent = '— kein Icon —';
+        }
+        ffPickerTrigger.setAttribute('aria-expanded', 'false');
+        ffPickerList.hidden = true;
+    }
+
+    ffPickerTrigger.addEventListener('click', () => {
+        const open = !ffPickerList.hidden;
+        ffPickerList.hidden = open;
+        ffPickerTrigger.setAttribute('aria-expanded', String(!open));
+    });
+
+    ffPickerList.querySelectorAll('.icon-picker-opt').forEach((opt) => {
+        opt.addEventListener('click', () => setFeedIconPicker(opt.dataset.value));
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!ffPickerTrigger.contains(e.target) && !ffPickerList.contains(e.target)) {
+            ffPickerList.hidden = true;
+            ffPickerTrigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // ── Modal open/close ──────────────────────────────────────────────────────
     function openModal()  { modal.classList.add('open'); }
-    function closeModal() { modal.classList.remove('open'); form.reset(); document.getElementById('ff-id').value = ''; }
+    function closeModal() {
+        modal.classList.remove('open');
+        form.reset();
+        document.getElementById('ff-id').value = '';
+        setFeedIconPicker('');
+    }
 
     document.getElementById('btnAddFeed').addEventListener('click', () => {
         title.textContent = 'Neuer Feed';
+        setFeedIconPicker('');
         openModal();
     });
     modal.querySelectorAll('[data-modal-close]').forEach((el) =>
@@ -335,10 +578,11 @@ render_header('Einstellungen', 'preferences');
     document.querySelectorAll('.btn-edit-feed').forEach((btn) =>
         btn.addEventListener('click', () => {
             title.textContent = 'Feed bearbeiten';
-            document.getElementById('ff-id').value      = btn.dataset.id;
-            document.getElementById('ff-title').value   = btn.dataset.title;
-            document.getElementById('ff-url').value     = btn.dataset.url;
+            document.getElementById('ff-id').value        = btn.dataset.id;
+            document.getElementById('ff-title').value     = btn.dataset.title;
+            document.getElementById('ff-url').value       = btn.dataset.url;
             document.getElementById('ff-enabled').checked = btn.dataset.enabled === '1';
+            setFeedIconPicker(btn.dataset.imgUrl || '');
             openModal();
         })
     );
@@ -350,6 +594,7 @@ render_header('Einstellungen', 'preferences');
             action:  id ? 'update' : 'create',
             title:   form.title.value,
             url:     form.url.value,
+            img_url: ffPickerInput.value,
             enabled: form.enabled.checked ? 1 : 0,
         };
         if (id) params.id = id;

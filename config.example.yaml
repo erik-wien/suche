@@ -30,4 +30,4 @@ smtp:
 slack:
   bot_token: your_bot_token
 app:
-  base_url: http://localhost/suche.test
+  base_url: http://suche.test

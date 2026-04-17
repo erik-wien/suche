@@ -3,33 +3,27 @@ require_once __DIR__ . '/../inc/initialize.php';
 require_once __DIR__ . '/../inc/layout.php';
 require_once __DIR__ . '/../inc/search_engines.php';
 
+use Erikr\Chrome\Admin\LogTab;
+use Erikr\Chrome\Admin\UserModals;
+use Erikr\Chrome\Admin\Users;
+use Erikr\Chrome\Admin\UsersTab;
+
 auth_require();
 admin_require();
 
 $selfId = (int) ($_SESSION['id'] ?? 0);
 
-// --- Users tab data -------------------------------------------------------
-// The users tab is server-rendered on initial load; the log tab is AJAX-only
+// Users tab is server-rendered on initial load; the log tab is AJAX-only
 // (Rule §15.1 — filters and pagination go through api.php?action=admin_log_list).
-
-$perPage  = 25;
-$page     = max(1, (int) ($_GET['page'] ?? 1));
-$filter   = trim((string) ($_GET['filter'] ?? ''));
-$listing  = admin_list_users($con, $page, $perPage, $filter);
-$users    = $listing['users'];
-$total    = $listing['total'];
-$lastPage = max(1, (int) ceil($total / $perPage));
+$perPage = 25;
+$page    = max(1, (int) ($_GET['page'] ?? 1));
+$filter  = trim((string) ($_GET['filter'] ?? ''));
+$listing = Users::listExtended($con, $page, $perPage, $filter);
 
 $csrfToken = csrf_token();
 
-/** Pagination URL for the users tab — preserves filter, keeps #adm-users hash. */
-function user_page_url(int $p, string $filter): string {
-    $qs = ['page' => $p];
-    if ($filter !== '') {
-        $qs['filter'] = $filter;
-    }
-    return 'admin.php?' . http_build_query($qs) . '#adm-users';
-}
+require_once __DIR__ . '/../inc/icons.php';
+$adminIconFiles = icons_list();
 
 render_header('Administration', 'admin');
 ?>
@@ -42,6 +36,9 @@ render_header('Administration', 'admin');
         <button type="button" class="tab-btn active" role="tab"
                 id="tab-adm-engines" aria-controls="adm-engines" aria-selected="true"
                 data-tab="adm-engines">Suchmaschinen</button>
+        <button type="button" class="tab-btn" role="tab"
+                id="tab-adm-icons" aria-controls="adm-icons" aria-selected="false"
+                data-tab="adm-icons">Icons</button>
         <button type="button" class="tab-btn" role="tab"
                 id="tab-adm-users" aria-controls="adm-users" aria-selected="false"
                 data-tab="adm-users">Benutzer</button>
@@ -88,22 +85,108 @@ render_header('Administration', 'admin');
         </div>
     </div>
 
+    <div class="tab-panel" id="adm-icons" role="tabpanel" aria-labelledby="tab-adm-icons" hidden>
+        <div class="card mt-3">
+            <div class="card-header card-header-split">
+                <h3>Icons</h3>
+                <label class="btn btn-outline-success btn-sm" style="cursor:pointer">
+                    Hochladen
+                    <input type="file" id="iconUploadInput" accept=".svg,.png,.jpg,.jpeg,.webp" style="display:none">
+                </label>
+            </div>
+            <div class="card-body">
+                <div id="iconAlerts"></div>
+                <?php if (empty($adminIconFiles)): ?>
+                    <p class="text-muted">Noch keine Icons vorhanden.</p>
+                <?php else: ?>
+                <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width:3rem"></th>
+                            <th>Dateiname</th>
+                            <th style="width:3rem"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($adminIconFiles as $iconFile): ?>
+                        <tr>
+                            <td><img src="<?= htmlspecialchars($base . '/icons/' . $iconFile, ENT_QUOTES, 'UTF-8') ?>"
+                                     alt=""
+                                     style="width:1.5rem;height:1.5rem;object-fit:contain;display:block"></td>
+                            <td><?= htmlspecialchars($iconFile, ENT_QUOTES, 'UTF-8') ?></td>
+                            <td style="white-space:nowrap">
+                                <button class="btn btn-sm btn-icon-rename" type="button"
+                                        title="Umbenennen"
+                                        data-file="<?= htmlspecialchars($iconFile, ENT_QUOTES, 'UTF-8') ?>"><span class="ui-icon ui-icon-edit" aria-hidden="true"></span></button>
+                                <button class="btn btn-sm btn-danger btn-icon-delete" type="button"
+                                        title="Löschen"
+                                        data-file="<?= htmlspecialchars($iconFile, ENT_QUOTES, 'UTF-8') ?>"><span class="ui-icon ui-icon-delete" aria-hidden="true"></span></button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
     <div class="tab-panel" id="adm-users" role="tabpanel" aria-labelledby="tab-adm-users" hidden>
-        <?php require __DIR__ . '/../inc/_admin_users_tab.php'; ?>
+        <?php
+            UsersTab::render([
+                'users'   => $listing['users'],
+                'total'   => $listing['total'],
+                'page'    => $page,
+                'perPage' => $perPage,
+                'filter'  => $filter,
+                'selfId'  => $selfId,
+                'pageUrl' => static fn(int $p, string $f): string =>
+                    'admin.php?' . http_build_query(
+                        ['page' => $p] + ($f !== '' ? ['filter' => $f] : [])
+                    ) . '#adm-users',
+            ]);
+        ?>
     </div>
 
     <div class="tab-panel" id="adm-log" role="tabpanel" aria-labelledby="tab-adm-log" hidden>
-        <?php require __DIR__ . '/../inc/_admin_log_tab.php'; ?>
+        <?php LogTab::render(); ?>
     </div>
 </div>
 
-<?php require __DIR__ . '/../inc/_admin_user_modals.php'; ?>
+<?php UserModals::render(['csrfToken' => $csrfToken]); ?>
+
+<div class="modal" id="iconRenameModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="max-width:26rem">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Icon umbenennen</h4>
+                <button type="button" class="close" data-modal-close>&times;</button>
+            </div>
+            <form id="iconRenameForm">
+                <div class="modal-body">
+                    <div class="modal-alerts" id="iconRenameAlerts"></div>
+                    <div class="form-group">
+                        <label for="iconRenameInput">Neuer Name (ohne Endung)</label>
+                        <input type="text" class="form-control" id="iconRenameInput"
+                               required maxlength="120" autocomplete="off">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-modal-close>Abbrechen</button>
+                    <button type="submit" class="btn btn-outline-success">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script nonce="<?= htmlspecialchars($_cspNonce, ENT_QUOTES, 'UTF-8') ?>">
 (function () {
     'use strict';
 
-    // ── Tiny inline helpers (modal open/close + alert) ──────────────────────
+    // ── Modal open/close + alert helpers ────────────────────────────────────
     // Fetch + tab switching come from window.sucheFetch / sucheActivateTab
     // (provided by /js/app.js, loaded by render_footer).
 
@@ -117,7 +200,6 @@ render_header('Administration', 'admin');
         setTimeout(() => div.remove(), 5000);
     }
 
-    /** If `form` is inside a modal, return that modal's inline alert slot. */
     function modalAlertBox(form) {
         return form?.closest('.modal')?.querySelector('.modal-alerts') || null;
     }
@@ -136,7 +218,6 @@ render_header('Administration', 'admin');
         m.setAttribute('aria-hidden', 'true');
     }
 
-    // Wire modal open/close/backdrop/Escape
     document.querySelectorAll('[data-modal-open]').forEach((btn) => {
         btn.addEventListener('click', () => openModal(btn.dataset.modalOpen));
     });
@@ -166,8 +247,6 @@ render_header('Administration', 'admin');
             document.getElementById('editEmail').value          = btn.dataset.email;
             document.getElementById('editRights').value         = btn.dataset.rights;
             document.getElementById('editDisabled').checked     = btn.dataset.disabled === '1';
-            document.getElementById('editDebug').checked        = btn.dataset.debug === '1';
-            document.getElementById('editTotpReset').checked    = false;
         });
     });
 
@@ -191,14 +270,12 @@ render_header('Administration', 'admin');
         }
     }
 
-    const editForm = document.getElementById('editForm');
-    editForm?.addEventListener('submit', (e) => {
+    document.getElementById('editForm')?.addEventListener('submit', (e) => {
         e.preventDefault();
         submitViaFetch(e.target, 'admin_user_edit', 'Gespeichert.', () => closeModal('editModal'));
     });
 
-    const createForm = document.getElementById('createForm');
-    createForm?.addEventListener('submit', (e) => {
+    document.getElementById('createForm')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = e.target.email.value;
         submitViaFetch(e.target, 'admin_user_create',
@@ -208,7 +285,7 @@ render_header('Administration', 'admin');
 
     document.querySelectorAll('.btn-reset').forEach((btn) => {
         btn.addEventListener('click', async () => {
-            if (!confirm('Einladungs-E-Mail erneut senden?')) return;
+            if (!confirm('Passwort-Reset-E-Mail an «' + btn.dataset.username + '» senden?')) return;
             const res = await apiPost('admin_user_reset', { id: btn.dataset.id });
             showAlert(res.ok ? 'E-Mail versandt.' : (res.error || 'Fehler.'), res.ok ? 'success' : 'danger');
         });
@@ -223,6 +300,50 @@ render_header('Administration', 'admin');
                 setTimeout(() => location.reload(), 700);
             } else {
                 showAlert(res.error || 'Löschen fehlgeschlagen.', 'danger');
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-toggle-disabled').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const wasDisabled = btn.dataset.disabled === '1';
+            const verb = wasDisabled ? 'aktivieren' : 'deaktivieren';
+            if (!confirm('«' + btn.dataset.username + '» ' + verb + '?')) return;
+            const res = await apiPost('admin_user_toggle_disabled', {
+                id: btn.dataset.id,
+                disabled: wasDisabled ? '' : '1',
+            });
+            if (res.ok) {
+                showAlert(wasDisabled ? 'Aktiviert.' : 'Deaktiviert.', 'success');
+                setTimeout(() => location.reload(), 700);
+            } else {
+                showAlert(res.error || 'Fehler.', 'danger');
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-revoke-totp').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('2FA für «' + btn.dataset.username + '» widerrufen?')) return;
+            const res = await apiPost('admin_user_revoke_totp', { id: btn.dataset.id });
+            if (res.ok) {
+                showAlert('2FA widerrufen.', 'success');
+                setTimeout(() => location.reload(), 700);
+            } else {
+                showAlert(res.error || 'Fehler.', 'danger');
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-invalid-reset').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Fehlversuche für «' + btn.dataset.username + '» (' + btn.dataset.count + ') zurücksetzen?')) return;
+            const res = await apiPost('admin_user_reset_invalid', { id: btn.dataset.id });
+            if (res.ok) {
+                showAlert('Zähler zurückgesetzt.', 'success');
+                setTimeout(() => location.reload(), 700);
+            } else {
+                showAlert(res.error || 'Fehler.', 'danger');
             }
         });
     });
@@ -364,9 +485,11 @@ render_header('Administration', 'admin');
             return;
         }
         populateFilters(res.apps, res.contexts);
+        const perPage  = res.per_page ?? res.perPage ?? 50;
+        const lastPage = res.lastPage ?? Math.max(1, Math.ceil((res.total || 0) / perPage));
         logTotalEl.textContent = String(res.total);
         renderRows(res.rows || []);
-        renderPagination(res.page, res.lastPage, loadPage);
+        renderPagination(res.page, lastPage, loadPage);
     }
 
     logForm?.addEventListener('submit', (e) => { e.preventDefault(); loadPage(1); });
@@ -395,6 +518,81 @@ render_header('Administration', 'admin');
     );
     window.addEventListener('hashchange', maybeLoad);
     maybeLoad();
+
+    // ── Icons tab ──────────────────────────────────────────────────────────────
+    const iconUploadInput = document.getElementById('iconUploadInput');
+    const iconAlerts      = document.getElementById('iconAlerts');
+    const csrfMeta        = document.querySelector('meta[name="csrf-token"]');
+
+    iconUploadInput?.addEventListener('change', async () => {
+        const file = iconUploadInput.files[0];
+        if (!file) return;
+        const fd = new FormData();
+        fd.append('icon', file);
+        fd.append('csrf_token', csrfMeta?.content || '');
+        iconUploadInput.value = '';
+        try {
+            const res  = await fetch('api.php?action=icon_upload', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.ok) {
+                showAlert('Icon hochgeladen: ' + data.file, 'success', iconAlerts);
+                setTimeout(() => location.reload(), 700);
+            } else {
+                showAlert(data.error || 'Upload fehlgeschlagen.', 'danger', iconAlerts);
+            }
+        } catch (e) {
+            showAlert('Netzwerkfehler.', 'danger', iconAlerts);
+        }
+    });
+
+    document.querySelectorAll('.btn-icon-delete').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Icon «' + btn.dataset.file + '» löschen?')) return;
+            const res = await apiPost('icon_delete', { file: btn.dataset.file });
+            if (res.ok) {
+                showAlert('Gelöscht.', 'success', iconAlerts);
+                setTimeout(() => location.reload(), 700);
+            } else {
+                showAlert(res.error || 'Fehler.', 'danger', iconAlerts);
+            }
+        });
+    });
+
+    // ── Icon rename ────────────────────────────────────────────────────────────
+    const renameModal  = document.getElementById('iconRenameModal');
+    const renameForm   = document.getElementById('iconRenameForm');
+    const renameInput  = document.getElementById('iconRenameInput');
+    const renameAlerts = document.getElementById('iconRenameAlerts');
+    let   renameTarget = '';
+
+    renameModal.querySelectorAll('[data-modal-close]').forEach((el) =>
+        el.addEventListener('click', () => closeModal('iconRenameModal'))
+    );
+    renameModal.addEventListener('click', (e) => {
+        if (e.target === renameModal) closeModal('iconRenameModal');
+    });
+
+    document.querySelectorAll('.btn-icon-rename').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            renameTarget = btn.dataset.file;
+            const base   = renameTarget.replace(/\.[^.]+$/, '');
+            renameInput.value = base;
+            renameAlerts.replaceChildren();
+            openModal('iconRenameModal');
+        });
+    });
+
+    renameForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await apiPost('icon_rename', { file: renameTarget, name: renameInput.value });
+        if (res.ok) {
+            showAlert('Umbenannt in «' + res.file + '».', 'success', iconAlerts);
+            closeModal('iconRenameModal');
+            setTimeout(() => location.reload(), 700);
+        } else {
+            showAlert(res.error || 'Fehler.', 'danger', renameAlerts);
+        }
+    });
 })();
 </script>
 <?php

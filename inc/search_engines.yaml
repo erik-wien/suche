@@ -4,6 +4,7 @@
 engines:
   - id: google
     label: Google
+    icon_url: "icons/google.svg"
     icon_text: "🔍"
     accesskey: g
     action: https://www.google.com/search
@@ -20,6 +21,7 @@ engines:
 
   - id: wikipedia
     label: Wikipedia
+    icon_url: "icons/wikipedia-w.svg"
     icon_text: "📖"
     accesskey: w
     action: https://de.wikipedia.org/wiki/Spezial:Suche
@@ -30,6 +32,7 @@ engines:
 
   - id: geizhals
     label: Geizhals
+    icon_url: "icons/geizhals.svg"
     icon_text: "€"
     accesskey: z
     action: https://geizhals.at/
@@ -40,6 +43,7 @@ engines:
 
   - id: amazon
     label: Amazon
+    icon_url: "icons/amazon.svg"
     icon_text: "🛒"
     accesskey: a
     action: https://www.amazon.de/s
@@ -52,6 +56,7 @@ engines:
 
   - id: pons
     label: Pons
+    icon_url: "icons/Pons.svg"
     icon_text: "🌐"
     accesskey: p
     action: https://de.pons.com/übersetzung
@@ -65,6 +70,7 @@ engines:
 
   - id: adobe_stock
     label: Adobe Stock
+    icon_url: "icons/Adobe_Stock_icon.svg"
     icon_text: "🖼️"
     accesskey: s
     action: https://stock.adobe.com/de/search

@@ -3,7 +3,7 @@ require_once __DIR__ . '/../inc/initialize.php';
 if (empty($_SESSION['loggedin'])) { http_response_code(403); exit; }
 
 $stmt = $con->prepare(
-    'SELECT img_blob, img_type FROM auth_accounts WHERE id = ? AND img_blob IS NOT NULL'
+    'SELECT img_blob FROM auth_accounts WHERE id = ? AND img_blob IS NOT NULL'
 );
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
@@ -19,12 +19,10 @@ if ($stmt->num_rows === 0) {
     exit;
 }
 
-$stmt->bind_result($blob, $type);
+$stmt->bind_result($blob);
 $stmt->fetch();
 $stmt->close();
 
-$allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-$type = in_array($type, $allowed, true) ? $type : 'image/jpeg';
-header('Content-Type: ' . $type);
+header('Content-Type: image/jpeg');
 header('Cache-Control: private, max-age=3600');
 echo $blob;

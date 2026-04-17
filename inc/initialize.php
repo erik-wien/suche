@@ -81,4 +81,6 @@ unset($_cfg, $_auth, $_db);
 
 // ── erikr/auth bootstrap (session, CSP nonce in $_cspNonce, cookies) ──────────
 
-auth_bootstrap();
+auth_bootstrap([
+    'img-src' => "'self' data: https:",   // RSS feed thumbnails come from external domains
+]);

@@ -34,6 +34,11 @@ render_header('Start', 'home');
                     data-tab="feed-<?= (int)$f['id'] ?>"
                     aria-controls="feed-<?= (int)$f['id'] ?>"
                     aria-selected="<?= $i === 0 ? 'true' : 'false' ?>">
+                <?php if (!empty($f['img_url'])): ?>
+                    <img src="<?= htmlspecialchars($base . '/' . $f['img_url'], ENT_QUOTES, 'UTF-8') ?>"
+                         alt="" aria-hidden="true"
+                         style="width:1em;height:1em;object-fit:contain;vertical-align:-0.1em;margin-right:.3em">
+                <?php endif; ?>
                 <?= htmlspecialchars($f['title'], ENT_QUOTES, 'UTF-8') ?>
             </button>
         <?php endforeach; ?>

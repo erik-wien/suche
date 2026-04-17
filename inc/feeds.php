@@ -5,7 +5,7 @@
 
 function feeds_for_user(int $uid, bool $enabledOnly = true): array {
     global $pdo;
-    $sql = 'SELECT id, title, url, sort, enabled
+    $sql = 'SELECT id, title, url, img_url, sort, enabled
             FROM s_feeds WHERE user_id = :uid';
     if ($enabledOnly) {
         $sql .= ' AND enabled = 1';
@@ -27,9 +27,25 @@ function feeds_validate(array $in): array {
         || !in_array($p['scheme'], ['http', 'https'], true)) {
         return [false, 'Feed-URL muss mit http:// oder https:// beginnen.', null];
     }
+    $imgUrl = trim((string)($in['img_url'] ?? ''));
+    if ($imgUrl !== '') {
+        $isLocalIcon = preg_match(
+            '/^icons\/[a-zA-Z0-9][a-zA-Z0-9 ._-]*\.(svg|png|jpe?g|webp)$/i',
+            $imgUrl
+        );
+        if (!$isLocalIcon) {
+            $p = parse_url($imgUrl);
+            if ($p === false || empty($p['scheme']) || empty($p['host'])
+                || !in_array($p['scheme'], ['http', 'https'], true)) {
+                return [false, 'Bild-Pfad ungültig.', null];
+            }
+        }
+    }
+
     return [true, null, [
         'title'   => $title,
         'url'     => $url,
+        'img_url' => $imgUrl !== '' ? $imgUrl : null,
         'enabled' => !empty($in['enabled']) ? 1 : 0,
     ]];
 }
@@ -44,13 +60,14 @@ function feeds_insert(int $uid, array $in): array {
     )->fetchColumn();
 
     $stmt = $pdo->prepare(
-        'INSERT INTO s_feeds (user_id, title, url, enabled, sort)
-         VALUES (:uid, :title, :url, :enabled, :sort)'
+        'INSERT INTO s_feeds (user_id, title, url, img_url, enabled, sort)
+         VALUES (:uid, :title, :url, :img_url, :enabled, :sort)'
     );
     $stmt->execute([
         ':uid'     => $uid,
         ':title'   => $row['title'],
         ':url'     => $row['url'],
+        ':img_url' => $row['img_url'],
         ':enabled' => $row['enabled'],
         ':sort'    => $maxSort + 10,
     ]);
@@ -63,7 +80,7 @@ function feeds_update(int $uid, int $id, array $in): array {
     if (!$ok) throw new InvalidArgumentException($err);
 
     $stmt = $pdo->prepare(
-        'UPDATE s_feeds SET title=:title, url=:url, enabled=:enabled
+        'UPDATE s_feeds SET title=:title, url=:url, img_url=:img_url, enabled=:enabled
          WHERE id = :id AND user_id = :uid'
     );
     $stmt->execute([
@@ -71,6 +88,7 @@ function feeds_update(int $uid, int $id, array $in): array {
         ':id'      => $id,
         ':title'   => $row['title'],
         ':url'     => $row['url'],
+        ':img_url' => $row['img_url'],
         ':enabled' => $row['enabled'],
     ]);
     if ($stmt->rowCount() === 0) {
@@ -91,7 +109,7 @@ function feeds_delete(int $uid, int $id): void {
 function feeds_get(int $uid, int $id): array {
     global $pdo;
     $stmt = $pdo->prepare(
-        'SELECT id, title, url, sort, enabled
+        'SELECT id, title, url, img_url, sort, enabled
          FROM s_feeds WHERE id = :id AND user_id = :uid'
     );
     $stmt->execute([':id' => $id, ':uid' => $uid]);

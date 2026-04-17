@@ -15,7 +15,7 @@ const BUTTON_VARIANTS = [
 function buttons_for_user(int $uid): array {
     global $pdo;
     $stmt = $pdo->prepare(
-        'SELECT id, caption, url, target, variant, icon, img_url, sort
+        'SELECT id, caption, url, target, variant, img_url, sort
          FROM s_buttons
          WHERE user_id = :uid
          ORDER BY sort ASC, id ASC'
@@ -47,17 +47,19 @@ function buttons_validate(array $in): array {
 
     $target = ($in['target'] ?? '_blank') === '_self' ? '_self' : '_blank';
 
-    $icon = trim((string)($in['icon'] ?? ''));
-    if ($icon !== '' && !preg_match('/^[a-z0-9 \-]{1,64}$/', $icon)) {
-        return [false, 'Icon enthält ungültige Zeichen.', null];
-    }
-
     $imgUrl = trim((string)($in['img_url'] ?? ''));
     if ($imgUrl !== '') {
-        $p = parse_url($imgUrl);
-        if ($p === false || empty($p['scheme']) || empty($p['host'])
-            || !in_array($p['scheme'], ['http', 'https'], true)) {
-            return [false, 'Bild-URL ungültig.', null];
+        // Accept a local icon path (icons/filename.ext) or an external http/https URL
+        $isLocalIcon = preg_match(
+            '/^icons\/[a-zA-Z0-9][a-zA-Z0-9 ._-]*\.(svg|png|jpe?g|webp)$/i',
+            $imgUrl
+        );
+        if (!$isLocalIcon) {
+            $p = parse_url($imgUrl);
+            if ($p === false || empty($p['scheme']) || empty($p['host'])
+                || !in_array($p['scheme'], ['http', 'https'], true)) {
+                return [false, 'Bild-Pfad ungültig.', null];
+            }
         }
     }
 
@@ -66,7 +68,6 @@ function buttons_validate(array $in): array {
         'url'     => $url,
         'target'  => $target,
         'variant' => $variant,
-        'icon'    => $icon !== '' ? $icon : null,
         'img_url' => $imgUrl !== '' ? $imgUrl : null,
     ]];
 }
@@ -81,8 +82,8 @@ function buttons_insert(int $uid, array $in): array {
     )->fetchColumn();
 
     $stmt = $pdo->prepare(
-        'INSERT INTO s_buttons (user_id, caption, url, target, variant, icon, img_url, sort)
-         VALUES (:uid, :caption, :url, :target, :variant, :icon, :img_url, :sort)'
+        'INSERT INTO s_buttons (user_id, caption, url, target, variant, img_url, sort)
+         VALUES (:uid, :caption, :url, :target, :variant, :img_url, :sort)'
     );
     $stmt->execute([
         ':uid'     => $uid,
@@ -90,7 +91,6 @@ function buttons_insert(int $uid, array $in): array {
         ':url'     => $row['url'],
         ':target'  => $row['target'],
         ':variant' => $row['variant'],
-        ':icon'    => $row['icon'],
         ':img_url' => $row['img_url'],
         ':sort'    => $maxSort + 10,
     ]);
@@ -105,7 +105,7 @@ function buttons_update(int $uid, int $id, array $in): array {
 
     $stmt = $pdo->prepare(
         'UPDATE s_buttons SET caption=:caption, url=:url, target=:target,
-            variant=:variant, icon=:icon, img_url=:img_url
+            variant=:variant, img_url=:img_url
          WHERE id = :id AND user_id = :uid'
     );
     $stmt->execute([
@@ -115,7 +115,6 @@ function buttons_update(int $uid, int $id, array $in): array {
         ':url'     => $row['url'],
         ':target'  => $row['target'],
         ':variant' => $row['variant'],
-        ':icon'    => $row['icon'],
         ':img_url' => $row['img_url'],
     ]);
     if ($stmt->rowCount() === 0) {
@@ -136,7 +135,7 @@ function buttons_delete(int $uid, int $id): void {
 function buttons_get(int $uid, int $id): array {
     global $pdo;
     $stmt = $pdo->prepare(
-        'SELECT id, caption, url, target, variant, icon, img_url, sort
+        'SELECT id, caption, url, target, variant, img_url, sort
          FROM s_buttons WHERE id = :id AND user_id = :uid'
     );
     $stmt->execute([':id' => $id, ':uid' => $uid]);
@@ -176,18 +175,21 @@ function buttons_reorder(int $uid, array $order): array {
 }
 
 function render_button(array $b): void {
-    $variant = htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8');
-    $url     = htmlspecialchars($b['url'],     ENT_QUOTES, 'UTF-8');
-    $target  = htmlspecialchars($b['target'],  ENT_QUOTES, 'UTF-8');
-    $caption = htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8');
-    $icon    = $b['icon']    ? htmlspecialchars($b['icon'],    ENT_QUOTES, 'UTF-8') : null;
-    $img     = $b['img_url'] ? htmlspecialchars($b['img_url'], ENT_QUOTES, 'UTF-8') : null;
+    global $base;
+    $variant  = htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8');
+    $url      = htmlspecialchars($b['url'],     ENT_QUOTES, 'UTF-8');
+    $target   = htmlspecialchars($b['target'],  ENT_QUOTES, 'UTF-8');
+    $caption  = htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8');
+    $imgRaw   = $b['img_url'] ?? '';
+    $img      = $imgRaw      ? htmlspecialchars($imgRaw, ENT_QUOTES, 'UTF-8') : null;
+    // Prefix local icon paths with the app base URL
+    $imgSrc   = $img
+        ? (str_starts_with($imgRaw, 'icons/') ? htmlspecialchars($base, ENT_QUOTES, 'UTF-8') . '/' . $img : $img)
+        : null;
     ?>
     <a class="btn <?= $variant ?>" href="<?= $url ?>" target="<?= $target ?>" rel="noopener noreferrer">
-        <?php if ($img): ?>
-            <img src="<?= $img ?>" alt="" style="height:1rem;flex:0 0 auto">
-        <?php elseif ($icon): ?>
-            <i class="<?= $icon ?>" aria-hidden="true" style="flex:0 0 auto"></i>
+        <?php if ($imgSrc): ?>
+            <img src="<?= $imgSrc ?>" alt="" style="height:1rem;flex:0 0 auto">
         <?php endif; ?>
         <span class="btn-label"><?= $caption ?></span>
     </a>

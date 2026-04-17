@@ -5,11 +5,14 @@
  * Per design rules §15.1, all admin mutations go through
  * api.php?action=admin_<verb> as POST + CSRF and return JSON.
  *
- * Currently dispatches only admin_* actions; other suche API endpoints
- * live in web/api/*.php (buttons, feeds, …).
+ * admin_* actions are routed to erikr/chrome's Admin\Dispatch (canonical
+ * §15.1 implementation). Other suche API endpoints live in web/api/*.php
+ * (buttons, feeds, …) and are dispatched from there.
  */
 
 require_once __DIR__ . '/../inc/initialize.php';
+
+use Erikr\Chrome\Admin\Dispatch;
 
 if (empty($_SESSION['loggedin'])) {
     http_response_code(401);
@@ -18,126 +21,71 @@ if (empty($_SESSION['loggedin'])) {
     exit;
 }
 
-header('Content-Type: application/json');
-
 $type = $_GET['action'] ?? $_GET['type'] ?? '';
 
-if (
-    $type === 'admin_user_create' ||
-    $type === 'admin_user_edit'   ||
-    $type === 'admin_user_reset'  ||
-    $type === 'admin_user_delete' ||
-    $type === 'admin_log_list'
-) {
-    if (($_SESSION['rights'] ?? '') !== 'Admin') {
+if (str_starts_with($type, 'admin_')) {
+    Dispatch::handle($con, $type, [
+        'baseUrl' => APP_BASE_URL,
+        'selfId'  => (int) ($_SESSION['id'] ?? 0),
+    ]);
+    exit;
+}
+
+header('Content-Type: application/json');
+
+if (str_starts_with($type, 'icon_')) {
+    // Admin-only icon management
+    $rights = (array) ($_SESSION['rights'] ?? []);
+    if (!in_array('Admin', $rights, true)) {
         http_response_code(403);
-        echo json_encode(['ok' => false, 'error' => 'Forbidden']);
+        echo json_encode(['ok' => false, 'error' => 'Nur für Admins.']);
         exit;
     }
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_verify()) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'CSRF-Fehler.']);
+        exit;
+    }
+    require_once __DIR__ . '/../inc/icons.php';
+    try {
+        switch ($type) {
+            case 'icon_list':
+                echo json_encode(['ok' => true, 'files' => icons_list()]);
+                break;
+            case 'icon_upload':
+                if (empty($_FILES['icon'])) {
+                    throw new RuntimeException('Keine Datei übermittelt.');
+                }
+                $name = icons_upload($_FILES['icon']);
+                appendLog($con, 'admin', 'icon uploaded: ' . $name);
+                echo json_encode(['ok' => true, 'file' => $name]);
+                break;
+            case 'icon_rename':
+                $oldName = trim((string) ($_POST['file'] ?? ''));
+                $newName = trim((string) ($_POST['name'] ?? ''));
+                $result  = icons_rename($oldName, $newName);
+                appendLog($con, 'admin', 'icon renamed: ' . $oldName . ' → ' . $result);
+                echo json_encode(['ok' => true, 'file' => $result]);
+                break;
+            case 'icon_delete':
+                $filename = trim((string) ($_POST['file'] ?? ''));
+                icons_delete($filename);
+                appendLog($con, 'admin', 'icon deleted: ' . $filename);
+                echo json_encode(['ok' => true]);
+                break;
+            default:
+                http_response_code(400);
+                echo json_encode(['ok' => false, 'error' => 'Unbekannte Aktion.']);
+        }
+    } catch (InvalidArgumentException $e) {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Ungültige Anfrage.']);
-        exit;
+        echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        error_log('api/icons: ' . $e->getMessage());
+        echo json_encode(['ok' => false, 'error' => 'Serverfehler']);
     }
-
-    $_cfg       = suche_load_config();
-    $appBaseUrl = rtrim($_cfg['app']['base_url'] ?? '', '/');
-
-    if ($type === 'admin_log_list') {
-        require_once __DIR__ . '/../inc/admin_log.php';
-        $perPage = 50;
-        $page    = max(1, (int) ($_POST['page'] ?? 1));
-        $filters = [
-            'app'     => trim((string) ($_POST['app']     ?? '')),
-            'context' => trim((string) ($_POST['context'] ?? '')),
-            'user'    => trim((string) ($_POST['user']    ?? '')),
-            'from'    => trim((string) ($_POST['from']    ?? '')),
-            'to'      => trim((string) ($_POST['to']      ?? '')),
-            'q'       => trim((string) ($_POST['q']       ?? '')),
-            'fail'    => !empty($_POST['fail']) ? '1' : '',
-        ];
-        $data = admin_log_list($con, $page, $perPage, $filters);
-        echo json_encode([
-            'ok'       => true,
-            'rows'     => $data['rows'],
-            'total'    => $data['total'],
-            'page'     => $page,
-            'perPage'  => $perPage,
-            'lastPage' => max(1, (int) ceil($data['total'] / $perPage)),
-            'apps'     => admin_log_distinct_apps($con),
-            'contexts' => admin_log_distinct_contexts($con),
-        ]);
-        exit;
-    }
-
-    if ($type === 'admin_user_create') {
-        $username = trim((string) ($_POST['username'] ?? ''));
-        $email    = trim((string) ($_POST['email']    ?? ''));
-        $rights   = (string) ($_POST['rights'] ?? 'User');
-        if ($username === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['ok' => false, 'error' => 'Benutzername und gültige E-Mail erforderlich.']);
-            exit;
-        }
-        try {
-            admin_create_user($con, $username, $email, $rights, $appBaseUrl);
-            appendLog($con, 'admin', "Created user {$username} ({$email})", 'suche');
-            echo json_encode(['ok' => true]);
-        } catch (\mysqli_sql_exception $e) {
-            if ($e->getCode() === 1062) {
-                echo json_encode(['ok' => false, 'error' => 'Benutzername oder E-Mail bereits vergeben.']);
-            } else {
-                appendLog($con, 'admin', "admin_user_create failed for {$username}: " . $e->getMessage(), 'suche');
-                echo json_encode(['ok' => false, 'error' => 'Datenbankfehler: ' . $e->getMessage()]);
-            }
-        }
-        exit;
-    }
-
-    if ($type === 'admin_user_edit') {
-        $targetId  = (int) ($_POST['id'] ?? 0);
-        $email     = trim((string) ($_POST['email'] ?? ''));
-        $rights    = (string) ($_POST['rights'] ?? 'User');
-        $disabled  = (int) !empty($_POST['disabled']);
-        $debug     = (int) !empty($_POST['debug']);
-        $totpReset = !empty($_POST['totp_reset']);
-        if ($targetId <= 0 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['ok' => false, 'error' => 'Ungültige Eingabe.']);
-            exit;
-        }
-        admin_edit_user($con, $targetId, $email, $rights, $disabled, $debug, $totpReset);
-        appendLog($con, 'admin', "User #{$targetId} updated.", 'suche');
-        echo json_encode(['ok' => true]);
-        exit;
-    }
-
-    if ($type === 'admin_user_reset') {
-        $targetId = (int) ($_POST['id'] ?? 0);
-        if ($targetId <= 0) {
-            echo json_encode(['ok' => false, 'error' => 'Ungültige ID.']);
-            exit;
-        }
-        $ok = admin_reset_password($con, $targetId, $appBaseUrl);
-        appendLog($con, 'admin', "Password reset requested for user #{$targetId}.", 'suche');
-        echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => 'E-Mail konnte nicht gesendet werden.']);
-        exit;
-    }
-
-    if ($type === 'admin_user_delete') {
-        $targetId = (int) ($_POST['id'] ?? 0);
-        $selfId   = (int) ($_SESSION['id'] ?? 0);
-        if ($targetId <= 0) {
-            echo json_encode(['ok' => false, 'error' => 'Ungültige ID.']);
-            exit;
-        }
-        if ($targetId === $selfId) {
-            echo json_encode(['ok' => false, 'error' => 'Sie können sich nicht selbst löschen.']);
-            exit;
-        }
-        $ok = admin_delete_user($con, $targetId, $selfId);
-        appendLog($con, 'admin', "User #{$targetId} deleted.", 'suche');
-        echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => 'Löschen fehlgeschlagen.']);
-        exit;
-    }
+    exit;
 }
 
 http_response_code(400);

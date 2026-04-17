@@ -55,13 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 appendLog($con, 'npw', 'Failed: wrong old password for ' . ($_SESSION['username'] ?? ''), 'suche');
                 $errors['password'] = 'Das alte Kennwort ist falsch.';
             } else {
-                $hash = password_hash($new1, PASSWORD_BCRYPT, ['cost' => 13]);
-                $upd  = $con->prepare(
-                    'UPDATE auth_accounts SET password = ?, invalidLogins = 0 WHERE id = ?'
-                );
-                $upd->bind_param('si', $hash, $userId);
-                $upd->execute();
-                $upd->close();
+                auth_change_password($con, $userId, $new1);
                 appendLog($con, 'npw', 'Success: password changed for ' . ($_SESSION['username'] ?? ''), 'suche');
                 addAlert('success', 'Kennwort erfolgreich geändert.');
                 header('Location: password.php'); exit;
@@ -167,7 +161,7 @@ render_header('Passwort &amp; 2FA', 'password');
                         <input type="password" id="newPassword2" name="newPassword2"
                                class="form-control" autocomplete="new-password" minlength="8" required>
                     </div>
-                    <button class="btn btn-primary" type="submit">Speichern</button>
+                    <button class="btn btn-outline-success" type="submit">Speichern</button>
                 </form>
             </div>
         </div>
@@ -190,7 +184,7 @@ render_header('Passwort &amp; 2FA', 'password');
                           onsubmit="return confirm('2FA wirklich deaktivieren?');">
                         <?= csrf_input() ?>
                         <input type="hidden" name="action" value="totp_disable">
-                        <button type="submit" class="btn btn-primary">2FA deaktivieren</button>
+                        <button type="submit" class="btn">2FA deaktivieren</button>
                     </form>
 
                 <?php elseif ($setupSecret !== null): ?>
@@ -212,7 +206,7 @@ render_header('Passwort &amp; 2FA', 'password');
                                    autocomplete="one-time-code" required autofocus
                                    class="totp-code-input" style="max-width:200px;">
                         </div>
-                        <button type="submit" class="btn btn-primary">Bestätigen</button>
+                        <button type="submit" class="btn btn-outline-success">Bestätigen</button>
                     </form>
 
                 <?php else: ?>
@@ -223,7 +217,7 @@ render_header('Passwort &amp; 2FA', 'password');
                     <form method="post" action="password.php">
                         <?= csrf_input() ?>
                         <input type="hidden" name="action" value="totp_start">
-                        <button type="submit" class="btn btn-primary">2FA aktivieren</button>
+                        <button type="submit" class="btn btn-outline-success">2FA aktivieren</button>
                     </form>
                 <?php endif; ?>
             </div>

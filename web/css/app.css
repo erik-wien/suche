@@ -111,7 +111,7 @@ body {
    transparent background leaves it visually floating. Give it a grey
    outline so it reads as a button against both light and dark page bg. */
 .btn.btn-default {
-  border-color: #808080;
+  border-color: var(--color-border);
   color: var(--color-text);
 }
 .btn.btn-default:hover {
@@ -144,7 +144,7 @@ body {
 .rss-card .rss-body h3 a:hover { text-decoration: underline; }
 
 /* ── Modal visibility (shared components.css uses .modal.show; we toggle .open) */
-.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; padding: 2rem; }
+.modal { z-index: 200; padding: 2rem; }
 .modal.open { display: block; }
 .modal-dialog { max-width: 560px; margin: 2rem auto; }
 
@@ -194,7 +194,7 @@ body {
     width: 100%;
     padding: 0.65rem;
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-on-accent);
     border: none;
     border-radius: 8px;
     font-size: 0.95rem;
@@ -202,6 +202,59 @@ body {
     margin-top: 0.5rem;
 }
 .btn-login:hover { opacity: 0.9; }
+
+/* ── Icon picker (Bild dropdown in button modal) ─────────────────────────── */
+
+.icon-picker { position: relative; }
+
+.icon-picker-trigger {
+  display: flex; align-items: center; gap: .5rem;
+  width: 100%; text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: .375rem .75rem;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: inherit;
+}
+.icon-picker-trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.icon-picker-trigger > .icon-picker-chevron { margin-left: auto; color: var(--color-muted); }
+
+.icon-picker-preview {
+  width: 1.2em; height: 1.2em; flex-shrink: 0; display: block;
+}
+.icon-picker-preview img {
+  width: 100%; height: 100%; object-fit: contain; display: block;
+}
+
+.icon-picker-list {
+  position: absolute; bottom: calc(100% + 2px); top: auto; left: 0; right: 0; z-index: 300;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  max-height: 220px; overflow-y: auto;
+  box-shadow: 0 -4px 12px rgba(0,0,0,.15);
+}
+
+.icon-picker-opt {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .35rem .75rem; cursor: pointer;
+  color: var(--color-text); font-size: .9rem;
+}
+.icon-picker-opt:hover { background: var(--color-surface-alt); }
+.icon-picker-opt[aria-selected="true"] {
+  background: var(--color-surface-alt);
+  font-weight: 500;
+}
+
+.icon-picker-thumb {
+  width: 1.2em; height: 1.2em; object-fit: contain; flex-shrink: 0; display: block;
+}
+.icon-picker-thumb-gap { width: 1.2em; height: 1.2em; flex-shrink: 0; display: block; }
 
 /* ── TOTP code input and 2FA card helpers ──────────────────────────────────── */
 

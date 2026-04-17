@@ -38,6 +38,7 @@ function search_engines_load(): array {
 }
 
 function render_search_form(array $engine): void {
+    global $base;
     $id          = htmlspecialchars($engine['id'],         ENT_QUOTES, 'UTF-8');
     $label       = htmlspecialchars($engine['label'],      ENT_QUOTES, 'UTF-8');
     $action      = htmlspecialchars($engine['action'],     ENT_QUOTES, 'UTF-8');
@@ -49,8 +50,10 @@ function render_search_form(array $engine): void {
     ?>
     <form class="search-form" action="<?= $action ?>" method="<?= $method ?>" target="_blank" id="form-<?= $id ?>">
         <span class="search-icon">
-            <?php if (!empty($engine['icon'])): ?>
-                <i class="<?= htmlspecialchars($engine['icon'], ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
+            <?php if (!empty($engine['icon_url'])): ?>
+                <img src="<?= htmlspecialchars($base . '/' . $engine['icon_url'], ENT_QUOTES, 'UTF-8') ?>"
+                     alt="" aria-hidden="true"
+                     style="width:1.5rem;height:1.5rem;object-fit:contain">
             <?php elseif (!empty($engine['icon_text'])): ?>
                 <span aria-hidden="true"><?= htmlspecialchars($engine['icon_text'], ENT_QUOTES, 'UTF-8') ?></span>
             <?php endif; ?>
