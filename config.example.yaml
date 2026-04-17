@@ -20,14 +20,10 @@ auth_db:
   name: jardyx_auth
   user: suche
   password: your_password
-smtp:
-  host: smtp.world4you.com
-  port: 587
-  user: catchall@jardyx.com
-  password: your_password
-  from: suche@jardyx.com
-  from_name: Suche
 slack:
   bot_token: your_bot_token
 app:
+  name: Suche
+  support_email: contact@eriks.cloud
   base_url: http://suche.test
+APP_CODE: suche

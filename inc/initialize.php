@@ -13,19 +13,14 @@ require_once __DIR__ . '/config.php';
 
 $_cfg = suche_load_config();
 
-define('APP_NAME',    'Suche');
-define('APP_VERSION', '3.0.0');
-define('APP_BUILD',   '2026-04-15');
-define('APP_ENV',     $_cfg['app']['env'] ?? 'dev');
-define('APP_SLUG',    'suche');
+define('APP_NAME',          $_cfg['app']['name']          ?? 'Suche');
+define('APP_SUPPORT_EMAIL', $_cfg['app']['support_email'] ?? 'contact@eriks.cloud');
+define('APP_VERSION',       '3.0');
+define('APP_BUILD',         1);
+define('APP_ENV',           $_cfg['app']['env']           ?? 'dev');
+define('APP_CODE',          $_cfg['APP_CODE']             ?? 'suche');
 
-define('APP_BASE_URL',   rtrim($_cfg['app']['base_url']  ?? '', '/'));
-define('SMTP_HOST',      $_cfg['smtp']['host']           ?? '');
-define('SMTP_PORT',      (int) ($_cfg['smtp']['port']    ?? 587));
-define('SMTP_USER',      $_cfg['smtp']['user']           ?? '');
-define('SMTP_PASS',      $_cfg['smtp']['password']       ?? '');
-define('SMTP_FROM',      $_cfg['smtp']['from']           ?? '');
-define('SMTP_FROM_NAME', $_cfg['smtp']['from_name']      ?? 'Suche');
+define('APP_BASE_URL',      rtrim($_cfg['app']['base_url'] ?? '', '/'));
 
 define('RATE_LIMIT_FILE', __DIR__ . '/../data/ratelimit.json');
 
