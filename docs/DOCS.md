@@ -77,15 +77,9 @@ auth_db:                         # MySQLi connection for erikr/auth
   user: suche
   password: …
 
-smtp:
-  host: smtp.world4you.com
-  port: 587
-  user: catchall@jardyx.com
-  password: …
-  from: suche@jardyx.com
-  from_name: Suche
-
 app:
+  name: Suche
+  support_email: contact@eriks.cloud
   base_url: http://localhost/suche.test   # no trailing slash
   env: dev                               # dev | prod
 ```
@@ -94,15 +88,19 @@ app:
 
 | Constant | Source |
 |---|---|
-| `APP_NAME` | `'Suche'` |
+| `APP_NAME` | `config.app.name` (default `'Suche'`) |
+| `APP_SUPPORT_EMAIL` | `config.app.support_email` (default `'contact@eriks.cloud'`) |
 | `APP_VERSION` | `'3.0'` — Major.Minor |
 | `APP_BUILD` | integer, incremented on major updates (not a date) |
 | `APP_ENV` | `config.app.env` |
 | `APP_BASE_URL` | `config.app.base_url` (trailing slash stripped) |
 | `APP_CODE` | `'suche'` — used by `appendLog()` as the `origin` field |
 | `AUTH_DB_PREFIX` | `''` — tables `auth_accounts`, `auth_log` without prefix |
-| `SMTP_HOST/PORT/USER/PASS/FROM/FROM_NAME` | from smtp config |
 | `RATE_LIMIT_FILE` | `__DIR__ . '/../data/ratelimit.json'` |
+
+SMTP credentials are no longer per-app — they live at host level in
+`/opt/homebrew/etc/jardyx-mail.ini` (dev) or `/etc/jardyx/mail.ini`
+(prod) and are read directly by the `erikr/auth` mailer.
 
 ---
 
