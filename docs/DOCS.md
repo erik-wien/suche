@@ -95,11 +95,11 @@ app:
 | Constant | Source |
 |---|---|
 | `APP_NAME` | `'Suche'` |
-| `APP_VERSION` | `'3.0.0'` |
-| `APP_BUILD` | date string e.g. `'2026-04-15'` |
+| `APP_VERSION` | `'3.0'` — Major.Minor |
+| `APP_BUILD` | integer, incremented on major updates (not a date) |
 | `APP_ENV` | `config.app.env` |
 | `APP_BASE_URL` | `config.app.base_url` (trailing slash stripped) |
-| `APP_SLUG` | `'suche'` — used by `appendLog()` as the `origin` field |
+| `APP_CODE` | `'suche'` — used by `appendLog()` as the `origin` field |
 | `AUTH_DB_PREFIX` | `''` — tables `auth_accounts`, `auth_log` without prefix |
 | `SMTP_HOST/PORT/USER/PASS/FROM/FROM_NAME` | from smtp config |
 | `RATE_LIMIT_FILE` | `__DIR__ . '/../data/ratelimit.json'` |
@@ -307,7 +307,7 @@ Every state-changing POST form includes `<?= csrf_input() ?>` (a hidden `_csrf_t
 
 ### Audit log
 
-Every significant action calls `appendLog($con, $context, $activity)`. The `origin` field defaults to `APP_SLUG` (`'suche'`). Entries are visible in the admin log tab.
+Every significant action calls `appendLog($con, $context, $activity)`. The `origin` field defaults to `APP_CODE` (`'suche'`). Entries are visible in the admin log tab.
 
 ---
 

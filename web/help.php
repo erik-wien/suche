@@ -6,7 +6,7 @@ auth_require();
 
 render_header('Hilfe', 'help');
 ?>
-<div class="container" style="padding:1.5rem;max-width:720px">
+<div class="page-reading">
     <h1>Hilfe</h1>
 
     <h2>Was ist Suche</h2>

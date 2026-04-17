@@ -61,9 +61,8 @@ function render_footer(): void {
 </main>
 <?php
     Footer::render([
-        'base'    => $base,
-        'year'    => '2016–' . date('Y'),
-        'version' => APP_VERSION . ' ' . APP_ENV,
+        'base' => $base,
+        'year' => '2016–' . date('Y'),
     ]);
 ?>
 <script src="<?= $base ?>/js/app.js" nonce="<?= $_cspNonce ?>"></script>
