@@ -4,10 +4,11 @@
      theme.css → reset.css → layout.css → components.css → app.css
 */
 
-/* Body reserves room for fixed header + fixed footer per design rules §12/§13. */
+/* Body reserves room for fixed header + fixed footer per design rules §12/§13.
+   The two custom properties are declared on :root in shared layout.css. */
 body {
-  padding-top: 64px;   /* .app-header ≈ 56px + breathing room */
-  padding-bottom: 44px; /* .app-footer ≈ 32px + breathing room */
+  padding-top:    var(--app-header-height);
+  padding-bottom: var(--app-footer-height);
 }
 
 /* Three-column footer per design rule §13 (overrides shared centered default). */
