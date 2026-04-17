@@ -22,7 +22,6 @@ final class ButtonsValidateTest extends TestCase
         self::assertSame('https://example.com/', $row['url']);
         self::assertSame('_blank', $row['target']);
         self::assertSame('btn-default', $row['variant']);
-        self::assertNull($row['icon']);
         self::assertNull($row['img_url']);
     }
 
@@ -64,15 +63,27 @@ final class ButtonsValidateTest extends TestCase
         self::assertStringContainsString('Variant', $err);
     }
 
-    public function testRejectsIconWithSuspiciousChars(): void
+    public function testRejectsInvalidImgUrl(): void
     {
         [$ok, $err] = buttons_validate([
             'caption' => 'X',
             'url'     => 'https://example.com/',
-            'icon'    => 'fa fa-home<script>',
+            'img_url' => 'javascript:alert(1)',
         ]);
         self::assertFalse($ok);
-        self::assertStringContainsString('Icon', $err);
+        self::assertStringContainsString('Bild', $err);
+    }
+
+    public function testAcceptsLocalIconPath(): void
+    {
+        [$ok, $err, $row] = buttons_validate([
+            'caption' => 'X',
+            'url'     => 'https://example.com/',
+            'img_url' => 'icons/home.svg',
+        ]);
+        self::assertTrue($ok);
+        self::assertNull($err);
+        self::assertSame('icons/home.svg', $row['img_url']);
     }
 
     public function testCoercesTargetToSelfOrBlank(): void

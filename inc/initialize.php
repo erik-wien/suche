@@ -78,4 +78,4 @@ unset($_cfg, $_auth, $_db);
 
 auth_bootstrap([
     'img-src' => "'self' data: https:",   // RSS feed thumbnails come from external domains
-]);
+], $con);

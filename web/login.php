@@ -64,6 +64,10 @@ $remembered = htmlspecialchars($_COOKIE['suche_username'] ?? '', ENT_QUOTES, 'UT
                        <?= $remembered !== '' ? 'checked' : '' ?>>
                 <label for="rememberName">Benutzername merken</label>
             </div>
+            <div class="form-check">
+                <input type="checkbox" id="remember_me" name="remember_me" value="1">
+                <label for="remember_me">Angemeldet bleiben (8&nbsp;Tage)</label>
+            </div>
             <button type="submit" class="btn-login">Anmelden</button>
         </form>
         <div class="login-links">
