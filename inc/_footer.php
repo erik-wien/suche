@@ -9,8 +9,9 @@
  *
  * Caller sets $base before include.
  */
+$_stage = in_array(strtolower(APP_ENV), ['local', 'localhost', 'dev', 'development', 'staging', 'akadbrain'], true) ? 'DEV' : 'PROD';
 \Erikr\Chrome\Footer::render([
     'base'    => $base ?? '',
     'year'    => '2016–' . date('Y'),
-    'version' => APP_VERSION . ' ' . APP_ENV,
+    'version' => APP_VERSION . '.' . APP_BUILD . ' ' . $_stage,
 ]);

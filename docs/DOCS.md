@@ -33,8 +33,8 @@ Suche is a PHP app with no build step, no front-end framework, and no server-sid
 
 | Variable | Driver | DB | Used for |
 |---|---|---|---|
-| `$con` | MySQLi | `jardyx_auth` | auth operations (auth_accounts, auth_log) |
-| `$pdo` | PDO | `jardyx_auth` | app data (s_buttons, s_feeds) |
+| `$con` | MySQLi | `auth` | auth operations (auth_accounts, auth_log) |
+| `$pdo` | PDO | `auth` | app data (s_buttons, s_feeds) |
 
 Both connections point at the same database. The separation exists because `erikr/auth` expects a MySQLi handle while all app queries use PDO prepared statements.
 
@@ -66,14 +66,14 @@ target: local                    # local | akadbrain | world4you
 db:                              # app PDO connection
   host: localhost
   socket: /tmp/mysql.sock        # optional; preferred over host when set
-  name: jardyx_auth
+  name: auth
   user: suche
   password: …
 
 auth_db:                         # MySQLi connection for erikr/auth
   host: localhost
   socket: /tmp/mysql.sock
-  name: jardyx_auth
+  name: auth
   user: suche
   password: …
 
@@ -127,7 +127,7 @@ Pages that only need auth (login, avatar, logout) may include `inc/initialize.ph
 
 ## 4. Database schema
 
-All tables are in the shared `jardyx_auth` database. The `s_` prefix namespaces them away from the auth tables.
+All tables are in the shared `auth` database. The `s_` prefix namespaces them away from the auth tables.
 
 ### `s_db_migrations`
 
@@ -394,7 +394,7 @@ Load order (hard requirement):
 <link rel="stylesheet" href="css/app.css">
 ```
 
-`web/css/shared/` is a symlink to `~/Git/css`. Deployed with `rsync --copy-links` so the symlink is resolved at the destination — no symlinks on the production server.
+`web/css/shared/` is a symlink to `~/Git/css_library`. Deployed with `rsync --copy-links` so the symlink is resolved at the destination — no symlinks on the production server.
 
 ### Token conventions
 
@@ -438,8 +438,8 @@ All inline scripts in PHP files must include `nonce="<?= $_cspNonce ?>"`. `app.j
 
 | Target | URL | Docroot | Auth DB |
 |---|---|---|---|
-| `local` | `http://localhost/suche.test/` | `/Library/WebServer/Documents/suche/web/` | `jardyx_auth` on localhost |
-| `akadbrain` | `https://suche.eriks.cloud/` | `/Library/WebServer/Documents/suche/web/` | `jardyx_auth` on localhost |
+| `local` | `http://localhost/suche.test/` | `/Library/WebServer/Documents/suche/web/` | `auth` on localhost |
+| `akadbrain` | `https://suche.eriks.cloud/` | `/Library/WebServer/Documents/suche/web/` | `auth` on localhost |
 | `world4you` | deferred | `/jardyx.com/suche/web/` | `5279249db19` (separate) |
 
 ### Deploy command

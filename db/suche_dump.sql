@@ -1,7 +1,7 @@
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19-12.2.2-MariaDB, for osx10.21 (arm64)
 --
--- Host: localhost    Database: jardyx_auth
+-- Host: localhost    Database: auth
 -- ------------------------------------------------------
 -- Server version	12.2.2-MariaDB
 

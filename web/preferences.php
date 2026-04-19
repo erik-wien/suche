@@ -31,12 +31,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'revoke_all_devices') {
+    if (!csrf_verify()) {
+        http_response_code(403);
+        exit('CSRF token mismatch');
+    }
+    if (auth_remember_revoke_all($con)) {
+        addAlert('success', 'Alle Sitzungen wurden beendet.');
+    } else {
+        addAlert('danger', 'Konnte Sitzungen nicht beenden.');
+    }
+    header('Location: preferences.php#pref-sicherheit'); exit;
+}
+
 $theme = $_SESSION['theme'] ?? 'auto';
 
 render_header('Einstellungen', 'preferences');
 ?>
 <div class="container" style="padding:1.5rem">
     <h1>Einstellungen</h1>
+
+    <?php foreach ($_SESSION['alerts'] ?? [] as [$type, $msg]): ?>
+        <div class="alert alert-<?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>"
+             role="alert"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php endforeach; unset($_SESSION['alerts']); ?>
 
     <div class="tab-bar" role="tablist">
         <button type="button" class="tab-btn active" role="tab"
@@ -45,6 +63,8 @@ render_header('Einstellungen', 'preferences');
                 data-tab="pref-links" aria-controls="pref-links" aria-selected="false">Links</button>
         <button type="button" class="tab-btn" role="tab"
                 data-tab="pref-feeds" aria-controls="pref-feeds" aria-selected="false">Feeds</button>
+        <button type="button" class="tab-btn" role="tab"
+                data-tab="pref-sicherheit" aria-controls="pref-sicherheit" aria-selected="false">Sicherheit</button>
     </div>
 
     <div class="tab-panel" id="pref-display" role="tabpanel">
@@ -73,9 +93,9 @@ render_header('Einstellungen', 'preferences');
                 <table class="table table-sm table-hover" id="buttonsTable">
                     <thead>
                         <tr>
+                            <th style="width:1rem" aria-hidden="true"></th>
                             <th style="width:1%">Vorschau</th>
                             <th>URL</th>
-                            <th style="width:6rem">Reihenfolge</th>
                             <th style="width:1%;white-space:nowrap">Aktionen</th>
                         </tr>
                     </thead>
@@ -86,12 +106,9 @@ render_header('Einstellungen', 'preferences');
                         foreach ($buttons as $b):
                         ?>
                             <tr data-id="<?= (int)$b['id'] ?>">
+                                <td class="drag-handle" title="Verschieben" aria-hidden="true">&#x2630;</td>
                                 <td class="btn-preview-cell"><?php render_button($b); ?></td>
                                 <td class="text-muted small"><?= htmlspecialchars($b['url'], ENT_QUOTES, 'UTF-8') ?></td>
-                                <td>
-                                    <button class="btn btn-sm btn-move-up" type="button" title="Nach oben">▲</button>
-                                    <button class="btn btn-sm btn-move-down" type="button" title="Nach unten">▼</button>
-                                </td>
                                 <td style="white-space:nowrap">
                                     <button class="btn btn-sm btn-edit-button" type="button"
                                             title="Bearbeiten"
@@ -165,6 +182,23 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-panel" id="pref-sicherheit" role="tabpanel" hidden>
+        <div class="card mt-3">
+            <div class="card-header">Aktive Sitzungen</div>
+            <div class="card-body">
+                <p>Meldet Sie auf allen Geräten und allen Apps auf eriks.cloud ab.</p>
+                <p class="text-muted small">Aktive Sitzungen auf anderen Apps bleiben bis zu 4 Tage bestehen;
+                    um sie sofort zu beenden, ändern Sie Ihr Kennwort.</p>
+                <form method="post" action="preferences.php"
+                      onsubmit="return confirm('Wirklich von allen Geräten abmelden?')">
+                    <?= csrf_input() ?>
+                    <input type="hidden" name="action" value="revoke_all_devices">
+                    <button type="submit" class="btn btn-outline-danger">Von allen Geräten abmelden</button>
+                </form>
             </div>
         </div>
     </div>
@@ -245,12 +279,23 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     </div>
 </div>
 
+<script src="<?= $base ?>/js/sortable.min.js"></script>
 <script nonce="<?= $_cspNonce ?>">
 (function () {
     const modal      = document.getElementById('buttonModal');
     const form       = document.getElementById('buttonForm');
     const title      = document.getElementById('buttonModalTitle');
     const tableBody  = document.querySelector('#buttonsTable tbody');
+
+    Sortable.create(tableBody, {
+        handle: '.drag-handle',
+        animation: 150,
+        onEnd: async () => {
+            const ids = Array.from(tableBody.querySelectorAll('tr')).map(r => r.dataset.id);
+            const res = await sucheFetch('api/buttons.php', { action: 'reorder', order: ids });
+            if (!res.ok) alert('Fehler beim Speichern der Reihenfolge.');
+        },
+    });
 
     // ── Icon picker ───────────────────────────────────────────────────────────
     const pickerTrigger = document.getElementById('bf-img-trigger');
@@ -417,22 +462,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         })
     );
 
-    async function move(row, direction) {
-        const ids = Array.from(tableBody.querySelectorAll('tr')).map((r) => r.dataset.id);
-        const idx = ids.indexOf(row.dataset.id);
-        const swap = idx + direction;
-        if (swap < 0 || swap >= ids.length) return;
-        [ids[idx], ids[swap]] = [ids[swap], ids[idx]];
-        const res = await sucheFetch('api/buttons.php', { action: 'reorder', order: ids });
-        if (res.ok) location.reload();
-        else alert('Fehler: ' + (res.error || 'unbekannt'));
-    }
-    document.querySelectorAll('.btn-move-up').forEach((b) =>
-        b.addEventListener('click', () => move(b.closest('tr'), -1))
-    );
-    document.querySelectorAll('.btn-move-down').forEach((b) =>
-        b.addEventListener('click', () => move(b.closest('tr'), +1))
-    );
+
 })();
 </script>
 

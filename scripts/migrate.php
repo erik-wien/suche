@@ -5,7 +5,7 @@
  * Reads db/migrations/*.sql in filename order, runs each file that isn't yet
  * recorded in s_db_migrations, then runs post-migration sanity checks.
  *
- * Connects as MariaDB root because it needs DDL privileges on jardyx_auth
+ * Connects as MariaDB root because it needs DDL privileges on auth
  * tables that the app user (suche) does not hold. This script is a dev/admin
  * tool run from the shell, not a web request — it never runs as the app user.
  *

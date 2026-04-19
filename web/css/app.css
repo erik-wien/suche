@@ -204,6 +204,16 @@ body {
 }
 .btn-login:hover { opacity: 0.9; }
 
+/* ── Drag handle (Links table) ───────────────────────────────────────────── */
+
+.drag-handle {
+  cursor: grab;
+  color: var(--color-muted);
+  user-select: none;
+  text-align: center;
+}
+.drag-handle:active { cursor: grabbing; }
+
 /* ── Icon picker (Bild dropdown in button modal) ─────────────────────────── */
 
 .icon-picker { position: relative; }

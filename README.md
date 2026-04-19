@@ -14,7 +14,7 @@ Personal search portal and start page. Six integrated search engines, per-user l
 
 PHP 8.2+ · MariaDB · Vanilla JS (no build step) · `erikr/auth` (Composer path dep) · `symfony/yaml`
 
-Shared CSS library (`~/Git/css`) symlinked at `web/css/shared/`. No Bootstrap, no CDN assets.
+Shared CSS library (`~/Git/css_library`) symlinked at `web/css/shared/`. No Bootstrap, no CDN assets.
 
 ## Quick start
 
@@ -82,7 +82,7 @@ suche/
 │   │   └── feeds.php      # Feed CRUD (create/update/delete/reorder)
 │   └── css/
 │       ├── app.css        # Suche-specific styles
-│       └── shared/        # → symlink to ~/Git/css
+│       └── shared/        # → symlink to ~/Git/css_library
 │
 ├── db/migrations/         # Idempotent SQL migration files
 ├── scripts/migrate.php    # Migration runner
@@ -106,7 +106,7 @@ The deploy rsyncs `web/`, `inc/`, and `vendor/` to the target. `data/cache/rss/`
 
 ## DB tables
 
-All three tables live in the shared `jardyx_auth` database with the `s_` prefix:
+All three tables live in the shared `auth` database with the `s_` prefix:
 
 | Table | Purpose |
 |---|---|
