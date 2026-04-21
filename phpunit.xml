@@ -17,7 +17,6 @@
         <exclude>
             <file>inc/initialize.php</file>
             <file>inc/layout.php</file>
-            <file>inc/_footer.php</file>
         </exclude>
     </source>
 </phpunit>

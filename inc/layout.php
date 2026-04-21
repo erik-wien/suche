@@ -83,6 +83,45 @@ function render_header(string $title, string $active = ''): void {
     <?php
 }
 
+function render_anon_header(string $title): void {
+    global $base, $_cspNonce;
+
+    $pageTitle = htmlspecialchars($title . ' — ' . APP_NAME, ENT_QUOTES, 'UTF-8');
+    ?>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= $pageTitle ?></title>
+    <meta name="theme-color" content="<?= htmlspecialchars(APP_COLOR, ENT_QUOTES) ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= $base ?>/jardyx-favicon.svg">
+    <link rel="icon" type="image/x-icon" href="<?= $base ?>/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= $base ?>/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= $base ?>/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="<?= $base ?>/apple-touch-icon.png">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+    <link rel="stylesheet" href="<?= $base ?>/css/shared/theme.css?v=<?= APP_BUILD ?>">
+    <link rel="stylesheet" href="<?= $base ?>/css/shared/reset.css?v=<?= APP_BUILD ?>">
+    <link rel="stylesheet" href="<?= $base ?>/css/shared/layout.css?v=<?= APP_BUILD ?>">
+    <link rel="stylesheet" href="<?= $base ?>/css/shared/components.css?v=<?= APP_BUILD ?>">
+    <link rel="stylesheet" href="<?= $base ?>/css/app.css?v=<?= APP_BUILD ?>">
+</head>
+<body>
+<?php
+    Header::render([
+        'appName'       => APP_NAME,
+        'base'          => $base,
+        'cspNonce'      => $_cspNonce,
+        'brandLogoSrc'  => $base . '/jardyx-logo.svg',
+        'loggedIn'      => false,
+        'anonLoginHref' => null,
+    ]);
+?>
+<main id="main-content" tabindex="-1">
+    <?php
+}
+
 function render_footer(): void {
     global $base, $_cspNonce;
     ?>

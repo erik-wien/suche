@@ -7,6 +7,7 @@
  * POST: Call auth_totp_complete(), redirect to index on success or re-render on failure.
  */
 require_once __DIR__ . '/../inc/initialize.php';
+require_once __DIR__ . '/../inc/layout.php';
 
 if (!empty($_SESSION['loggedin'])) {
     header('Location: index.php'); exit;
@@ -56,38 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 $alerts = $_SESSION['alerts'] ?? [];
 unset($_SESSION['alerts']);
-?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Suche · Zwei-Faktor-Authentifizierung</title>
-    <?php $_b = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/'); ?>
-    <link rel="stylesheet" href="<?= $_b ?>/css/shared/theme.css">
-    <link rel="stylesheet" href="<?= $_b ?>/css/shared/reset.css">
-    <link rel="stylesheet" href="<?= $_b ?>/css/shared/layout.css">
-    <link rel="stylesheet" href="<?= $_b ?>/css/shared/components.css">
-    <link rel="stylesheet" href="<?= $_b ?>/css/app.css">
-    <meta name="theme-color" content="<?= htmlspecialchars(APP_COLOR, ENT_QUOTES) ?>">
-    <link rel="icon" type="image/svg+xml" href="<?= $_b ?>/jardyx-favicon.svg">
-    <link rel="icon" type="image/x-icon" href="<?= $_b ?>/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="<?= $_b ?>/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="<?= $_b ?>/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="<?= $_b ?>/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="<?= $_b ?>/web-app-manifest-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="<?= $_b ?>/web-app-manifest-512x512.png">
-</head>
-<body>
-<header class="app-header">
-    <div class="header-left">
-        <span class="brand">
-            <img src="<?= $_b ?>/css/shared/icons/jardyx.svg" class="header-logo" width="28" height="28" alt="">
-            <span class="header-appname">Suche</span>
-        </span>
-    </div>
-    <div class="header-right"></div>
-</header>
+<?php render_anon_header('Zwei-Faktor-Authentifizierung'); ?>
 <div class="login-wrap">
     <div class="login-card">
         <h2>2FA-Code eingeben</h2>
@@ -123,6 +93,4 @@ unset($_SESSION['alerts']);
         </div>
     </div>
 </div>
-<?php $base = $_b; require __DIR__ . '/../inc/_footer.php'; ?>
-</body>
-</html>
+<?php render_footer(); ?>
