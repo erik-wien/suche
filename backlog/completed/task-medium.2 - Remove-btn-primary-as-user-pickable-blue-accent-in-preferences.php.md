@@ -1,10 +1,10 @@
 ---
 id: TASK-MEDIUM.2
 title: Remove btn-primary as user-pickable 'blue' accent in preferences.php
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-21 05:44'
-updated_date: '2026-04-21 06:16'
+updated_date: '2026-04-21 11:45'
 labels: []
 dependencies: []
 parent_task_id: TASK-MEDIUM
@@ -18,8 +18,8 @@ Audit 2026-04-20 ui-rules §9 contradiction: preferences.php:231 has <option val
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Option label no longer says 'blau'
-- [ ] #2 Either option removed or relabeled to match palette semantics
+- [x] #1 Option label no longer says 'blau'
+- [x] #2 Either option removed or relabeled to match palette semantics
 <!-- AC:END -->
 
 ## Implementation Plan

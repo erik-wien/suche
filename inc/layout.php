@@ -68,7 +68,6 @@ function render_header(string $title, string $active = ''): void {
                 'label'    => 'Test',
                 'adminOnly' => true,
                 'children' => [
-                    ['href' => sibling_url('http://suche.test',     'https://suche.eriks.cloud',     'https://www.jardyx.com'),           'label' => 'Suche'],
                     ['href' => sibling_url('http://wlmonitor.test', 'https://wlmonitor.eriks.cloud', 'https://wlmonitor.jardyx.com'),     'label' => 'WL Monitor'],
                     ['href' => sibling_url('http://energie.test',   'https://energie.eriks.cloud',   'https://energie.jardyx.com'),       'label' => 'Energie'],
                     ['href' => sibling_url('http://chat.test',      'https://chat.eriks.cloud',       'https://chat.jardyx.com'),          'label' => 'Chat'],

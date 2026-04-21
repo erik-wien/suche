@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS `s_buttons`;
 
-CREATE TABLE `s_buttons` (
+CREATE TABLE IF NOT EXISTS `s_buttons` (
   `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id`    INT(11)      NOT NULL,
   `caption`    VARCHAR(64)  NOT NULL,

@@ -228,7 +228,6 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         <label for="bf-variant">Farbe</label>
                         <select class="form-select" id="bf-variant" name="variant">
                             <option value="btn-default">Standard</option>
-                            <option value="btn-primary">Primary (blau)</option>
                             <option value="btn-success">Success (grün)</option>
                             <option value="btn-warning">Warning (gelb)</option>
                             <option value="btn-danger">Danger (rot)</option>

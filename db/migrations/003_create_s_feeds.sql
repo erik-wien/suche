@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS `s_feeds`;
 
-CREATE TABLE `s_feeds` (
+CREATE TABLE IF NOT EXISTS `s_feeds` (
   `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id`    INT(11)      NOT NULL,
   `title`      VARCHAR(64)  NOT NULL,

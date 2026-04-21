@@ -1,6 +1,6 @@
 # Config template — copy to config.yaml and fill in your values
 
-target: local
+target: akadbrain
 db:
   host: localhost
   socket: /tmp/mysql.sock
@@ -8,7 +8,9 @@ db:
   user: suche
   password: your_password
 deploy:
-  web_root: /Library/WebServer/Documents
+  ssh_user: erik
+  ssh_host: akadbrain.local
+  ssh_key: ~/.ssh/id_rsa
   dest: /Library/WebServer/Documents/suche
   sync_dirs:
   - web
@@ -26,5 +28,5 @@ app:
   name: Suche
   support_email: contact@eriks.cloud
   color: '#ffffff'
-  base_url: http://suche.test
+  base_url: https://suche.eriks.cloud
 APP_CODE: suche

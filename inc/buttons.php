@@ -8,7 +8,7 @@
  */
 
 const BUTTON_VARIANTS = [
-    'btn-default', 'btn-primary', 'btn-success', 'btn-warning',
+    'btn-default', 'btn-success', 'btn-warning',
     'btn-danger',  'btn-secondary', 'btn-dark',   'btn-light',
 ];
 
