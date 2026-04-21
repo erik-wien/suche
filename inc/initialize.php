@@ -21,6 +21,7 @@ define('APP_ENV',           $_cfg['app']['env']           ?? 'dev');
 define('APP_CODE',          $_cfg['APP_CODE']             ?? 'suche');
 
 define('APP_BASE_URL',      rtrim($_cfg['app']['base_url'] ?? '', '/'));
+define('APP_COLOR',         $_cfg['app']['color']          ?? '#e2001a');
 
 define('RATE_LIMIT_FILE', __DIR__ . '/../data/ratelimit.json');
 

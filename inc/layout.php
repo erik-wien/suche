@@ -36,6 +36,8 @@ function render_header(string $title, string $active = ''): void {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $pageTitle ?></title>
+    <meta name="theme-color" content="<?= htmlspecialchars(APP_COLOR, ENT_QUOTES) ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= $base ?>/jardyx-favicon.svg">
     <link rel="icon" type="image/x-icon" href="<?= $base ?>/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="<?= $base ?>/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= $base ?>/favicon-32x32.png">
@@ -55,7 +57,7 @@ function render_header(string $title, string $active = ''): void {
         'cspNonce'       => $_cspNonce,
         'csrfToken'      => csrf_token(),
         'pageType'       => $active,
-        'brandLogoSrc'   => $base . '/css/shared/icons/jardyx.svg',
+        'brandLogoSrc'   => $base . '/jardyx-logo.svg',
         'themeEndpoint'  => $base . '/preferences.php',
         'appMenu'        => [
             ['href' => sibling_url('http://wlmonitor.test', 'https://wlmonitor.eriks.cloud', 'https://wlmonitor.jardyx.com'), 'label' => 'WL Monitor'],
