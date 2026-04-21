@@ -6,6 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-04-21 16:26'
+updated_date: '2026-04-21 16:52'
 labels: []
 dependencies: []
 parent_task_id: TASK-HIGH
@@ -26,7 +27,7 @@ Note: Test submenu already exists and is adminOnly ✓
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 securityHref resolves to correct page (standalone security.php or documented tab approach)
-- [ ] #2 Suche not listed in its own Test submenu
+- [x] #1 securityHref resolves to correct page (standalone security.php or documented tab approach)
+- [x] #2 Suche not listed in its own Test submenu
 - [ ] #3 Anwendung → preferences.php (Links+Feeds) wired once Chrome supports appPrefsHref
 <!-- AC:END -->
