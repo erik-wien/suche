@@ -79,7 +79,7 @@ function render_header(string $title, string $active = ''): void {
         ],
     ]);
 ?>
-<main id="main-content">
+<main id="main-content" tabindex="-1">
     <?php
 }
 

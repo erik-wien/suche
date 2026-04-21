@@ -25,5 +25,6 @@ slack:
 app:
   name: Suche
   support_email: contact@eriks.cloud
+  color: '#ffffff'
   base_url: http://suche.test
 APP_CODE: suche
