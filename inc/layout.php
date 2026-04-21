@@ -51,6 +51,22 @@ function render_header(string $title, string $active = ''): void {
 </head>
 <body>
 <?php
+    $appsMenu = [
+        ['href' => 'https://wlmonitor.jardyx.com', 'label' => 'WL Monitor'],
+        ['href' => 'https://energie.jardyx.com',   'label' => 'Energie'],
+        ['href' => 'https://chat.jardyx.com',      'label' => 'Chat'],
+        ['href' => 'https://lastfm.jardyx.com',    'label' => 'Last.fm'],
+        ['href' => 'https://werda.eriks.cloud',    'label' => 'Zeiterfassung'],
+    ];
+    if (defined('APP_ENV') && APP_ENV === 'local') {
+        $appsMenu[] = ['label' => 'Test', 'children' => [
+            ['href' => 'http://wlmonitor.test', 'label' => 'WL Monitor'],
+            ['href' => 'http://energie.test',   'label' => 'Energie'],
+            ['href' => 'http://chat.test',      'label' => 'Chat'],
+            ['href' => 'http://lastfm.test',    'label' => 'Last.fm'],
+            ['href' => 'http://zeit.test',      'label' => 'Zeiterfassung'],
+        ]];
+    }
     Header::render([
         'appName'        => APP_NAME,
         'base'           => $base,
@@ -59,23 +75,7 @@ function render_header(string $title, string $active = ''): void {
         'pageType'       => $active,
         'brandLogoSrc'   => $base . '/jardyx-logo.svg',
         'themeEndpoint'  => $base . '/preferences.php',
-        'appMenu'        => [
-            ['href' => sibling_url('http://wlmonitor.test', 'https://wlmonitor.eriks.cloud', 'https://wlmonitor.jardyx.com'), 'label' => 'WL Monitor'],
-            ['href' => sibling_url('http://energie.test',   'https://energie.eriks.cloud',   'https://energie.jardyx.com'),   'label' => 'Energie'],
-            ['href' => sibling_url('http://chat.test',      'https://chat.eriks.cloud',       'https://chat.jardyx.com'),      'label' => 'Chat'],
-            ['href' => 'https://lastfm.jardyx.com', 'label' => 'Last.fm'],
-            [
-                'label'    => 'Test',
-                'adminOnly' => true,
-                'children' => [
-                    ['href' => sibling_url('http://wlmonitor.test', 'https://wlmonitor.eriks.cloud', 'https://wlmonitor.jardyx.com'),     'label' => 'WL Monitor'],
-                    ['href' => sibling_url('http://energie.test',   'https://energie.eriks.cloud',   'https://energie.jardyx.com'),       'label' => 'Energie'],
-                    ['href' => sibling_url('http://chat.test',      'https://chat.eriks.cloud',       'https://chat.jardyx.com'),          'label' => 'Chat'],
-                    ['href' => 'http://lastfm.test',                                                                                      'label' => 'Last.fm'],
-                    ['href' => sibling_url('http://zeit.test',      'https://werda.eriks.cloud'),                                         'label' => 'Zeiterfassung'],
-                ],
-            ],
-        ],
+        'appsMenu'       => $appsMenu,
     ]);
 ?>
 <main id="main-content" tabindex="-1">

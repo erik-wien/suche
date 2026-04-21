@@ -31,19 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'revoke_all_devices') {
-    if (!csrf_verify()) {
-        http_response_code(403);
-        exit('CSRF token mismatch');
-    }
-    if (auth_remember_revoke_all($con)) {
-        addAlert('success', 'Alle Sitzungen wurden beendet.');
-    } else {
-        addAlert('danger', 'Konnte Sitzungen nicht beenden.');
-    }
-    header('Location: preferences.php#pref-sicherheit'); exit;
-}
-
 $theme = $_SESSION['theme'] ?? 'auto';
 
 render_header('Einstellungen', 'preferences');
@@ -63,8 +50,6 @@ render_header('Einstellungen', 'preferences');
                 data-tab="pref-links" aria-controls="pref-links" aria-selected="false">Links</button>
         <button type="button" class="tab-btn" role="tab"
                 data-tab="pref-feeds" aria-controls="pref-feeds" aria-selected="false">Feeds</button>
-        <button type="button" class="tab-btn" role="tab"
-                data-tab="pref-sicherheit" aria-controls="pref-sicherheit" aria-selected="false">Sicherheit</button>
     </div>
 
     <div class="tab-panel" id="pref-display" role="tabpanel">
@@ -186,22 +171,6 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         </div>
     </div>
 
-    <div class="tab-panel" id="pref-sicherheit" role="tabpanel" hidden>
-        <div class="card mt-3">
-            <div class="card-header">Aktive Sitzungen</div>
-            <div class="card-body">
-                <p>Meldet Sie auf allen Geräten und allen Apps auf eriks.cloud ab.</p>
-                <p class="text-muted small">Aktive Sitzungen auf anderen Apps bleiben bis zu 4 Tage bestehen;
-                    um sie sofort zu beenden, ändern Sie Ihr Kennwort.</p>
-                <form method="post" action="preferences.php"
-                      onsubmit="return confirm('Wirklich von allen Geräten abmelden?')">
-                    <?= csrf_input() ?>
-                    <input type="hidden" name="action" value="revoke_all_devices">
-                    <button type="submit" class="btn btn-outline-danger">Von allen Geräten abmelden</button>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 <div class="modal" id="buttonModal" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
