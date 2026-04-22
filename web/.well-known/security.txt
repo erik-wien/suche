@@ -1,0 +1,5 @@
+Contact: mailto:contact@eriks.cloud
+Expires: 2027-04-22T00:00:00.000Z
+Preferred-Languages: de, en
+Canonical: https://suche.eriks.cloud/.well-known/security.txt
+Canonical: https://www.jardyx.com/.well-known/security.txt

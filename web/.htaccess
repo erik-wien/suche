@@ -1,3 +1,6 @@
+RewriteEngine On
+RewriteRule ^\.well-known/change-password$ /password.php [R=302,L]
+
 # Custom error documents (Jardyx CI)
 ErrorDocument 400 /error/400.html
 ErrorDocument 401 /error/401.html
