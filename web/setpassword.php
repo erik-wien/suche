@@ -36,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $userId !== null) {
         }
     }
 }
-<?php render_anon_header('Passwort einrichten'); ?>
+render_anon_header('Passwort einrichten');
+?>
 <div class="login-wrap">
     <div class="login-card">
         <h2>Passwort einrichten</h2>

@@ -57,7 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 $alerts = $_SESSION['alerts'] ?? [];
 unset($_SESSION['alerts']);
-<?php render_anon_header('Zwei-Faktor-Authentifizierung'); ?>
+render_anon_header('Zwei-Faktor-Authentifizierung');
+?>
 <div class="login-wrap">
     <div class="login-card">
         <h2>2FA-Code eingeben</h2>

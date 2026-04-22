@@ -50,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $resetRow !== null) {
         }
     }
 }
-<?php render_anon_header('Neues Kennwort'); ?>
+render_anon_header('Neues Kennwort');
+?>
 <div class="login-wrap">
     <div class="login-card">
         <h2>Neues Kennwort setzen</h2>

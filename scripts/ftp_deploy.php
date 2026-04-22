@@ -205,10 +205,19 @@ foreach ($files as $file) {
     $name = basename($file);
     if (isset($applied[$name])) { echo "skip $name\n"; continue; }
     $sql = file_get_contents($file);
-    $con->multi_query($sql);
-    do { if ($result = $con->store_result()) $result->free(); }
-    while ($con->more_results() && $con->next_result());
-    if ($con->errno) { echo "FAIL $name: " . $con->error . "\n"; unlink(__FILE__); exit; }
+    $sql = preg_replace('/^\s*USE\s+\S+\s*;\s*$/im', '', $sql);
+    $sql = preg_replace('/\bADD COLUMN IF NOT EXISTS\b/i', 'ADD COLUMN', $sql);
+    $sql = preg_replace('/\bADD INDEX IF NOT EXISTS\b/i', 'ADD INDEX', $sql);
+    try {
+        $con->multi_query($sql);
+        do { if ($result = $con->store_result()) $result->free(); }
+        while ($con->more_results() && $con->next_result());
+    } catch (\mysqli_sql_exception $e) {
+        // errno 1060 = duplicate column, 1061 = duplicate key — idempotent
+        if (!in_array($e->getCode(), [1060, 1061], true)) {
+            echo "FAIL $name: " . $e->getMessage() . "\n"; unlink(__FILE__); exit;
+        }
+    }
     $stmt = $con->prepare('INSERT INTO s_db_migrations (filename) VALUES (?)');
     $stmt->bind_param('s', $name); $stmt->execute(); $stmt->close();
     echo "apply $name\n"; $ran++;

@@ -44,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-<?php render_anon_header('Kennwort vergessen'); ?>
+render_anon_header('Kennwort vergessen');
+?>
 <div class="login-wrap">
     <div class="login-card">
         <h2>Kennwort vergessen</h2>

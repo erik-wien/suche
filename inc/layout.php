@@ -59,7 +59,7 @@ function render_header(string $title, string $active = ''): void {
         ['href' => 'https://werda.eriks.cloud',    'label' => 'Zeiterfassung'],
     ];
     if (defined('APP_ENV') && APP_ENV === 'local') {
-        $appsMenu[] = ['label' => 'Test', 'children' => [
+        $appsMenu[] = ['label' => 'Test', 'adminOnly' => true, 'children' => [
             ['href' => 'http://wlmonitor.test', 'label' => 'WL Monitor'],
             ['href' => 'http://energie.test',   'label' => 'Energie'],
             ['href' => 'http://chat.test',      'label' => 'Chat'],

@@ -9,7 +9,8 @@ if (!empty($_SESSION['loggedin'])) {
 $alerts    = $_SESSION['alerts'] ?? [];
 unset($_SESSION['alerts']);
 $remembered = htmlspecialchars($_COOKIE['suche_username'] ?? '', ENT_QUOTES, 'UTF-8');
-<?php render_anon_header('Anmelden'); ?>
+render_anon_header('Anmelden');
+?>
 <div class="login-wrap">
     <div class="login-card">
         <h2>Anmelden</h2>
