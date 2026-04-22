@@ -31,7 +31,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
     exit;
 }
 
+$avatarError = null;
+$emailError  = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upload_avatar') {
+    if (!csrf_verify()) {
+        http_response_code(403);
+        exit('CSRF token mismatch');
+    }
+    $res = \Erikr\Chrome\AvatarUpload::handle($con, $uid, $_FILES['avatar'] ?? null);
+    if ($res['ok']) {
+        appendLog($con, 'prefs', 'Avatar updated (' . $res['size'] . ' bytes).');
+        addAlert('success', 'Profilbild aktualisiert.');
+        header('Location: preferences.php#profilbild'); exit;
+    }
+    $avatarError = match ($res['error']) {
+        'upload_failed'                  => 'Upload fehlgeschlagen.',
+        'too_large'                      => 'Maximal 5 MB.',
+        'not_image'                      => 'Nur Bilder (JPEG, PNG, GIF, WebP).',
+        'too_small'                      => 'Mindestens 64×64 Pixel.',
+        'decode_failed', 'encode_failed' => 'Bild konnte nicht verarbeitet werden.',
+        default                          => 'Fehler beim Hochladen.',
+    };
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'change_email') {
+    if (!csrf_verify()) {
+        http_response_code(403);
+        exit('CSRF token mismatch');
+    }
+    $newEmail  = trim($_POST['email'] ?? '');
+    $emailPass = $_POST['email_password'] ?? '';
+    if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+        $emailError = 'Ungültige E-Mail-Adresse.';
+    } elseif ($emailPass === '') {
+        $emailError = 'Bitte Kennwort zur Bestätigung eingeben.';
+    } else {
+        $stmt2 = $con->prepare('SELECT password FROM auth_accounts WHERE id = ?');
+        $stmt2->bind_param('i', $uid);
+        $stmt2->execute();
+        $pwRow = $stmt2->get_result()->fetch_assoc();
+        $stmt2->close();
+        if (!$pwRow || !password_verify($emailPass, $pwRow['password'])) {
+            $emailError = 'Das Kennwort ist falsch.';
+        } else {
+            $chk = $con->prepare('SELECT id FROM auth_accounts WHERE email = ? AND id != ?');
+            $chk->bind_param('si', $newEmail, $uid);
+            $chk->execute();
+            $chk->store_result();
+            $taken = $chk->num_rows > 0;
+            $chk->close();
+            if ($taken) {
+                $emailError = 'Diese E-Mail-Adresse ist bereits vergeben.';
+            } else {
+                $code = auth_email_confirmation_issue($con, $uid, $newEmail)['token'];
+                $confirmUrl = APP_BASE_URL . '/confirm_email.php?code=' . urlencode($code);
+                if (mail_send_email_change_confirmation($newEmail, $username, $confirmUrl)) {
+                    appendLog($con, 'prefs', 'Email change requested');
+                    addAlert('info', 'Bestätigungslink wurde an die neue E-Mail-Adresse gesendet.');
+                    header('Location: preferences.php#email'); exit;
+                }
+                appendLog($con, 'prefs', 'Email send failed');
+                $emailError = 'Die Bestätigungs-E-Mail konnte nicht gesendet werden.';
+            }
+        }
+    }
+}
+
 $theme = $_SESSION['theme'] ?? 'auto';
+
+$emailStmt = $con->prepare('SELECT email FROM auth_accounts WHERE id = ?');
+$emailStmt->bind_param('i', $uid);
+$emailStmt->execute();
+$currentEmail = htmlspecialchars(
+    $emailStmt->get_result()->fetch_assoc()['email'] ?? '', ENT_QUOTES, 'UTF-8'
+);
+$emailStmt->close();
 
 render_header('Einstellungen', 'preferences');
 ?>
@@ -50,6 +125,10 @@ render_header('Einstellungen', 'preferences');
                 data-tab="pref-links" aria-controls="pref-links" aria-selected="false">Links</button>
         <button type="button" class="tab-btn" role="tab"
                 data-tab="pref-feeds" aria-controls="pref-feeds" aria-selected="false">Feeds</button>
+        <button type="button" class="tab-btn" role="tab"
+                data-tab="pref-profilbild" aria-controls="pref-profilbild" aria-selected="false">Profilbild</button>
+        <button type="button" class="tab-btn" role="tab"
+                data-tab="pref-email" aria-controls="pref-email" aria-selected="false">E-Mail</button>
     </div>
 
     <div class="tab-panel" id="pref-display" role="tabpanel">
@@ -167,6 +246,61 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-panel" id="pref-profilbild" role="tabpanel" hidden>
+        <div class="card mt-3">
+            <div class="card-header">Profilbild</div>
+            <div class="card-body">
+                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+                    <img src="<?= $base ?>/avatar.php" class="avatar-preview"
+                         style="width:4rem;height:4rem;border-radius:50%;object-fit:cover"
+                         alt="Profilbild">
+                    <span class="text-muted small">JPEG, PNG, GIF oder WebP · max. 5 MB</span>
+                </div>
+                <?php if ($avatarError): ?>
+                    <div class="alert alert-danger" role="alert"><?= htmlspecialchars($avatarError, ENT_QUOTES, 'UTF-8') ?></div>
+                <?php endif; ?>
+                <form method="post" action="preferences.php#profilbild" enctype="multipart/form-data">
+                    <?= csrf_input() ?>
+                    <input type="hidden" name="action" value="upload_avatar">
+                    <div class="input-group">
+                        <input type="file" class="form-control" name="avatar"
+                               accept="image/jpeg,image/png,image/gif,image/webp" required>
+                        <button class="btn btn-outline-success" type="submit">Hochladen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-panel" id="pref-email" role="tabpanel" hidden>
+        <div class="card mt-3">
+            <div class="card-header">E-Mail-Adresse</div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Aktuell: <strong><?= $currentEmail ?: '(keine)' ?></strong><br>
+                    Nach dem Speichern erhältst du einen Bestätigungslink an die neue Adresse.
+                </p>
+                <?php if ($emailError): ?>
+                    <div class="alert alert-danger" role="alert"><?= htmlspecialchars($emailError, ENT_QUOTES, 'UTF-8') ?></div>
+                <?php endif; ?>
+                <form method="post" action="preferences.php#email">
+                    <?= csrf_input() ?>
+                    <input type="hidden" name="action" value="change_email">
+                    <div class="form-group">
+                        <label for="newEmail">Neue E-Mail-Adresse</label>
+                        <input type="email" id="newEmail" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailPassword">Kennwort zur Bestätigung</label>
+                        <input type="password" id="emailPassword" name="email_password"
+                               class="form-control" autocomplete="current-password" required>
+                    </div>
+                    <button class="btn btn-outline-success" type="submit">Bestätigungslink senden</button>
+                </form>
             </div>
         </div>
     </div>

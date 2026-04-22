@@ -75,6 +75,10 @@ function render_header(string $title, string $active = ''): void {
         'pageType'       => $active,
         'brandLogoSrc'   => $base . '/jardyx-logo.svg',
         'themeEndpoint'  => $base . '/preferences.php',
+        'profileHref'    => $base . '/preferences.php#profilbild',
+        'emailHref'      => $base . '/preferences.php#email',
+        'appPrefsHref'   => $base . '/preferences.php',
+        'appPrefsLabel'  => 'Anwendung',
         'appsMenu'       => $appsMenu,
     ]);
 ?>
