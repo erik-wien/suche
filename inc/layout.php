@@ -77,6 +77,7 @@ function render_header(string $title, string $active = ''): void {
         'themeEndpoint'  => $base . '/preferences.php',
         'profileHref'    => $base . '/preferences.php#profilbild',
         'emailHref'      => $base . '/preferences.php#email',
+        'securityHref'   => $base . '/security.php',
         'appPrefsHref'   => $base . '/preferences.php',
         'appPrefsLabel'  => 'Anwendung',
         'appsMenu'       => $appsMenu,

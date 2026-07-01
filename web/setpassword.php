@@ -43,11 +43,11 @@ render_anon_header('Passwort einrichten');
         <h2>Passwort einrichten</h2>
 
         <?php if ($userId === null): ?>
-            <div class="alert alert-danger">Dieser Einladungslink ist ungültig oder abgelaufen.</div>
+            <div class="app-alert app-alert-danger">Dieser Einladungslink ist ungültig oder abgelaufen.</div>
             <div class="login-links"><a href="login.php">Zur Anmeldung</a></div>
         <?php else: ?>
             <?php if ($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+                <div class="app-alert app-alert-danger"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
             <form method="post" action="setpassword.php?token=<?= urlencode($token) ?>">
                 <?= csrf_input() ?>

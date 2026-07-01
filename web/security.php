@@ -21,7 +21,7 @@ $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_verify()) {
         addAlert('danger', 'Ungültige Anfrage.');
-        header('Location: password.php'); exit;
+        header('Location: security.php'); exit;
     }
 
     $action = $_POST['action'] ?? '';
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 auth_change_password($con, $userId, $new1);
                 appendLog($con, 'npw', 'Success: password changed for ' . ($_SESSION['username'] ?? ''), 'suche');
                 addAlert('success', 'Kennwort erfolgreich geändert.');
-                header('Location: password.php'); exit;
+                header('Location: security.php'); exit;
             }
         }
     }
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors['totp'] = 'Konto nicht gefunden.';
         }
         if (empty($errors['totp'])) {
-            header('Location: password.php'); exit;
+            header('Location: security.php'); exit;
         }
     }
 
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 unset($_SESSION['totp_setup_secret']);
                 appendLog($con, 'auth', ($_SESSION['username'] ?? '') . ' enabled 2FA.', 'suche');
                 addAlert('success', '2FA ist jetzt aktiv.');
-                header('Location: password.php'); exit;
+                header('Location: security.php'); exit;
             }
             $errors['totp'] = 'Code ungültig. Bitte erneut versuchen.';
         }
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['totp_setup_secret']);
         appendLog($con, 'auth', ($_SESSION['username'] ?? '') . ' disabled 2FA.', 'suche');
         addAlert('success', '2FA wurde deaktiviert.');
-        header('Location: password.php'); exit;
+        header('Location: security.php'); exit;
     }
 
     // ── Revoke all remember-me tokens ─────────────────────────────────────────
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             addAlert('danger', 'Konnte Sitzungen nicht beenden.');
         }
-        header('Location: password.php'); exit;
+        header('Location: security.php'); exit;
     }
 
     // ── Revoke a single remember-me token ─────────────────────────────────────
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             addAlert('danger', 'Konnte Sitzung nicht beenden.');
         }
-        header('Location: password.php'); exit;
+        header('Location: security.php'); exit;
     }
 }
 
@@ -150,23 +150,35 @@ if (!$has2fa && $setupData !== null && time() <= $setupData['until']) {
                  . '" width="200" height="200" alt="QR Code">';
 }
 
-render_header('Passwort &amp; 2FA', 'password');
+render_header('Sicherheit', 'security');
 ?>
 
-    <div class="pref-section">
+    <div class="container-md" style="padding-block:1.5rem">
+        <h1>Sicherheit</h1>
 
         <?php foreach ($_SESSION['alerts'] ?? [] as [$type, $msg]): ?>
-            <div class="alert alert-<?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>"><?= $msg ?></div>
+            <div class="app-alert app-alert-<?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>"
+                 role="alert"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
         <?php endforeach; unset($_SESSION['alerts']); ?>
 
+        <div class="app-tabs" role="tablist">
+            <button type="button" class="app-tab active" role="tab"
+                    data-tab="sec-password" aria-controls="sec-password" aria-selected="true">Kennwort</button>
+            <button type="button" class="app-tab" role="tab"
+                    data-tab="sec-totp" aria-controls="sec-totp" aria-selected="false">2FA</button>
+            <button type="button" class="app-tab" role="tab"
+                    data-tab="sec-sessions" aria-controls="sec-sessions" aria-selected="false">Sitzungen</button>
+        </div>
+
+    <div class="app-tab-panel" id="sec-password" role="tabpanel">
         <!-- Kennwort -->
-        <div class="pref-card">
-            <div class="pref-card-hdr">Kennwort ändern</div>
-            <div class="pref-card-body">
+        <div class="app-card mt-3">
+            <div class="app-card-header">Kennwort ändern</div>
+            <div class="app-card-body">
                 <?php if (!empty($errors['password'])): ?>
-                    <div class="alert alert-danger"><?= htmlspecialchars($errors['password'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="app-alert app-alert-danger"><?= htmlspecialchars($errors['password'], ENT_QUOTES, 'UTF-8') ?></div>
                 <?php endif; ?>
-                <form method="post" action="password.php">
+                <form method="post" action="security.php">
                     <?= csrf_input() ?>
                     <input type="hidden" name="action" value="change_password">
                     <div class="form-group">
@@ -184,17 +196,20 @@ render_header('Passwort &amp; 2FA', 'password');
                         <input type="password" id="newPassword2" name="newPassword2"
                                class="form-control" autocomplete="new-password" minlength="8" required>
                     </div>
-                    <button class="btn btn-outline-success" type="submit">Speichern</button>
+                    <button class="btn btn-outline-danger" type="submit">Speichern</button>
                 </form>
             </div>
         </div>
 
+    </div><!-- /app-tab-panel sec-password -->
+
+    <div class="app-tab-panel" id="sec-totp" role="tabpanel" hidden>
         <!-- Zwei-Faktor-Authentifizierung -->
-        <div class="pref-card">
-            <div class="pref-card-hdr">Zwei-Faktor-Authentifizierung</div>
-            <div class="pref-card-body">
+        <div class="app-card mt-3">
+            <div class="app-card-header">Zwei-Faktor-Authentifizierung</div>
+            <div class="app-card-body">
                 <?php if (!empty($errors['totp'])): ?>
-                    <div class="alert alert-danger">
+                    <div class="app-alert app-alert-danger">
                         <?= htmlspecialchars($errors['totp'], ENT_QUOTES, 'UTF-8') ?>
                     </div>
                 <?php endif; ?>
@@ -203,7 +218,7 @@ render_header('Passwort &amp; 2FA', 'password');
                     <p class="text-muted" style="margin-bottom:.75rem">
                         Dein Konto ist mit einem TOTP-Authenticator gesichert.
                     </p>
-                    <form method="post" action="password.php"
+                    <form method="post" action="security.php"
                           onsubmit="return confirm('2FA wirklich deaktivieren?');">
                         <?= csrf_input() ?>
                         <input type="hidden" name="action" value="totp_disable">
@@ -219,7 +234,7 @@ render_header('Passwort &amp; 2FA', 'password');
                         Oder gib den Code manuell ein:
                         <span class="totp-secret"><?= htmlspecialchars($setupSecret, ENT_QUOTES, 'UTF-8') ?></span>
                     </p>
-                    <form method="post" action="password.php">
+                    <form method="post" action="security.php">
                         <?= csrf_input() ?>
                         <input type="hidden" name="action" value="totp_confirm">
                         <div class="form-group">
@@ -229,7 +244,7 @@ render_header('Passwort &amp; 2FA', 'password');
                                    autocomplete="one-time-code" required autofocus
                                    class="totp-code-input" style="max-width:200px;">
                         </div>
-                        <button type="submit" class="btn btn-outline-success">Bestätigen</button>
+                        <button type="submit" class="btn btn-outline-danger">Bestätigen</button>
                     </form>
 
                 <?php else: ?>
@@ -237,19 +252,22 @@ render_header('Passwort &amp; 2FA', 'password');
                         2FA ist derzeit nicht aktiviert. Aktiviere es, um dein Konto mit einem
                         zweiten Faktor zu schützen.
                     </p>
-                    <form method="post" action="password.php">
+                    <form method="post" action="security.php">
                         <?= csrf_input() ?>
                         <input type="hidden" name="action" value="totp_start">
-                        <button type="submit" class="btn btn-outline-success">2FA aktivieren</button>
+                        <button type="submit" class="btn btn-outline-danger">2FA aktivieren</button>
                     </form>
                 <?php endif; ?>
             </div>
         </div>
 
+    </div><!-- /app-tab-panel sec-totp -->
+
+    <div class="app-tab-panel" id="sec-sessions" role="tabpanel" hidden>
         <!-- Aktive Sitzungen -->
-        <div class="pref-card">
-            <div class="pref-card-hdr">Aktive Sitzungen</div>
-            <div class="pref-card-body">
+        <div class="app-card mt-3">
+            <div class="app-card-header">Aktive Sitzungen</div>
+            <div class="app-card-body">
                 <?php if (!empty($sessions)): ?>
                     <div class="table-responsive">
                         <table class="table table-sm">
@@ -271,14 +289,14 @@ render_header('Passwort &amp; 2FA', 'password');
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="icon-info-circle" tabindex="0" role="img"><title><?= htmlspecialchars($s['user_agent'], ENT_QUOTES, 'UTF-8') ?></title><circle cx="8" cy="8" r="7" fill="currentColor"/><text x="8" y="12" text-anchor="middle" font-family="'Times New Roman', Times, serif" font-size="11" font-weight="bold" font-style="italic" fill="#fff">i</text></svg>
                                             <?php endif; ?>
                                             <?php if ($s['is_current']): ?>
-                                                <span class="badge badge-info">Diese Sitzung</span>
+                                                <span class="app-badge app-badge-info">Diese Sitzung</span>
                                             <?php endif; ?>
                                         </td>
                                         <td><code><?= htmlspecialchars($s['ip'], ENT_QUOTES, 'UTF-8') ?></code></td>
                                         <td><?= htmlspecialchars(substr($s['created_at'], 0, 16), ENT_QUOTES, 'UTF-8') ?></td>
                                         <td><?= htmlspecialchars(substr($s['expires_at'], 0, 16), ENT_QUOTES, 'UTF-8') ?></td>
                                         <td>
-                                            <form method="post" action="password.php"
+                                            <form method="post" action="security.php"
                                                   <?= $s['is_current'] ? 'onsubmit="return confirm(\'Das ist Ihre aktuelle Sitzung. Wirklich abmelden?\')"' : '' ?>>
                                                 <?= csrf_input() ?>
                                                 <input type="hidden" name="action" value="revoke_one_device">
@@ -296,7 +314,7 @@ render_header('Passwort &amp; 2FA', 'password');
                     Aktive Sitzungen auf anderen Apps bleiben bis zu 4 Tage bestehen;
                     um sie sofort zu beenden, ändern Sie Ihr Kennwort.
                 </p>
-                <form method="post" action="password.php"
+                <form method="post" action="security.php"
                       onsubmit="return confirm('Wirklich von allen Geräten abmelden?')">
                     <?= csrf_input() ?>
                     <input type="hidden" name="action" value="revoke_all_devices">
@@ -304,7 +322,8 @@ render_header('Passwort &amp; 2FA', 'password');
                 </form>
             </div>
         </div>
+    </div><!-- /app-tab-panel sec-sessions -->
 
-    </div>
+    </div><!-- /container-md -->
 
 <?php render_footer(); ?>

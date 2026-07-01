@@ -114,26 +114,26 @@ render_header('Einstellungen', 'preferences');
     <h1>Einstellungen</h1>
 
     <?php foreach ($_SESSION['alerts'] ?? [] as [$type, $msg]): ?>
-        <div class="alert alert-<?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>"
+        <div class="app-alert app-alert-<?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>"
              role="alert"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endforeach; unset($_SESSION['alerts']); ?>
 
-    <div class="tab-bar" role="tablist">
-        <button type="button" class="tab-btn active" role="tab"
+    <div class="app-tabs" role="tablist">
+        <button type="button" class="app-tab active" role="tab"
                 data-tab="pref-display" aria-controls="pref-display" aria-selected="true">Darstellung</button>
-        <button type="button" class="tab-btn" role="tab"
+        <button type="button" class="app-tab" role="tab"
                 data-tab="pref-links" aria-controls="pref-links" aria-selected="false">Links</button>
-        <button type="button" class="tab-btn" role="tab"
+        <button type="button" class="app-tab" role="tab"
                 data-tab="pref-feeds" aria-controls="pref-feeds" aria-selected="false">Feeds</button>
-        <button type="button" class="tab-btn" role="tab"
+        <button type="button" class="app-tab" role="tab"
                 data-tab="pref-profilbild" aria-controls="pref-profilbild" aria-selected="false">Profilbild</button>
-        <button type="button" class="tab-btn" role="tab"
+        <button type="button" class="app-tab" role="tab"
                 data-tab="pref-email" aria-controls="pref-email" aria-selected="false">E-Mail</button>
     </div>
 
-    <div class="tab-panel" id="pref-display" role="tabpanel">
-        <div class="card mt-3">
-            <div class="card-body">
+    <div class="app-tab-panel" id="pref-display" role="tabpanel">
+        <div class="app-card mt-3">
+            <div class="app-card-body">
                 <h3>Theme</h3>
                 <p class="text-muted">
                     Wähle das Farbschema. <em>Auto</em> folgt deiner Systemeinstellung.
@@ -147,13 +147,13 @@ render_header('Einstellungen', 'preferences');
         </div>
     </div>
 
-    <div class="tab-panel" id="pref-links" role="tabpanel" hidden>
-        <div class="card mt-3">
-            <div class="card-header card-header-split">
+    <div class="app-tab-panel" id="pref-links" role="tabpanel" hidden>
+        <div class="app-card mt-3">
+            <div class="app-card-header app-card-header-split">
                 <h3>Links</h3>
-                <button type="button" class="btn btn-outline-success btn-sm" data-modal-open="buttonModal" id="btnAddButton">Neuer Link</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-modal-open="buttonModal" id="btnAddButton">Neuer Link</button>
             </div>
-            <div class="card-body">
+            <div class="app-card-body">
                 <table class="table table-sm table-hover" id="buttonsTable">
                     <thead>
                         <tr>
@@ -179,13 +179,13 @@ render_header('Einstellungen', 'preferences');
                                             data-id="<?= (int)$b['id'] ?>"
                                             data-caption="<?= htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8') ?>"
                                             data-url="<?= htmlspecialchars($b['url'], ENT_QUOTES, 'UTF-8') ?>"
-                                            data-variant="<?= htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-variant="<?= htmlspecialchars(button_normalize_variant((string)$b['variant']), ENT_QUOTES, 'UTF-8') ?>"
 data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><span class="ui-icon ui-icon-edit" aria-hidden="true"></span></button>
                                     <button class="btn btn-sm btn-copy-button" type="button"
                                             title="Kopieren"
                                             data-caption="<?= htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8') ?>"
                                             data-url="<?= htmlspecialchars($b['url'], ENT_QUOTES, 'UTF-8') ?>"
-                                            data-variant="<?= htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-variant="<?= htmlspecialchars(button_normalize_variant((string)$b['variant']), ENT_QUOTES, 'UTF-8') ?>"
 data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>">⧉</button>
                                     <button class="btn btn-sm btn-danger btn-delete-button" type="button"
                                             title="Löschen"
@@ -199,13 +199,13 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         </div>
     </div>
 
-    <div class="tab-panel" id="pref-feeds" role="tabpanel" hidden>
-        <div class="card mt-3">
-            <div class="card-header card-header-split">
+    <div class="app-tab-panel" id="pref-feeds" role="tabpanel" hidden>
+        <div class="app-card mt-3">
+            <div class="app-card-header app-card-header-split">
                 <h3>Feeds</h3>
-                <button type="button" class="btn btn-outline-success btn-sm" id="btnAddFeed">Neuer Feed</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btnAddFeed">Neuer Feed</button>
             </div>
-            <div class="card-body">
+            <div class="app-card-body">
                 <table class="table table-sm table-hover" id="feedsTable">
                     <thead>
                         <tr>
@@ -250,10 +250,10 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         </div>
     </div>
 
-    <div class="tab-panel" id="pref-profilbild" role="tabpanel" hidden>
-        <div class="card mt-3">
-            <div class="card-header">Profilbild</div>
-            <div class="card-body">
+    <div class="app-tab-panel" id="pref-profilbild" role="tabpanel" hidden>
+        <div class="app-card mt-3">
+            <div class="app-card-header">Profilbild</div>
+            <div class="app-card-body">
                 <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
                     <img src="<?= $base ?>/avatar.php" class="avatar-preview"
                          style="width:4rem;height:4rem;border-radius:50%;object-fit:cover"
@@ -261,7 +261,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                     <span class="text-muted small">JPEG, PNG, GIF oder WebP · max. 5 MB</span>
                 </div>
                 <?php if ($avatarError): ?>
-                    <div class="alert alert-danger" role="alert"><?= htmlspecialchars($avatarError, ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="app-alert app-alert-danger" role="alert"><?= htmlspecialchars($avatarError, ENT_QUOTES, 'UTF-8') ?></div>
                 <?php endif; ?>
                 <form method="post" action="preferences.php#profilbild" enctype="multipart/form-data">
                     <?= csrf_input() ?>
@@ -269,23 +269,23 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                     <div class="input-group">
                         <input type="file" class="form-control" name="avatar"
                                accept="image/jpeg,image/png,image/gif,image/webp" required>
-                        <button class="btn btn-outline-success" type="submit">Hochladen</button>
+                        <button class="btn btn-outline-danger" type="submit">Hochladen</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="tab-panel" id="pref-email" role="tabpanel" hidden>
-        <div class="card mt-3">
-            <div class="card-header">E-Mail-Adresse</div>
-            <div class="card-body">
+    <div class="app-tab-panel" id="pref-email" role="tabpanel" hidden>
+        <div class="app-card mt-3">
+            <div class="app-card-header">E-Mail-Adresse</div>
+            <div class="app-card-body">
                 <p class="text-muted small">
                     Aktuell: <strong><?= $currentEmail ?: '(keine)' ?></strong><br>
                     Nach dem Speichern erhältst du einen Bestätigungslink an die neue Adresse.
                 </p>
                 <?php if ($emailError): ?>
-                    <div class="alert alert-danger" role="alert"><?= htmlspecialchars($emailError, ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="app-alert app-alert-danger" role="alert"><?= htmlspecialchars($emailError, ENT_QUOTES, 'UTF-8') ?></div>
                 <?php endif; ?>
                 <form method="post" action="preferences.php#email">
                     <?= csrf_input() ?>
@@ -299,23 +299,25 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         <input type="password" id="emailPassword" name="email_password"
                                class="form-control" autocomplete="current-password" required>
                     </div>
-                    <button class="btn btn-outline-success" type="submit">Bestätigungslink senden</button>
+                    <button class="btn btn-outline-danger" type="submit">Bestätigungslink senden</button>
                 </form>
             </div>
         </div>
     </div>
 
 </div>
-<div class="modal" id="buttonModal" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="buttonModalTitle">Neuer Link</h4>
-                <button type="button" class="close" data-modal-close>&times;</button>
+<div class="app-modal-backdrop" id="buttonModal" role="dialog" aria-modal="true" aria-labelledby="buttonModalTitle" aria-hidden="true" hidden>
+    <div class="app-modal-dialog">
+        <div class="app-modal-content">
+            <div class="app-modal-header">
+                <div class="app-modal-header-row">
+                    <h4 class="app-modal-title" id="buttonModalTitle">Neuer Link</h4>
+                    <button type="button" class="app-modal-close" data-modal-close aria-label="Schließen">&times;</button>
+                </div>
             </div>
             <form id="buttonForm">
                 <input type="hidden" name="id" id="bf-id" value="">
-                <div class="modal-body">
+                <div class="app-modal-body">
                     <div id="bf-preview-wrap" style="display:flex;align-items:center;justify-content:center;min-height:3.5rem;margin-bottom:1rem;padding:.75rem;background:var(--color-surface-alt);border:1px solid var(--color-border);border-radius:var(--radius)">
                         <div id="bf-preview"></div>
                     </div>
@@ -331,12 +333,12 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         <label for="bf-variant">Farbe</label>
                         <select class="form-select" id="bf-variant" name="variant">
                             <option value="btn-default">Standard</option>
-                            <option value="btn-success">Success (grün)</option>
-                            <option value="btn-warning">Warning (gelb)</option>
-                            <option value="btn-danger">Danger (rot)</option>
-                            <option value="btn-secondary">Secondary</option>
-                            <option value="btn-dark">Dunkel</option>
-                            <option value="btn-light">Hell</option>
+                            <option value="btn-color-green">Grün</option>
+                            <option value="btn-color-yellow">Gelb</option>
+                            <option value="btn-color-red">Rot</option>
+                            <option value="btn-color-neutral">Neutral</option>
+                            <option value="btn-color-grey-dark">Dunkel</option>
+                            <option value="btn-color-grey-light">Hell</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -372,9 +374,9 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="app-modal-footer">
                     <button type="button" class="btn" data-modal-close>Abbrechen</button>
-                    <button type="submit" class="btn btn-outline-success">Speichern</button>
+                    <button type="submit" class="btn btn-outline-danger">Speichern</button>
                 </div>
             </form>
         </div>
@@ -494,9 +496,9 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     });
     // ─────────────────────────────────────────────────────────────────────────
 
-    function openModal()  { modal.classList.add('open'); }
+    function openModal()  { modal.hidden = false; }
     function closeModal() {
-        modal.classList.remove('open');
+        modal.hidden = true;
         form.reset();
         document.getElementById('bf-id').value = '';
         setIconPicker('');
@@ -509,7 +511,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     modal.querySelectorAll('[data-modal-close]').forEach((el) =>
         el.addEventListener('click', closeModal)
     );
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    modal.addEventListener('pointerdown', (e) => { if (e.target === modal) closeModal(); });
 
     function fillForm(data) {
         document.getElementById('bf-caption').value = data.caption || '';
@@ -568,16 +570,18 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
 })();
 </script>
 
-<div class="modal" id="feedModal" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="feedModalTitle">Neuer Feed</h4>
-                <button type="button" class="close" data-modal-close>&times;</button>
+<div class="app-modal-backdrop" id="feedModal" role="dialog" aria-modal="true" aria-labelledby="feedModalTitle" aria-hidden="true" hidden>
+    <div class="app-modal-dialog">
+        <div class="app-modal-content">
+            <div class="app-modal-header">
+                <div class="app-modal-header-row">
+                    <h4 class="app-modal-title" id="feedModalTitle">Neuer Feed</h4>
+                    <button type="button" class="app-modal-close" data-modal-close aria-label="Schließen">&times;</button>
+                </div>
             </div>
             <form id="feedForm">
                 <input type="hidden" name="id" id="ff-id" value="">
-                <div class="modal-body">
+                <div class="app-modal-body">
                     <div class="form-group">
                         <label for="ff-title">Titel</label>
                         <input type="text" class="form-control" id="ff-title" name="title" required maxlength="64">
@@ -623,9 +627,9 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         <label class="form-check-label" for="ff-enabled">Aktiv</label>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="app-modal-footer">
                     <button type="button" class="btn" data-modal-close>Abbrechen</button>
-                    <button type="submit" class="btn btn-outline-success">Speichern</button>
+                    <button type="submit" class="btn btn-outline-danger">Speichern</button>
                 </div>
             </form>
         </div>
@@ -689,9 +693,9 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     });
 
     // ── Modal open/close ──────────────────────────────────────────────────────
-    function openModal()  { modal.classList.add('open'); }
+    function openModal()  { modal.hidden = false; }
     function closeModal() {
-        modal.classList.remove('open');
+        modal.hidden = true;
         form.reset();
         document.getElementById('ff-id').value = '';
         setFeedIconPicker('');
@@ -705,7 +709,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     modal.querySelectorAll('[data-modal-close]').forEach((el) =>
         el.addEventListener('click', closeModal)
     );
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    modal.addEventListener('pointerdown', (e) => { if (e.target === modal) closeModal(); });
 
     document.querySelectorAll('.btn-edit-feed').forEach((btn) =>
         btn.addEventListener('click', () => {
@@ -760,6 +764,24 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     document.querySelectorAll('.btn-move-down-feed').forEach((b) =>
         b.addEventListener('click', () => moveFeed(b.closest('tr'), +1))
     );
+})();
+</script>
+<script nonce="<?= $_cspNonce ?>">
+(function () {
+    'use strict';
+    // Wire the Darstellung-tab theme buttons (the header user-menu switcher is
+    // handled separately by the shared Chrome library).
+    const btns = document.querySelectorAll('#pref-display .theme-btn');
+    btns.forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const t = btn.dataset.theme;
+            if (t === 'auto') { delete document.documentElement.dataset.theme; }
+            else { document.documentElement.dataset.theme = t; }
+            btns.forEach((b) => b.classList.toggle('active', b.dataset.theme === t));
+            document.cookie = 'theme=' + t + ';path=/;max-age=' + (365 * 86400) + ';samesite=Lax';
+            await sucheFetch('preferences.php', { action: 'change_theme', theme: t });
+        });
+    });
 })();
 </script>
 <?php
