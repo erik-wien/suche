@@ -52,15 +52,16 @@ final class ButtonsValidateTest extends TestCase
         self::assertStringContainsString('http', $err);
     }
 
-    public function testRejectsUnknownVariant(): void
+    public function testNormalizesUnknownVariantToDefault(): void
     {
-        [$ok, $err] = buttons_validate([
+        [$ok, $err, $row] = buttons_validate([
             'caption' => 'X',
             'url'     => 'https://example.com/',
             'variant' => 'btn-rainbow',
         ]);
-        self::assertFalse($ok);
-        self::assertStringContainsString('Variant', $err);
+        self::assertTrue($ok);
+        self::assertNull($err);
+        self::assertSame('btn-default', $row['variant']);
     }
 
     public function testRejectsInvalidImgUrl(): void
