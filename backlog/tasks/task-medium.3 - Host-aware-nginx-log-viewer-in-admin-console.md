@@ -1,10 +1,10 @@
 ---
 id: TASK-MEDIUM.3
 title: Host-aware nginx-log viewer in admin console
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-07-01 14:59'
-updated_date: '2026-07-01 14:59'
+updated_date: '2026-07-02 04:37'
 labels: []
 dependencies: []
 parent_task_id: TASK-MEDIUM
@@ -18,13 +18,15 @@ Add a paginated, filterable Nginx-Log tab to web/admin.php (access + error), adm
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Nginx-Log tab visible to admins on local/akadbrain; absent on world4you and nginxlog_list returns 404
-- [ ] #2 Non-admins never see the tab; API rejects them 403; CSRF enforced on the endpoint
-- [ ] #3 Access + error logs render newest-first with working pagination (tail-window reader)
-- [ ] #4 Status (exact + 2xx/4xx/5xx class), free-text, and date-range filters work and combine
-- [ ] #5 Missing/unreadable log yields a clean 'nicht lesbar' message, no fatal error
-- [ ] #6 Parser + filter + enablement unit tests pass (phpunit); output escaped; inline script carries CSP nonce
+- [x] #1 Nginx-Log tab visible to admins on local/akadbrain; absent on world4you and nginxlog_list returns 404
+- [x] #2 Non-admins never see the tab; API rejects them 403; CSRF enforced on the endpoint
+- [x] #3 Access + error logs render newest-first with working pagination (tail-window reader)
+- [x] #4 Status (exact + 2xx/4xx/5xx class), free-text, and date-range filters work and combine
+- [x] #5 Missing/unreadable log yields a clean 'nicht lesbar' message, no fatal error
+- [x] #6 Parser + filter + enablement unit tests pass (phpunit); output escaped; inline script carries CSP nonce
 <!-- AC:END -->
+
+
 
 ## Implementation Plan
 

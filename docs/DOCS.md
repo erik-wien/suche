@@ -349,15 +349,51 @@ Requires Admin rights. CSRF-protected. Delegates to `admin_*_user()` helpers fro
 
 ## 10. Admin console
 
-`web/admin.php` — three-tab layout per ecosystem convention:
+`web/admin.php` — tab layout per ecosystem convention:
 
 | Tab | Content |
 |---|---|
-| **App** | (placeholder — no app-specific parameters yet) |
-| **Users** | User table with Edit / Deactivate / Reset password / Revoke 2FA / Delete actions |
+| **Suchmaschinen** | Read-only list from `inc/search_engines.yaml` (edit the file + redeploy to change) |
+| **Icons** | Upload / rename / delete icon files served from `web/icons/` |
+| **Benutzer** | User table with Edit / Deactivate / Reset password / Revoke 2FA / Delete actions |
 | **Log** | Read-only view of `auth_log`, filterable by app / context / user / date / keyword |
+| **Nginx-Log** | Host-gated nginx access/error log viewer (§10.1) — absent on world4you |
 
-Tab switching is client-side only (no page reload). All write actions are POST + CSRF via `adminPost()` JS helper. User table reuses the shared `.table` component. Log tab paginates at 50 rows/page via the shared `.pagination` component.
+Tab switching is client-side only (no page reload), driven by `web/js/app.js`'s
+`activateTab()` / `sucheActivateTab()`. All write actions are POST + CSRF via the
+inline `apiPost()` helper (`api.php?action=...`). User table reuses the shared
+`.table` component. Log / Nginx-Log tabs paginate via the shared `.pagination`
+component.
+
+### 10.1 Nginx-Log tab
+
+Backed by `inc/nginx_log.php`. Enablement and file paths are keyed off
+`config.yaml`'s `target` via the `NGINX_LOG_HOSTS` map:
+
+- **Enabled:** `local`, `akadbrain`. **Absent:** `world4you` — the tab isn't
+  rendered and `api.php?action=nginxlog_list` returns `404` (not just 403), so the
+  feature is truly invisible on shared hosting where there's no log access.
+- Access log uses nginx's `combined` format; error log uses nginx's native error
+  format. Both parsers live in `inc/nginx_log.php` (`nginxlog_parse_access()` /
+  `nginxlog_parse_error()`), covered by `tests/Unit/NginxLogParserTest.php`.
+- **Tail-window read**, not full history: only the last `window_bytes` (default
+  4 MB, overridable via `config.yaml`'s `nginx_log.window_bytes`) of the file is
+  read, newest-first. A `truncated` flag in the API response surfaces this in the
+  UI when the window was hit.
+- Filters (combine freely): log type (access/error), status (exact `404` or class
+  `4xx`), free-text substring, date range.
+- A missing/unreadable log file is **not** an error — the UI shows a clean
+  "Log nicht lesbar: `<path>`" message; `nginxlog_read_tail()` returns `null` and
+  the endpoint still responds `200 {ok:true, rows:[], error:"..."}`.
+- **Local (Hamish) path caveat:** `suche.test.conf` has no per-site
+  `access_log`/`error_log` directive, so the `local` entry in `NGINX_LOG_HOSTS`
+  points at nginx.conf's *global* log (`/opt/homebrew/var/log/nginx/*.log`) —
+  shared across every `*.test` vhost on the machine, not suche-exclusive. Override
+  with `config.yaml`'s `nginx_log:` section (see `config.example.yaml`) for a
+  dedicated per-site log if that mixing becomes a problem.
+- Table columns render via a JS-driven `<colgroup>` (`table-layout: fixed`); Pfad
+  and User-Agent (access) / Meldung (error) are ellipsis-truncated with the full
+  value in a `title` tooltip.
 
 ---
 

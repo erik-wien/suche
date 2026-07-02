@@ -288,3 +288,23 @@ body {
     outline: none;
     border-color: var(--color-accent);
 }
+
+/* ── Nginx-Log Access/Error toggle ──────────────────────────────────────────── */
+
+.nginxlog-type-toggle .btn.active {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.nginxlog-table {
+    table-layout: fixed;
+}
+.nginxlog-nowrap {
+    white-space: nowrap;
+}
+.nginxlog-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

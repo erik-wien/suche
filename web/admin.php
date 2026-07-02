@@ -168,10 +168,10 @@ render_header('Administration', 'admin');
         <div class="app-card mt-3">
             <div class="app-card-header app-card-header-split">
                 <span>Nginx-Log (<span id="nginxlogTotal">…</span> Einträge)</span>
-                <div class="app-tabs app-tabs-sub" role="tablist" aria-label="Log-Typ" id="nginxlogTypeTabs">
-                    <button type="button" class="app-tab active" role="tab" aria-selected="true"
+                <div class="btn-group btn-group-sm nginxlog-type-toggle" role="group" aria-label="Log-Typ" id="nginxlogTypeTabs">
+                    <button type="button" class="btn active" aria-pressed="true"
                             data-nginxlog-type="access">Access</button>
-                    <button type="button" class="app-tab" role="tab" aria-selected="false"
+                    <button type="button" class="btn" aria-pressed="false"
                             data-nginxlog-type="error">Error</button>
                 </div>
             </div>
@@ -212,7 +212,8 @@ render_header('Administration', 'admin');
                 </p>
 
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover">
+                    <table class="table table-sm table-hover nginxlog-table">
+                        <colgroup id="nginxlogColgroup"></colgroup>
                         <thead id="nginxlogThead"></thead>
                         <tbody id="nginxlogTbody">
                             <tr><td class="text-muted">Lade…</td></tr>
@@ -596,6 +597,7 @@ render_header('Administration', 'admin');
 
     // ── Nginx-Log tab: AJAX load, type toggle, filter, paginate ────────────
     const nginxlogForm      = document.getElementById('nginxlogFilterForm');
+    const nginxlogColgroup  = document.getElementById('nginxlogColgroup');
     const nginxlogThead     = document.getElementById('nginxlogThead');
     const nginxlogTbody     = document.getElementById('nginxlogTbody');
     const nginxlogPaginate  = document.getElementById('nginxlogPagination');
@@ -610,6 +612,16 @@ render_header('Administration', 'admin');
         const NGINXLOG_COLS = {
             access: ['Zeit', 'IP', 'Methode', 'Pfad', 'Status', 'User-Agent'],
             error:  ['Zeit', 'Level', 'PID', 'Meldung'],
+        };
+        // Fixed widths for narrow, deterministic columns; null = shares remaining space.
+        const NGINXLOG_COL_WIDTHS = {
+            access: ['11.5rem', '7rem', '5rem', null, '4.5rem', null],
+            error:  ['11.5rem', '5rem', '4rem', null],
+        };
+        // Column indices that get overflow-ellipsis + a title tooltip with the full value.
+        const NGINXLOG_TRUNCATE_COLS = {
+            access: [3, 5],
+            error:  [3],
         };
 
         let nginxlogType   = 'access';
@@ -634,6 +646,13 @@ render_header('Administration', 'admin');
                 tr.appendChild(th);
             });
             nginxlogThead.replaceChildren(tr);
+
+            const cols = NGINXLOG_COL_WIDTHS[nginxlogType].map((width) => {
+                const col = document.createElement('col');
+                if (width) col.style.width = width;
+                return col;
+            });
+            nginxlogColgroup.replaceChildren(...cols);
         }
 
         function nginxlogRenderRows(rows) {
@@ -642,14 +661,20 @@ render_header('Administration', 'admin');
                 nginxlogSetPlaceholder('Keine Einträge gefunden.');
                 return;
             }
+            const truncateCols = NGINXLOG_TRUNCATE_COLS[nginxlogType];
             for (const r of rows) {
                 const tr = document.createElement('tr');
                 const cells = nginxlogType === 'access'
                     ? [r.time, r.ip, r.method, r.path, r.status, r.ua]
                     : [r.time, r.level, r.pid, r.message];
-                cells.forEach((val) => {
+                cells.forEach((val, i) => {
                     const td = document.createElement('td');
                     td.textContent = val ?? '';
+                    if (i === 0) td.classList.add('nginxlog-nowrap');
+                    if (truncateCols.includes(i)) {
+                        td.classList.add('nginxlog-truncate');
+                        if (val) td.title = val;
+                    }
                     tr.appendChild(td);
                 });
                 nginxlogTbody.appendChild(tr);
@@ -715,7 +740,7 @@ render_header('Administration', 'admin');
                 if (btn.dataset.nginxlogType === nginxlogType) return;
                 document.querySelectorAll('#nginxlogTypeTabs [data-nginxlog-type]').forEach((b) => {
                     b.classList.toggle('active', b === btn);
-                    b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+                    b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
                 });
                 nginxlogType = btn.dataset.nginxlogType;
                 nginxlogStatusGrp.hidden = nginxlogType !== 'access';
@@ -745,7 +770,15 @@ render_header('Administration', 'admin');
             btn.addEventListener('click', () => { if (!nginxlogLoaded) { nginxlogLoaded = true; nginxlogLoadPage(1); } })
         );
         window.addEventListener('hashchange', nginxlogMaybeLoad);
-        nginxlogMaybeLoad();
+        // Deferred to DOMContentLoaded: app.js (defines window.sucheFetch) loads via a
+        // later <script> tag, so an immediate call here would race it on a fresh
+        // #adm-nginxlog page load (setTimeout(fn, 0) is NOT safe — it can still fire
+        // while the parser is blocked fetching that later script).
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', nginxlogMaybeLoad);
+        } else {
+            nginxlogMaybeLoad();
+        }
     }
 
     // ── Icons tab ──────────────────────────────────────────────────────────────

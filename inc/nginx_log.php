@@ -13,9 +13,10 @@ const NGINX_LOG_HOSTS = [
         'access' => '/var/log/nginx/suche.access.log',
         'error'  => '/var/log/nginx/suche.error.log',
     ],
-    'local' => [ // Hamish — nginx in the making; Homebrew default, overridable via config.yaml
-        'access' => '/opt/homebrew/var/log/nginx/suche.access.log',
-        'error'  => '/opt/homebrew/var/log/nginx/suche.error.log',
+    'local' => [ // Hamish — Homebrew nginx; suche.test.conf has no per-site access_log/error_log,
+                 // so this is nginx.conf's global log, shared across all *.test vhosts.
+        'access' => '/opt/homebrew/var/log/nginx/access.log',
+        'error'  => '/opt/homebrew/var/log/nginx/error.log',
     ],
 ];
 
