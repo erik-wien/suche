@@ -7,10 +7,37 @@
  * user's rows. Relies on the global $pdo from inc/initialize.php.
  */
 
+// Canonical stored values: the §9 palette classes (plus 'btn-default' = no colour).
 const BUTTON_VARIANTS = [
-    'btn-default', 'btn-success', 'btn-warning',
-    'btn-danger',  'btn-secondary', 'btn-dark',   'btn-light',
+    'btn-default',
+    'btn-color-green', 'btn-color-yellow', 'btn-color-red',
+    'btn-color-neutral', 'btn-color-grey-dark', 'btn-color-grey-light',
 ];
+
+// Back-compat: old Bootstrap-tier values stored before the .app-* / palette
+// convergence, mapped onto the §9 palette. Applied on save and render so existing
+// s_buttons rows keep their colour without a data migration (the green tier
+// .btn-success is removed from css_library in the P8 cutover).
+const BUTTON_VARIANT_LEGACY = [
+    'btn-success'   => 'btn-color-green',
+    'btn-warning'   => 'btn-color-yellow',
+    'btn-danger'    => 'btn-color-red',
+    'btn-secondary' => 'btn-color-neutral',
+    'btn-dark'      => 'btn-color-grey-dark',
+    'btn-light'     => 'btn-color-grey-light',
+];
+
+/** Canonical stored variant for any (old or new) value; unknown → 'btn-default'. */
+function button_normalize_variant(string $v): string {
+    $v = BUTTON_VARIANT_LEGACY[$v] ?? $v;
+    return in_array($v, BUTTON_VARIANTS, true) ? $v : 'btn-default';
+}
+
+/** CSS class to render on the <a> (empty for the neutral default). */
+function button_variant_class(string $v): string {
+    $v = button_normalize_variant($v);
+    return $v === 'btn-default' ? '' : $v;
+}
 
 function buttons_for_user(int $uid): array {
     global $pdo;
@@ -40,10 +67,8 @@ function buttons_validate(array $in): array {
         return [false, 'URL muss mit http:// oder https:// beginnen.', null];
     }
 
-    $variant = (string)($in['variant'] ?? 'btn-default');
-    if (!in_array($variant, BUTTON_VARIANTS, true)) {
-        return [false, 'Unbekannter Variant.', null];
-    }
+    // Normalise (accepts legacy Bootstrap values too); always yields a valid variant.
+    $variant = button_normalize_variant((string)($in['variant'] ?? 'btn-default'));
 
     $target = ($in['target'] ?? '_blank') === '_self' ? '_self' : '_blank';
 
@@ -176,7 +201,7 @@ function buttons_reorder(int $uid, array $order): array {
 
 function render_button(array $b): void {
     global $base;
-    $variant  = htmlspecialchars($b['variant'], ENT_QUOTES, 'UTF-8');
+    $variant  = button_variant_class((string) $b['variant']);
     $url      = htmlspecialchars($b['url'],     ENT_QUOTES, 'UTF-8');
     $target   = htmlspecialchars($b['target'],  ENT_QUOTES, 'UTF-8');
     $caption  = htmlspecialchars($b['caption'], ENT_QUOTES, 'UTF-8');

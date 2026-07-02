@@ -88,5 +88,40 @@ if (str_starts_with($type, 'icon_')) {
     exit;
 }
 
+if ($type === 'nginxlog_list') {
+    require_once __DIR__ . '/../inc/nginx_log.php';
+
+    // Invisible on hosts where it's not enabled (e.g. world4you) — 404, not 403.
+    if (!nginxlog_enabled()) {
+        http_response_code(404);
+        echo json_encode(['ok' => false, 'error' => 'Nicht gefunden.']);
+        exit;
+    }
+    $rights = (array) ($_SESSION['rights'] ?? []);
+    if (!in_array('Admin', $rights, true)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Nur für Admins.']);
+        exit;
+    }
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_verify()) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'CSRF-Fehler.']);
+        exit;
+    }
+
+    $logType = (string) ($_POST['log_type'] ?? 'access');
+    $page    = max(1, (int) ($_POST['page'] ?? 1));
+    $perPage = max(1, min(500, (int) ($_POST['per_page'] ?? 50)));
+    $filters = [
+        'status' => trim((string) ($_POST['status'] ?? '')),
+        'q'      => trim((string) ($_POST['q'] ?? '')),
+        'from'   => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) ($_POST['from'] ?? '')) ? $_POST['from'] : '',
+        'to'     => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) ($_POST['to']   ?? '')) ? $_POST['to']   : '',
+    ];
+
+    echo json_encode(nginxlog_query($logType, $filters, $page, $perPage));
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['ok' => false, 'error' => 'Unknown action.']);

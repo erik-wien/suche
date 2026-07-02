@@ -69,6 +69,9 @@ function icons_upload(array $file): string {
     if (!move_uploaded_file($file['tmp_name'], $dest)) {
         throw new RuntimeException('Speichern fehlgeschlagen.');
     }
+    // move_uploaded_file übernimmt die restriktiven Temp-Perms (oft 0600) —
+    // der Webserver-User könnte die Datei dann nicht lesen (403). Weltlesbar machen.
+    @chmod($dest, 0644);
     return $filename;
 }
 

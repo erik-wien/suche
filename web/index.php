@@ -26,10 +26,10 @@ render_header('Start', 'home');
 </div>
 <?php $feeds = feeds_for_user($uid); ?>
 <section class="rss-section">
-    <div class="tab-bar" role="tablist">
+    <div class="app-tabs" role="tablist">
         <?php foreach ($feeds as $i => $f): ?>
             <button type="button"
-                    class="tab-btn<?= $i === 0 ? ' active' : '' ?>"
+                    class="app-tab<?= $i === 0 ? ' active' : '' ?>"
                     role="tab"
                     data-tab="feed-<?= (int)$f['id'] ?>"
                     aria-controls="feed-<?= (int)$f['id'] ?>"
@@ -44,7 +44,7 @@ render_header('Start', 'home');
         <?php endforeach; ?>
     </div>
     <?php foreach ($feeds as $i => $f): ?>
-        <div class="tab-panel"
+        <div class="app-tab-panel"
              id="feed-<?= (int)$f['id'] ?>"
              role="tabpanel"
              aria-labelledby="feed-<?= (int)$f['id'] ?>"

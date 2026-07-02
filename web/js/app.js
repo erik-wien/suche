@@ -4,21 +4,21 @@
     // ── CSRF token — rendered into a <meta> tag by render_header ──────────────
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-    // ── Tab switching — .tab-bar + .tab-btn + .tab-panel, hash-synced ─────────
+    // ── Tab switching — .app-tabs + .app-tab + .app-tab-panel, hash-synced ────
     function activateTab(name, scope) {
         const root = scope || document;
-        root.querySelectorAll('.tab-btn').forEach((b) => {
+        root.querySelectorAll('.app-tab').forEach((b) => {
             const isActive = b.dataset.tab === name;
             b.classList.toggle('active', isActive);
             b.setAttribute('aria-selected', isActive ? 'true' : 'false');
         });
-        root.querySelectorAll('.tab-panel').forEach((p) => {
+        root.querySelectorAll('.app-tab-panel').forEach((p) => {
             p.hidden = p.id !== name;
         });
     }
 
-    document.querySelectorAll('.tab-bar').forEach((bar) => {
-        bar.querySelectorAll('.tab-btn').forEach((btn) => {
+    document.querySelectorAll('.app-tabs').forEach((bar) => {
+        bar.querySelectorAll('.app-tab').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const name = btn.dataset.tab;
                 activateTab(name);

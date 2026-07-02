@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../inc/initialize.php';
 require_once __DIR__ . '/../inc/layout.php';
 require_once __DIR__ . '/../inc/search_engines.php';
+require_once __DIR__ . '/../inc/nginx_log.php';
 
 use Erikr\Chrome\Admin\LogTab;
 use Erikr\Chrome\Admin\UserModals;
@@ -25,6 +26,9 @@ $csrfToken = csrf_token();
 require_once __DIR__ . '/../inc/icons.php';
 $adminIconFiles = icons_list();
 
+// Nginx-Log tab is host-gated (target ∈ NGINX_LOG_HOSTS) — absent on world4you.
+$nginxLogEnabled = nginxlog_enabled();
+
 render_header('Administration', 'admin');
 ?>
 <div class="container" style="padding:1.5rem">
@@ -32,24 +36,29 @@ render_header('Administration', 'admin');
 
     <div id="adminAlerts"></div>
 
-    <div class="tab-bar" role="tablist" aria-label="Administration">
-        <button type="button" class="tab-btn active" role="tab"
+    <div class="app-tabs" role="tablist" aria-label="Administration">
+        <button type="button" class="app-tab active" role="tab"
                 id="tab-adm-engines" aria-controls="adm-engines" aria-selected="true"
                 data-tab="adm-engines">Suchmaschinen</button>
-        <button type="button" class="tab-btn" role="tab"
+        <button type="button" class="app-tab" role="tab"
                 id="tab-adm-icons" aria-controls="adm-icons" aria-selected="false"
                 data-tab="adm-icons">Icons</button>
-        <button type="button" class="tab-btn" role="tab"
+        <button type="button" class="app-tab" role="tab"
                 id="tab-adm-users" aria-controls="adm-users" aria-selected="false"
                 data-tab="adm-users">Benutzer</button>
-        <button type="button" class="tab-btn" role="tab"
+        <button type="button" class="app-tab" role="tab"
                 id="tab-adm-log" aria-controls="adm-log" aria-selected="false"
                 data-tab="adm-log">Log</button>
+        <?php if ($nginxLogEnabled): ?>
+        <button type="button" class="app-tab" role="tab"
+                id="tab-adm-nginxlog" aria-controls="adm-nginxlog" aria-selected="false"
+                data-tab="adm-nginxlog">Nginx-Log</button>
+        <?php endif; ?>
     </div>
 
-    <div class="tab-panel" id="adm-engines" role="tabpanel" aria-labelledby="tab-adm-engines">
-        <div class="card mt-3">
-            <div class="card-body">
+    <div class="app-tab-panel" id="adm-engines" role="tabpanel" aria-labelledby="tab-adm-engines">
+        <div class="app-card mt-3">
+            <div class="app-card-body">
                 <h3>Suchmaschinen (global)</h3>
                 <p class="text-muted">
                     Diese Liste wird aus <code>inc/search_engines.yaml</code> geladen.
@@ -85,16 +94,16 @@ render_header('Administration', 'admin');
         </div>
     </div>
 
-    <div class="tab-panel" id="adm-icons" role="tabpanel" aria-labelledby="tab-adm-icons" hidden>
-        <div class="card mt-3">
-            <div class="card-header card-header-split">
+    <div class="app-tab-panel" id="adm-icons" role="tabpanel" aria-labelledby="tab-adm-icons" hidden>
+        <div class="app-card mt-3">
+            <div class="app-card-header app-card-header-split">
                 <h3>Icons</h3>
-                <label class="btn btn-outline-success btn-sm" style="cursor:pointer">
+                <label class="btn btn-outline-danger btn-sm" style="cursor:pointer">
                     Hochladen
                     <input type="file" id="iconUploadInput" accept=".svg,.png,.jpg,.jpeg,.webp" style="display:none">
                 </label>
             </div>
-            <div class="card-body">
+            <div class="app-card-body">
                 <div id="iconAlerts"></div>
                 <?php if (empty($adminIconFiles)): ?>
                     <p class="text-muted">Noch keine Icons vorhanden.</p>
@@ -133,7 +142,7 @@ render_header('Administration', 'admin');
         </div>
     </div>
 
-    <div class="tab-panel" id="adm-users" role="tabpanel" aria-labelledby="tab-adm-users" hidden>
+    <div class="app-tab-panel" id="adm-users" role="tabpanel" aria-labelledby="tab-adm-users" hidden>
         <?php
             UsersTab::render([
                 'users'   => $listing['users'],
@@ -150,35 +159,99 @@ render_header('Administration', 'admin');
         ?>
     </div>
 
-    <div class="tab-panel" id="adm-log" role="tabpanel" aria-labelledby="tab-adm-log" hidden>
+    <div class="app-tab-panel" id="adm-log" role="tabpanel" aria-labelledby="tab-adm-log" hidden>
         <?php LogTab::render(); ?>
     </div>
+
+    <?php if ($nginxLogEnabled): ?>
+    <div class="app-tab-panel" id="adm-nginxlog" role="tabpanel" aria-labelledby="tab-adm-nginxlog" hidden>
+        <div class="app-card mt-3">
+            <div class="app-card-header app-card-header-split">
+                <span>Nginx-Log (<span id="nginxlogTotal">…</span> Einträge)</span>
+                <div class="app-tabs app-tabs-sub" role="tablist" aria-label="Log-Typ" id="nginxlogTypeTabs">
+                    <button type="button" class="app-tab active" role="tab" aria-selected="true"
+                            data-nginxlog-type="access">Access</button>
+                    <button type="button" class="app-tab" role="tab" aria-selected="false"
+                            data-nginxlog-type="error">Error</button>
+                </div>
+            </div>
+            <div class="app-card-body">
+                <div id="nginxlogAlerts"></div>
+
+                <form id="nginxlogFilterForm" class="log-filter-form"
+                      style="display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1rem; align-items:end">
+                    <div class="form-group" style="width:7.5rem">
+                        <label for="nginxlog_from">Von</label>
+                        <input type="date" id="nginxlog_from" name="from" class="form-control">
+                    </div>
+                    <div class="form-group" style="width:7.5rem">
+                        <label for="nginxlog_to">Bis</label>
+                        <input type="date" id="nginxlog_to" name="to" class="form-control">
+                    </div>
+                    <div class="form-group" id="nginxlogStatusGroup" style="width:7rem">
+                        <label for="nginxlog_status">Status</label>
+                        <input type="text" id="nginxlog_status" name="status" class="form-control" placeholder="404 / 4xx">
+                    </div>
+                    <div class="form-group" style="flex:1; min-width:10rem">
+                        <label for="nginxlog_q">Suche</label>
+                        <input type="text" id="nginxlog_q" name="q" class="form-control" placeholder="Text">
+                    </div>
+                    <div class="form-group" style="display:flex; gap:.25rem">
+                        <button type="submit" class="btn btn-icon" title="Filter anwenden" aria-label="Filter anwenden">
+                            <span class="ui-icon ui-icon-filter" aria-hidden="true"></span>
+                        </button>
+                        <button type="reset" class="btn btn-icon btn-outline-danger" id="nginxlogReset"
+                                title="Zurücksetzen" aria-label="Zurücksetzen">
+                            <span class="ui-icon ui-icon-close" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+
+                <p class="text-muted small" id="nginxlogTruncatedNote" hidden>
+                    Zeigt nur die letzten Einträge im Lesefenster, nicht die vollständige Historie.
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead id="nginxlogThead"></thead>
+                        <tbody id="nginxlogTbody">
+                            <tr><td class="text-muted">Lade…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav class="pagination" id="nginxlogPagination"></nav>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <?php UserModals::render(['csrfToken' => $csrfToken]); ?>
 
-<div class="modal" id="iconRenameModal" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" style="max-width:26rem">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Icon umbenennen</h4>
-                <button type="button" class="close" data-modal-close>&times;</button>
+<div class="app-modal-backdrop" id="iconRenameModal" role="dialog" aria-modal="true"
+     aria-labelledby="iconRenameTitle" aria-hidden="true" hidden>
+    <div class="app-modal-dialog app-modal-sm">
+        <div class="app-modal-header">
+            <div class="app-modal-header-row">
+                <h4 class="app-modal-title" id="iconRenameTitle">Icon umbenennen</h4>
+                <button type="button" class="app-modal-close" data-modal-close aria-label="Schließen">&times;</button>
             </div>
-            <form id="iconRenameForm">
-                <div class="modal-body">
-                    <div class="modal-alerts" id="iconRenameAlerts"></div>
-                    <div class="form-group">
-                        <label for="iconRenameInput">Neuer Name (ohne Endung)</label>
-                        <input type="text" class="form-control" id="iconRenameInput"
-                               required maxlength="120" autocomplete="off">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn" data-modal-close>Abbrechen</button>
-                    <button type="submit" class="btn btn-outline-success">Speichern</button>
-                </div>
-            </form>
         </div>
+        <form id="iconRenameForm">
+            <div class="app-modal-body">
+                <div class="app-modal-alerts" id="iconRenameAlerts"></div>
+                <div class="form-group">
+                    <label for="iconRenameInput">Neuer Name (ohne Endung)</label>
+                    <input type="text" class="form-control" id="iconRenameInput"
+                           required maxlength="120" autocomplete="off">
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button type="button" class="btn" data-modal-close>Abbrechen</button>
+                <button type="submit" class="btn btn-outline-danger">Speichern</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -194,27 +267,27 @@ render_header('Administration', 'admin');
         const box = targetEl || document.getElementById('adminAlerts');
         if (!box) return;
         const div = document.createElement('div');
-        div.className = 'alert alert-' + (type || 'info');
+        div.className = 'app-alert app-alert-' + (type || 'info');
         div.textContent = msg;
         box.appendChild(div);
         setTimeout(() => div.remove(), 5000);
     }
 
     function modalAlertBox(form) {
-        return form?.closest('.modal')?.querySelector('.modal-alerts') || null;
+        return form?.closest('.app-modal-backdrop')?.querySelector('.app-modal-alerts') || null;
     }
 
     function openModal(id) {
         const m = document.getElementById(id);
         if (!m) return;
-        m.classList.add('open', 'show');
+        m.hidden = false;
         m.setAttribute('aria-hidden', 'false');
     }
 
     function closeModal(id) {
         const m = document.getElementById(id);
         if (!m) return;
-        m.classList.remove('open', 'show');
+        m.hidden = true;
         m.setAttribute('aria-hidden', 'true');
     }
 
@@ -223,16 +296,18 @@ render_header('Administration', 'admin');
     });
     document.querySelectorAll('[data-modal-close]').forEach((btn) => {
         btn.addEventListener('click', () => {
-            const m = btn.closest('.modal');
+            const m = btn.closest('.app-modal-backdrop');
             if (m) closeModal(m.id);
         });
     });
-    document.querySelectorAll('.modal').forEach((m) => {
-        m.addEventListener('click', (e) => { if (e.target === m) closeModal(m.id); });
+    // Backdrop close binds to pointerdown (gesture start) so a text-selection drag
+    // that ends outside the dialog doesn't wrongly close it (UI rule §8).
+    document.querySelectorAll('.app-modal-backdrop').forEach((m) => {
+        m.addEventListener('pointerdown', (e) => { if (e.target === m) closeModal(m.id); });
     });
     document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
-        document.querySelectorAll('.modal.open, .modal.show').forEach((m) => closeModal(m.id));
+        document.querySelectorAll('.app-modal-backdrop:not([hidden])').forEach((m) => closeModal(m.id));
     });
 
     async function apiPost(action, params) {
@@ -513,11 +588,165 @@ render_header('Administration', 'admin');
             loadPage(1);
         }
     }
-    document.querySelectorAll('.tab-btn[data-tab="adm-log"]').forEach((btn) =>
+    document.querySelectorAll('.app-tab[data-tab="adm-log"]').forEach((btn) =>
         btn.addEventListener('click', () => { if (!loaded) { loaded = true; loadPage(1); } })
     );
     window.addEventListener('hashchange', maybeLoad);
     maybeLoad();
+
+    // ── Nginx-Log tab: AJAX load, type toggle, filter, paginate ────────────
+    const nginxlogForm      = document.getElementById('nginxlogFilterForm');
+    const nginxlogThead     = document.getElementById('nginxlogThead');
+    const nginxlogTbody     = document.getElementById('nginxlogTbody');
+    const nginxlogPaginate  = document.getElementById('nginxlogPagination');
+    const nginxlogTotalEl   = document.getElementById('nginxlogTotal');
+    const nginxlogFromInput = document.getElementById('nginxlog_from');
+    const nginxlogToInput   = document.getElementById('nginxlog_to');
+    const nginxlogStatusGrp = document.getElementById('nginxlogStatusGroup');
+    const nginxlogResetBtn  = document.getElementById('nginxlogReset');
+    const nginxlogTruncated = document.getElementById('nginxlogTruncatedNote');
+
+    if (nginxlogForm) {
+        const NGINXLOG_COLS = {
+            access: ['Zeit', 'IP', 'Methode', 'Pfad', 'Status', 'User-Agent'],
+            error:  ['Zeit', 'Level', 'PID', 'Meldung'],
+        };
+
+        let nginxlogType   = 'access';
+        let nginxlogLoaded = false;
+
+        function nginxlogSetPlaceholder(text) {
+            nginxlogTbody.replaceChildren();
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = NGINXLOG_COLS[nginxlogType].length;
+            td.className = 'text-muted';
+            td.textContent = text;
+            tr.appendChild(td);
+            nginxlogTbody.appendChild(tr);
+        }
+
+        function nginxlogRenderHead() {
+            const tr = document.createElement('tr');
+            NGINXLOG_COLS[nginxlogType].forEach((label) => {
+                const th = document.createElement('th');
+                th.textContent = label;
+                tr.appendChild(th);
+            });
+            nginxlogThead.replaceChildren(tr);
+        }
+
+        function nginxlogRenderRows(rows) {
+            nginxlogTbody.replaceChildren();
+            if (!rows.length) {
+                nginxlogSetPlaceholder('Keine Einträge gefunden.');
+                return;
+            }
+            for (const r of rows) {
+                const tr = document.createElement('tr');
+                const cells = nginxlogType === 'access'
+                    ? [r.time, r.ip, r.method, r.path, r.status, r.ua]
+                    : [r.time, r.level, r.pid, r.message];
+                cells.forEach((val) => {
+                    const td = document.createElement('td');
+                    td.textContent = val ?? '';
+                    tr.appendChild(td);
+                });
+                nginxlogTbody.appendChild(tr);
+            }
+        }
+
+        function nginxlogRenderPagination(page, lastPage, onClick) {
+            nginxlogPaginate.replaceChildren();
+            if (lastPage <= 1) return;
+            for (let p = 1; p <= lastPage; p++) {
+                const a = document.createElement('a');
+                a.className = 'page-link' + (p === page ? ' active' : '');
+                a.href = '#adm-nginxlog';
+                a.textContent = String(p);
+                a.addEventListener('click', (e) => { e.preventDefault(); onClick(p); });
+                nginxlogPaginate.appendChild(a);
+            }
+        }
+
+        function nginxlogCurrentFilters() {
+            return {
+                from:   nginxlogFromInput.value.trim(),
+                to:     nginxlogToInput.value.trim(),
+                status: nginxlogType === 'access' ? document.getElementById('nginxlog_status').value.trim() : '',
+                q:      document.getElementById('nginxlog_q').value.trim(),
+            };
+        }
+
+        async function nginxlogLoadPage(page) {
+            nginxlogRenderHead();
+            nginxlogSetPlaceholder('Lade…');
+            const res = await apiPost('nginxlog_list', {
+                log_type: nginxlogType,
+                page,
+                ...nginxlogCurrentFilters(),
+            });
+            if (!res.ok) {
+                nginxlogSetPlaceholder('Fehler beim Laden.');
+                showAlert(res.error || 'Log konnte nicht geladen werden.', 'danger', nginxlogAlerts());
+                return;
+            }
+            if (res.error) {
+                nginxlogSetPlaceholder(res.error);
+                nginxlogTotalEl.textContent = '0';
+                nginxlogPaginate.replaceChildren();
+                nginxlogTruncated.hidden = true;
+                return;
+            }
+            const perPage  = res.per_page ?? 50;
+            const lastPage = res.lastPage ?? Math.max(1, Math.ceil((res.total || 0) / perPage));
+            nginxlogTotalEl.textContent = String(res.total);
+            nginxlogTruncated.hidden = !res.truncated;
+            nginxlogRenderRows(res.rows || []);
+            nginxlogRenderPagination(res.page, lastPage, nginxlogLoadPage);
+        }
+
+        function nginxlogAlerts() {
+            return document.getElementById('nginxlogAlerts');
+        }
+
+        document.querySelectorAll('#nginxlogTypeTabs [data-nginxlog-type]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.nginxlogType === nginxlogType) return;
+                document.querySelectorAll('#nginxlogTypeTabs [data-nginxlog-type]').forEach((b) => {
+                    b.classList.toggle('active', b === btn);
+                    b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+                });
+                nginxlogType = btn.dataset.nginxlogType;
+                nginxlogStatusGrp.hidden = nginxlogType !== 'access';
+                nginxlogLoadPage(1);
+            });
+        });
+
+        nginxlogForm.addEventListener('submit', (e) => { e.preventDefault(); nginxlogLoadPage(1); });
+
+        nginxlogResetBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            nginxlogFromInput.value = '';
+            nginxlogToInput.value   = '';
+            document.getElementById('nginxlog_status').value = '';
+            document.getElementById('nginxlog_q').value       = '';
+            nginxlogLoadPage(1);
+        });
+
+        function nginxlogMaybeLoad() {
+            if (nginxlogLoaded) return;
+            if (location.hash === '#adm-nginxlog') {
+                nginxlogLoaded = true;
+                nginxlogLoadPage(1);
+            }
+        }
+        document.querySelectorAll('.app-tab[data-tab="adm-nginxlog"]').forEach((btn) =>
+            btn.addEventListener('click', () => { if (!nginxlogLoaded) { nginxlogLoaded = true; nginxlogLoadPage(1); } })
+        );
+        window.addEventListener('hashchange', nginxlogMaybeLoad);
+        nginxlogMaybeLoad();
+    }
 
     // ── Icons tab ──────────────────────────────────────────────────────────────
     const iconUploadInput = document.getElementById('iconUploadInput');
@@ -568,7 +797,7 @@ render_header('Administration', 'admin');
     renameModal.querySelectorAll('[data-modal-close]').forEach((el) =>
         el.addEventListener('click', () => closeModal('iconRenameModal'))
     );
-    renameModal.addEventListener('click', (e) => {
+    renameModal.addEventListener('pointerdown', (e) => {
         if (e.target === renameModal) closeModal('iconRenameModal');
     });
 
