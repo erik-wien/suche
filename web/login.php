@@ -1,9 +1,17 @@
 <?php
 require_once __DIR__ . '/../inc/initialize.php';
 require_once __DIR__ . '/../inc/layout.php';
+require_once __DIR__ . '/../inc/sso_finish.php';
 
 if (!empty($_SESSION['loggedin'])) {
-    header('Location: index.php'); exit;
+    // Bereits am zentralen Host angemeldet: liegt ein gültiger Rücksprung vor,
+    // Ticket ausstellen und zurück zur App (App-zu-App-Navigation ohne
+    // Remember-Cookie); sonst zur suche-Startseite.
+    $r = (string) ($_GET['return'] ?? '');
+    if ($r !== '' && auth_sso_return_allowed($r, AUTH_SSO_ALLOWED_HOSTS)) {
+        $_SESSION['sso_return'] = $r;
+    }
+    sso_finish_login($con, (int) $_SESSION['id']);
 }
 
 $alerts     = $_SESSION['alerts'] ?? [];
