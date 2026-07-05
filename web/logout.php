@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_verify()) {
 
 // GET oder POST ohne gültiges CSRF → Auto-POST-Bounce (mint eigenes CSRF-Token).
 header('X-Frame-Options: DENY');
+header('Cache-Control: no-store');
 $__nonce = htmlspecialchars($_cspNonce ?? '', ENT_QUOTES, 'UTF-8');
 $__ret   = htmlspecialchars($__return, ENT_QUOTES, 'UTF-8');
 ?>
