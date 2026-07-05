@@ -8,6 +8,7 @@
  */
 require_once __DIR__ . '/../inc/initialize.php';
 require_once __DIR__ . '/../inc/layout.php';
+require_once __DIR__ . '/../inc/sso_finish.php';
 
 if (!empty($_SESSION['loggedin'])) {
     header('Location: index.php'); exit;
@@ -28,8 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = auth_totp_complete($con, $code);
 
     if ($result['ok']) {
-        addAlert('info', 'Willkommen zurück.');
-        header('Location: ./'); exit;
+        sso_finish_login($con, (int) $_SESSION['id']);
     }
 
     appendLog($con, 'auth_fail', 'TOTP failed (user="' . $pendingUser . '"): ' . $result['error'], 'suche');

@@ -31,6 +31,12 @@ define('RATE_LIMIT_FILE', __DIR__ . '/../data/ratelimit.json');
  */
 define('AUTH_DB_PREFIX', '');
 
+// Erlaubte Rücksprung-Hosts für den zentralen SSO-Login (Open-Redirect-Schutz).
+const AUTH_SSO_ALLOWED_HOSTS = [
+    'www.eriks.cloud', 'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
+    'energie.eriks.cloud', 'werda.eriks.cloud',
+];
+
 // URL prefix for this page. On DEV: '/suche.test'. On TEST/PROD: '' (bare vhost).
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
 

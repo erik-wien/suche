@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../inc/initialize.php';
+require_once __DIR__ . '/../inc/sso_finish.php';
 
 $attemptUser = substr((string)($_POST['login-username'] ?? ''), 0, 64);
 $logUser     = $attemptUser !== '' ? $attemptUser : '(empty)';
@@ -59,8 +60,7 @@ if ($result['ok']) {
             'samesite' => 'Lax',
         ]);
     }
-    addAlert('info', 'Hallo ' . htmlspecialchars($result['username'], ENT_QUOTES, 'UTF-8') . '.');
-    header('Location: ./'); exit;
+    sso_finish_login($con, (int) $_SESSION['id']);
 } else {
     addAlert('danger', $result['error']);
     header('Location: login.php'); exit;
