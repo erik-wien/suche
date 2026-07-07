@@ -74,6 +74,13 @@ body {
   flex: 1 1 auto;
   min-width: 0;
 }
+/* field-enhance (shared) umschließt type=search-Inputs mit .clear-wrap für das
+   Clear-×. Dieser Wrapper wird dann das Flex-Item der Zeile — er muss die
+   wachsende Rolle des Inputs übernehmen, sonst wird das Suchfeld zu schmal. */
+.search-form .clear-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 .search-form .form-select {
   flex: 0 0 auto;
   width: auto;
