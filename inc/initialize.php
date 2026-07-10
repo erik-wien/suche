@@ -35,11 +35,11 @@ define('AUTH_DB_PREFIX', '');
 const AUTH_SSO_ALLOWED_HOSTS = [
     // Prod (*.eriks.cloud)
     'www.eriks.cloud', 'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
-    'energie.eriks.cloud', 'werda.eriks.cloud',
+    'energie.eriks.cloud', 'werda.eriks.cloud', 'biblio.eriks.cloud',
     // Lokal (*.test) — für den faithful-Test auf Hamish. Öffentlich nicht
     // auflösbar, daher in Prod harmlos.
     'suche.test', 'energie.test', 'chat.test', 'wlmonitor.test', 'zeit.test', 'werda.test',
-    'lastfm.test',
+    'lastfm.test', 'biblio.test',
 ];
 
 // URL prefix for this page. On DEV: '/suche.test'. On TEST/PROD: '' (bare vhost).
