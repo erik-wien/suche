@@ -140,7 +140,7 @@ render_header('Einstellungen', 'preferences');
                 </p>
                 <div class="theme-row" style="justify-content:flex-start">
                     <button class="theme-btn<?= $theme === 'light' ? ' active' : '' ?>" data-theme="light"><span class="ui-icon ui-icon-sun" aria-hidden="true"></span> Hell</button>
-                    <button class="theme-btn<?= $theme === 'auto'  ? ' active' : '' ?>" data-theme="auto"><span class="ui-icon ui-icon-monitor" aria-hidden="true"></span> Auto</button>
+                    <button class="theme-btn<?= $theme === 'auto'  ? ' active' : '' ?>" data-theme="auto"><span class="ui-icon ui-icon-sun-moon" aria-hidden="true"></span> Auto</button>
                     <button class="theme-btn<?= $theme === 'dark'  ? ' active' : '' ?>" data-theme="dark"><span class="ui-icon ui-icon-moon" aria-hidden="true"></span> Dunkel</button>
                 </div>
             </div>
