@@ -16,7 +16,7 @@ $_cfg = suche_load_config();
 define('APP_NAME',          $_cfg['app']['name']          ?? 'Suche');
 define('APP_SUPPORT_EMAIL', $_cfg['app']['support_email'] ?? 'contact@eriks.cloud');
 define('APP_VERSION',       '3.0');
-define('APP_BUILD',         4);
+define('APP_BUILD',         5);
 define('APP_ENV',           $_cfg['app']['env']           ?? 'dev');
 define('APP_CODE',          $_cfg['APP_CODE']             ?? 'suche');
 
