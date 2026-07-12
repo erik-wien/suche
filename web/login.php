@@ -40,7 +40,7 @@ $v          = defined('APP_BUILD') ? ('?v=' . APP_BUILD) : '';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Anmelden &mdash; Eriks Cloud</title>
   <meta name="theme-color" content="#e2001a">
-  <link rel="icon" type="image/svg+xml" href="<?= $base ?>/css/shared/icons/jardyx_offwhite.svg">
+  <link rel="icon" type="image/svg+xml" href="<?= $base ?>/css/shared/logos/jardyx_offwhite.svg">
   <link rel="icon" type="image/x-icon" href="<?= $base ?>/favicon.ico">
   <link rel="stylesheet" href="<?= $base ?>/css/shared/theme.css<?= $v ?>">
   <link rel="stylesheet" href="<?= $base ?>/css/shared/reset.css<?= $v ?>">
