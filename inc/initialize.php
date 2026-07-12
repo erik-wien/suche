@@ -36,6 +36,15 @@ const AUTH_SSO_ALLOWED_HOSTS = [
     // Prod (*.eriks.cloud)
     'www.eriks.cloud', 'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
     'energie.eriks.cloud', 'werda.eriks.cloud', 'biblio.eriks.cloud',
+    'lastfm.eriks.cloud',
+    // Prod (*.jardyx.com) — bestätigtes echtes SSO-Return-Ziel (Audit S2,
+    // 2026-07-12): appsMenu-Prodlinks der Apps zeigen auf diese Hosts.
+    // biblio.jardyx.com taucht in keinem appsMenu auf und ist (noch) kein
+    // konfigurierter world4you-Deploy-Ziel-Host — analog zu biblio.eriks.cloud
+    // ergänzt, bitte verifizieren.
+    'www.jardyx.com', 'chat.jardyx.com', 'wlmonitor.jardyx.com',
+    'energie.jardyx.com', 'zeit.jardyx.com', 'biblio.jardyx.com',
+    'lastfm.jardyx.com',
     // Lokal (*.test) — für den faithful-Test auf Hamish. Öffentlich nicht
     // auflösbar, daher in Prod harmlos.
     'suche.test', 'energie.test', 'chat.test', 'wlmonitor.test', 'zeit.test', 'werda.test',
