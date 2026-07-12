@@ -39,9 +39,7 @@ const AUTH_SSO_ALLOWED_HOSTS = [
     'lastfm.eriks.cloud',
     // Prod (*.jardyx.com) — bestätigtes echtes SSO-Return-Ziel (Audit S2,
     // 2026-07-12): appsMenu-Prodlinks der Apps zeigen auf diese Hosts.
-    // biblio.jardyx.com taucht in keinem appsMenu auf und ist (noch) kein
-    // konfigurierter world4you-Deploy-Ziel-Host — analog zu biblio.eriks.cloud
-    // ergänzt, bitte verifizieren.
+    // biblio.jardyx.com bewusst enthalten (für den künftigen biblio-jardyx-Deploy).
     'www.jardyx.com', 'chat.jardyx.com', 'wlmonitor.jardyx.com',
     'energie.jardyx.com', 'zeit.jardyx.com', 'biblio.jardyx.com',
     'lastfm.jardyx.com',
