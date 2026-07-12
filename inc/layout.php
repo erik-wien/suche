@@ -37,7 +37,7 @@ function render_header(string $title, string $active = ''): void {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $pageTitle ?></title>
     <meta name="theme-color" content="<?= htmlspecialchars(APP_COLOR, ENT_QUOTES) ?>">
-    <link rel="icon" type="image/svg+xml" href="<?= $base ?>/jardyx-favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="<?= $base ?>/css/shared/icons/jardyx_offwhite.svg">
     <link rel="icon" type="image/x-icon" href="<?= $base ?>/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="<?= $base ?>/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= $base ?>/favicon-32x32.png">
@@ -61,7 +61,6 @@ function render_header(string $title, string $active = ''): void {
         'cspNonce'       => $_cspNonce,
         'csrfToken'      => csrf_token(),
         'pageType'       => $active,
-        'brandLogoSrc'   => $base . '/jardyx-logo.svg',
         'themeEndpoint'  => $base . '/preferences.php',
         'profileHref'    => $base . '/preferences.php#profilbild',
         'emailHref'      => $base . '/preferences.php#email',
@@ -87,7 +86,7 @@ function render_anon_header(string $title): void {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $pageTitle ?></title>
     <meta name="theme-color" content="<?= htmlspecialchars(APP_COLOR, ENT_QUOTES) ?>">
-    <link rel="icon" type="image/svg+xml" href="<?= $base ?>/jardyx-favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="<?= $base ?>/css/shared/icons/jardyx_offwhite.svg">
     <link rel="icon" type="image/x-icon" href="<?= $base ?>/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="<?= $base ?>/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= $base ?>/favicon-32x32.png">
@@ -105,7 +104,6 @@ function render_anon_header(string $title): void {
         'appName'       => APP_NAME,
         'base'          => $base,
         'cspNonce'      => $_cspNonce,
-        'brandLogoSrc'  => $base . '/jardyx-logo.svg',
         'loggedIn'      => false,
         'anonLoginHref' => null,
     ]);
