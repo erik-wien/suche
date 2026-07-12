@@ -51,22 +51,10 @@ function render_header(string $title, string $active = ''): void {
 </head>
 <body>
 <?php
-    $appsMenu = [
-        ['href' => 'https://wlmonitor.jardyx.com', 'label' => 'WL Monitor'],
-        ['href' => 'https://energie.jardyx.com',   'label' => 'Energie'],
-        ['href' => 'https://chat.jardyx.com',      'label' => 'Chat'],
-        ['href' => 'https://lastfm.jardyx.com',    'label' => 'Last.fm'],
-        ['href' => 'https://werda.eriks.cloud',    'label' => 'Zeiterfassung'],
-    ];
-    if (defined('APP_ENV') && APP_ENV === 'local') {
-        $appsMenu[] = ['label' => 'Test', 'adminOnly' => true, 'children' => [
-            ['href' => 'http://wlmonitor.test', 'label' => 'WL Monitor'],
-            ['href' => 'http://energie.test',   'label' => 'Energie'],
-            ['href' => 'http://chat.test',      'label' => 'Chat'],
-            ['href' => 'http://lastfm.test',    'label' => 'Last.fm'],
-            ['href' => 'http://zeit.test',      'label' => 'Zeiterfassung'],
-        ]];
-    }
+    // Cross-App-Navigation aus der zentralen Registry (Erikr\Chrome\AppsMenu) —
+    // ersetzt die frühere handgepflegte Liste (TASK-19). Behebt den werda/
+    // Zeiterfassung-Ausreißer (jetzt zeit.jardyx.com / „Zeit").
+    $appsMenu = \Erikr\Chrome\AppsMenu::build('suche', APP_ENV);
     Header::render([
         'appName'        => APP_NAME,
         'base'           => $base,
