@@ -384,6 +384,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
 </div>
 
 <script src="<?= $base ?>/js/sortable.min.js"></script>
+<script type="module" src="<?= $base ?>/css/shared/js/dialog.js?v=<?= APP_BUILD ?>" nonce="<?= $_cspNonce ?>"></script>
 <script nonce="<?= $_cspNonce ?>">
 (function () {
     const modal      = document.getElementById('buttonModal');
@@ -397,7 +398,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         onEnd: async () => {
             const ids = Array.from(tableBody.querySelectorAll('tr')).map(r => r.dataset.id);
             const res = await sucheFetch('api/buttons.php', { action: 'reorder', order: ids });
-            if (!res.ok) alert('Fehler beim Speichern der Reihenfolge.');
+            if (!res.ok) await window.alertDialog('Fehler beim Speichern der Reihenfolge.');
         },
     });
 
@@ -553,16 +554,16 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         if (res.ok) {
             location.reload();
         } else {
-            alert('Fehler: ' + (res.error || 'unbekannt'));
+            await window.alertDialog('Fehler: ' + (res.error || 'unbekannt'));
         }
     });
 
     document.querySelectorAll('.btn-delete-button').forEach((btn) =>
         btn.addEventListener('click', async () => {
-            if (!confirm('Diesen Link löschen?')) return;
+            if (!await window.confirmDialog('Diesen Link löschen?', { titel: 'Link löschen', okLabel: 'Löschen', gefahr: 'commit' })) return;
             const res = await sucheFetch('api/buttons.php', { action: 'delete', id: btn.dataset.id });
             if (res.ok) location.reload();
-            else alert('Fehler: ' + (res.error || 'unbekannt'));
+            else await window.alertDialog('Fehler: ' + (res.error || 'unbekannt'));
         })
     );
 
@@ -736,15 +737,15 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         if (id) params.id = id;
         const res = await sucheFetch('api/feeds.php', params);
         if (res.ok) location.reload();
-        else alert('Fehler: ' + (res.error || 'unbekannt'));
+        else await window.alertDialog('Fehler: ' + (res.error || 'unbekannt'));
     });
 
     document.querySelectorAll('.btn-delete-feed').forEach((btn) =>
         btn.addEventListener('click', async () => {
-            if (!confirm('Diesen Feed löschen?')) return;
+            if (!await window.confirmDialog('Diesen Feed löschen?', { titel: 'Feed löschen', okLabel: 'Löschen', gefahr: 'commit' })) return;
             const res = await sucheFetch('api/feeds.php', { action: 'delete', id: btn.dataset.id });
             if (res.ok) location.reload();
-            else alert('Fehler: ' + (res.error || 'unbekannt'));
+            else await window.alertDialog('Fehler: ' + (res.error || 'unbekannt'));
         })
     );
 
@@ -756,7 +757,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         [ids[idx], ids[swap]] = [ids[swap], ids[idx]];
         const res = await sucheFetch('api/feeds.php', { action: 'reorder', order: ids });
         if (res.ok) location.reload();
-        else alert('Fehler: ' + (res.error || 'unbekannt'));
+        else await window.alertDialog('Fehler: ' + (res.error || 'unbekannt'));
     }
     document.querySelectorAll('.btn-move-up-feed').forEach((b) =>
         b.addEventListener('click', () => moveFeed(b.closest('tr'), -1))

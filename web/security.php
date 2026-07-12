@@ -219,7 +219,7 @@ render_header('Sicherheit', 'security');
                         Dein Konto ist mit einem TOTP-Authenticator gesichert.
                     </p>
                     <form method="post" action="security.php"
-                          onsubmit="return confirm('2FA wirklich deaktivieren?');">
+                          data-confirm="2FA wirklich deaktivieren?" data-confirm-gefahr="commit">
                         <?= csrf_input() ?>
                         <input type="hidden" name="action" value="totp_disable">
                         <button type="submit" class="btn">2FA deaktivieren</button>
@@ -297,7 +297,7 @@ render_header('Sicherheit', 'security');
                                         <td><?= htmlspecialchars(substr($s['expires_at'], 0, 16), ENT_QUOTES, 'UTF-8') ?></td>
                                         <td>
                                             <form method="post" action="security.php"
-                                                  <?= $s['is_current'] ? 'onsubmit="return confirm(\'Das ist Ihre aktuelle Sitzung. Wirklich abmelden?\')"' : '' ?>>
+                                                  <?= $s['is_current'] ? 'data-confirm="Das ist Ihre aktuelle Sitzung. Wirklich abmelden?" data-confirm-gefahr="commit"' : '' ?>>
                                                 <?= csrf_input() ?>
                                                 <input type="hidden" name="action" value="revoke_one_device">
                                                 <input type="hidden" name="selector" value="<?= htmlspecialchars($s['selector'], ENT_QUOTES, 'UTF-8') ?>">
@@ -315,7 +315,7 @@ render_header('Sicherheit', 'security');
                     um sie sofort zu beenden, ändern Sie Ihr Kennwort.
                 </p>
                 <form method="post" action="security.php"
-                      onsubmit="return confirm('Wirklich von allen Geräten abmelden?')">
+                      data-confirm="Wirklich von allen Geräten abmelden?" data-confirm-gefahr="commit">
                     <?= csrf_input() ?>
                     <input type="hidden" name="action" value="revoke_all_devices">
                     <button type="submit" class="btn btn-outline-danger">Von allen Geräten abmelden</button>
@@ -326,4 +326,8 @@ render_header('Sicherheit', 'security');
 
     </div><!-- /container-md -->
 
+<script type="module" src="<?= $base ?>/css/shared/js/dialog.js?v=<?= APP_BUILD ?>" nonce="<?= $_cspNonce ?>"></script>
+<script nonce="<?= $_cspNonce ?>">
+document.querySelectorAll('form[data-confirm]').forEach(f=>f.addEventListener('submit',async e=>{e.preventDefault(); if(await window.confirmDialog(f.dataset.confirm,{gefahr:f.dataset.confirmGefahr||'secondary'})) f.submit();}));
+</script>
 <?php render_footer(); ?>

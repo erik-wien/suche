@@ -256,6 +256,7 @@ render_header('Administration', 'admin');
     </div>
 </div>
 
+<script type="module" src="<?= $base ?>/css/shared/js/dialog.js?v=<?= APP_BUILD ?>" nonce="<?= htmlspecialchars($_cspNonce, ENT_QUOTES, 'UTF-8') ?>"></script>
 <script nonce="<?= htmlspecialchars($_cspNonce, ENT_QUOTES, 'UTF-8') ?>">
 (function () {
     'use strict';
@@ -361,7 +362,7 @@ render_header('Administration', 'admin');
 
     document.querySelectorAll('.btn-reset').forEach((btn) => {
         btn.addEventListener('click', async () => {
-            if (!confirm('Passwort-Reset-E-Mail an «' + btn.dataset.username + '» senden?')) return;
+            if (!await window.confirmDialog('Passwort-Reset-E-Mail an «' + btn.dataset.username + '» senden?', { titel: 'Passwort-Reset', okLabel: 'Senden', gefahr: 'secondary' })) return;
             const res = await apiPost('admin_user_reset', { id: btn.dataset.id });
             showAlert(res.ok ? 'E-Mail versandt.' : (res.error || 'Fehler.'), res.ok ? 'success' : 'danger');
         });
@@ -369,7 +370,7 @@ render_header('Administration', 'admin');
 
     document.querySelectorAll('.btn-delete').forEach((btn) => {
         btn.addEventListener('click', async () => {
-            if (!confirm('Benutzer «' + btn.dataset.username + '» wirklich löschen?')) return;
+            if (!await window.confirmDialog('Benutzer «' + btn.dataset.username + '» wirklich löschen?', { titel: 'Benutzer löschen', okLabel: 'Löschen', gefahr: 'commit' })) return;
             const res = await apiPost('admin_user_delete', { id: btn.dataset.id });
             if (res.ok) {
                 showAlert('Gelöscht.', 'success');
@@ -384,7 +385,7 @@ render_header('Administration', 'admin');
         btn.addEventListener('click', async () => {
             const wasDisabled = btn.dataset.disabled === '1';
             const verb = wasDisabled ? 'aktivieren' : 'deaktivieren';
-            if (!confirm('«' + btn.dataset.username + '» ' + verb + '?')) return;
+            if (!await window.confirmDialog('«' + btn.dataset.username + '» ' + verb + '?', { titel: 'Status ändern', okLabel: verb.charAt(0).toUpperCase() + verb.slice(1), gefahr: 'neutral' })) return;
             const res = await apiPost('admin_user_toggle_disabled', {
                 id: btn.dataset.id,
                 disabled: wasDisabled ? '' : '1',
@@ -400,7 +401,7 @@ render_header('Administration', 'admin');
 
     document.querySelectorAll('.btn-revoke-totp').forEach((btn) => {
         btn.addEventListener('click', async () => {
-            if (!confirm('2FA für «' + btn.dataset.username + '» widerrufen?')) return;
+            if (!await window.confirmDialog('2FA für «' + btn.dataset.username + '» widerrufen?', { titel: '2FA widerrufen', okLabel: 'Widerrufen', gefahr: 'secondary' })) return;
             const res = await apiPost('admin_user_revoke_totp', { id: btn.dataset.id });
             if (res.ok) {
                 showAlert('2FA widerrufen.', 'success');
@@ -413,7 +414,7 @@ render_header('Administration', 'admin');
 
     document.querySelectorAll('.btn-invalid-reset').forEach((btn) => {
         btn.addEventListener('click', async () => {
-            if (!confirm('Fehlversuche für «' + btn.dataset.username + '» (' + btn.dataset.count + ') zurücksetzen?')) return;
+            if (!await window.confirmDialog('Fehlversuche für «' + btn.dataset.username + '» (' + btn.dataset.count + ') zurücksetzen?', { titel: 'Fehlversuche zurücksetzen', okLabel: 'Zurücksetzen', gefahr: 'secondary' })) return;
             const res = await apiPost('admin_user_reset_invalid', { id: btn.dataset.id });
             if (res.ok) {
                 showAlert('Zähler zurückgesetzt.', 'success');
@@ -809,7 +810,7 @@ render_header('Administration', 'admin');
 
     document.querySelectorAll('.btn-icon-delete').forEach((btn) => {
         btn.addEventListener('click', async () => {
-            if (!confirm('Icon «' + btn.dataset.file + '» löschen?')) return;
+            if (!await window.confirmDialog('Icon «' + btn.dataset.file + '» löschen?', { titel: 'Icon löschen', okLabel: 'Löschen', gefahr: 'commit' })) return;
             const res = await apiPost('icon_delete', { file: btn.dataset.file });
             if (res.ok) {
                 showAlert('Gelöscht.', 'success', iconAlerts);
