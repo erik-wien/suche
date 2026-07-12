@@ -119,11 +119,11 @@ function render_footer(): void {
     ?>
 </main>
 <?php
-    $stage = in_array(strtolower(APP_ENV), ['local', 'localhost', 'dev', 'development', 'staging', 'akadbrain'], true) ? 'DEV' : 'PROD';
+    // Stage/version aus dem Library-Default (Footer::deriveStage kennt akadbrain
+    // jetzt selbst) — TASK-19.
     Footer::render([
-        'base'    => $base,
-        'year'    => '2016–' . date('Y'),
-        'version' => APP_VERSION . '.' . APP_BUILD . ' ' . $stage,
+        'base' => $base,
+        'year' => '2016–' . date('Y'),
     ]);
 ?>
 <script src="<?= $base ?>/js/app.js?v=<?= APP_BUILD ?>" nonce="<?= $_cspNonce ?>"></script>
