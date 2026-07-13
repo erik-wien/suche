@@ -124,6 +124,13 @@ body {
   pointer-events: none;        /* preview, not a real link */
 }
 
+/* Schmale Schirme (iPhone): Link-Kacheln zwei nebeneinander statt einer pro
+   Reihe — halbe Container-Breite (minus halber Gap), lange Labels kürzen
+   dank .btn-label ellipsis + .btn overflow:hidden von selbst. */
+@media (max-width: 480px) {
+  .button-grid .btn { width: calc(50% - 0.25rem); }
+}
+
 /* .btn-default isn't defined in shared/components.css, so the base .btn
    transparent background leaves it visually floating. Give it a grey
    outline so it reads as a button against both light and dark page bg. */
