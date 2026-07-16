@@ -1,3 +1,5 @@
+import { apiForm, ApiError } from '../css/shared/js/api-call.js';
+
 (function () {
     'use strict';
 
@@ -38,6 +40,13 @@
     }
 
     // ── fetch helper for API POSTs ────────────────────────────────────────────
+    // Built on the shared apiForm()/ApiError hull (§21): reads the JSON body
+    // even on !res.ok so concrete server messages (e.g. inc/feeds.php
+    // validation errors) reach the caller instead of a bare "HTTP 400", and
+    // catches ApiError here so network failures never surface as unhandled
+    // promise rejections at the many existing sucheFetch(...) callsites.
+    // Return contract stays {ok, error, ...} so those callsites keep working
+    // unchanged.
     window.sucheFetch = async function (url, params) {
         const fd = new FormData();
         Object.entries(params || {}).forEach(([k, v]) => {
@@ -48,11 +57,14 @@
             }
         });
         fd.append('csrf_token', csrfToken);
-        const res = await fetch(url, { method: 'POST', body: fd });
-        if (!res.ok) {
-            return { ok: false, error: 'HTTP ' + res.status };
+        try {
+            return await apiForm(url, fd);
+        } catch (e) {
+            if (e instanceof ApiError) {
+                return { ok: false, error: e.message };
+            }
+            throw e;
         }
-        return res.json();
     };
 
     // ── Expose activateTab for inline handlers ───────────────────────────────

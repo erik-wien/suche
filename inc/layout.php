@@ -124,7 +124,7 @@ function render_footer(): void {
         'year' => '2016–' . date('Y'),
     ]);
 ?>
-<script src="<?= $base ?>/js/app.js?v=<?= APP_BUILD ?>" nonce="<?= $_cspNonce ?>"></script>
+<script type="module" src="<?= $base ?>/js/app.js?v=<?= APP_BUILD ?>" nonce="<?= $_cspNonce ?>"></script>
 </body>
 </html>
     <?php

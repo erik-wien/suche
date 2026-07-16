@@ -3,9 +3,10 @@ id: TASK-5
 title: >-
   sucheFetch auf geteilte apiCall()-Hülle umstellen — Servermeldungen nicht mehr
   wegwerfen
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-07-16 06:56'
+updated_date: '2026-07-16 11:16'
 labels: []
 dependencies: []
 priority: high
@@ -61,12 +62,12 @@ konkrete Meldungen ankommen und Netzwerkfehler nicht mehr unbehandelt durchschla
 
 ## Acceptance Criteria
 
-- [ ] `sucheFetch` nutzt intern `apiCall()`/`apiForm()` aus `css_library/js/api-call.js` (oder
+- [x] `sucheFetch` nutzt intern `apiCall()`/`apiForm()` aus `css_library/js/api-call.js` (oder
       liefert äquivalentes Verhalten: Body bei `!res.ok` wird gelesen, `error`/`detail` wird
       durchgereicht).
-- [ ] Alle bestehenden `sucheFetch`-Callsites (`web/preferences.php`, `web/admin.php`) zeigen bei
+- [x] Alle bestehenden `sucheFetch`-Callsites (`web/preferences.php`, `web/admin.php`) zeigen bei
       einem 400er-Validierungsfehler die konkrete Servermeldung statt „HTTP 400".
-- [ ] Alle `sucheFetch`-Callsites fangen Netzwerkfehler ab und zeigen eine konkrete
+- [x] Alle `sucheFetch`-Callsites fangen Netzwerkfehler ab und zeigen eine konkrete
       Fehlermeldung (`showAlert`/`alertDialog`) — kein unhandled rejection mehr in der
       Browser-Konsole.
 - [ ] Manuelle Verifikation: künstlich getrennte Verbindung / erzwungener 400er zeigt sichtbaren,
@@ -77,3 +78,9 @@ konkrete Meldungen ankommen und Netzwerkfehler nicht mehr unbehandelt durchschla
 `/Users/erikr/TUEV/audit-robustheit-20260716/audit-suche.md` (HOCH-Befund 2 + NIEDRIG-Befund),
 `/Users/erikr/TUEV/audit-robustheit-20260716/spec-apicall.md`.
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+app.js jetzt type=module (inc/layout.php) und importiert apiForm/ApiError aus css/shared/js/api-call.js. sucheFetch() baut wie zuvor ein FormData mit csrf_token, ruft aber jetzt apiForm() auf und fängt ApiError intern ab -> {ok:false, error:e.message}; Rückgabevertrag {ok,...} bleibt für alle bestehenden Callsites (preferences.php, admin.php) unverändert, kein Callsite-Code geändert. Damit: konkrete Servermeldungen statt 'HTTP 400', keine unhandled rejection mehr (ApiError wird immer innerhalb sucheFetch gefangen). Letzter AC-Punkt (manuelle Browser-Verifikation mit echtem 400er/Netzwerkausfall) bewusst offen gelassen — keine Login-Session in dieser Session verfügbar (Vorgabe: nicht einloggen).
+<!-- SECTION:NOTES:END -->
