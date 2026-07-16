@@ -84,6 +84,11 @@ render_header('Start', 'home');
     // read-only GET action added to api/feeds.php (auth + user-scoped
     // ownership check happen server-side, same as the page itself).
 
+    // Same token, same meta tag as window.sucheFetch (web/js/app.js) — that
+    // helper appends it as a POST field, this is a GET so it travels as the
+    // X-CSRF-TOKEN header instead (csrf_verify() accepts either).
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
     function escapeHtml(s) {
         const d = document.createElement('div');
         d.textContent = s;
@@ -95,7 +100,10 @@ render_header('Start', 'home');
         panel.dataset.lazy = '0'; // mark as (being) loaded so a second click can't double-fetch
         const id = panel.dataset.feedId;
         try {
-            const data = await window.apiCall('api/feeds.php?action=render&id=' + encodeURIComponent(id), { method: 'GET' });
+            const data = await window.apiCall('api/feeds.php?action=render&id=' + encodeURIComponent(id), {
+                method: 'GET',
+                headers: { 'X-CSRF-TOKEN': csrfToken },
+            });
             if (data && data.ok) {
                 panel.innerHTML = data.html;
             } else {

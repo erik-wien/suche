@@ -8,11 +8,18 @@ auth_require();
 
 $uid = (int) ($_SESSION['id'] ?? 0);
 
-// ── GET: render (read-only, no CSRF — same class as any other data read;
+// ── GET: render (read-only, CSRF-checked like every other action below;
 // ownership is still enforced via feeds_get()'s user_id-scoped lookup) ──────
 // Used by web/index.php to lazy-load inactive feed tabs (§20) instead of
 // fetching every feed synchronously during page render.
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'render') {
+    if (!csrf_verify()) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'CSRF token mismatch']);
+        appendLog($con, 'csrf', 'feeds API csrf mismatch', 'suche');
+        exit;
+    }
+
     require_once __DIR__ . '/../../inc/rss.php';
 
     $id = (int) ($_GET['id'] ?? 0);

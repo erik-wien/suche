@@ -6,6 +6,14 @@
  * TTL: 600 seconds (10 min). Fetch timeout: 3 seconds. Stale-while-error: the
  * last successful snapshot is returned if a refresh attempt fails.
  *
+ * Failure-log throttle: <app_root>/data/cache/rss/<md5(url)>.logged marks the
+ * last time a failure was logged for that URL; rss_log_error() skips logging
+ * while that marker is younger than RSS_TTL (a dead feed hit repeatedly —
+ * e.g. lazy-loaded tabs or the synchronously-rendered first tab on every
+ * landing-page view — would otherwise spam the log once per request). A
+ * successful fetch removes the marker so a later failure re-arms logging
+ * immediately.
+ *
  * Hardening: SimpleXMLElement is constructed with LIBXML_NONET so no network
  * access happens during parsing (XXE defense-in-depth).
  */
@@ -27,13 +35,24 @@ function rss_cache_path(string $url): string {
     return rss_cache_dir() . '/' . md5($url) . '.xml';
 }
 
+function rss_log_marker_path(string $url): string {
+    return rss_cache_dir() . '/' . md5($url) . '.logged';
+}
+
 /**
- * Log an RSS fetch failure with the feed URL and a concrete reason.
- * Uses appendLog() (visible in the Admin-Log view) when a DB connection is
- * available in the global scope; falls back to error_log() otherwise (e.g.
- * unit tests that don't bootstrap $con).
+ * Log an RSS fetch failure with the feed URL and a concrete reason — but only
+ * once per RSS_TTL window per URL (see file header). Uses appendLog()
+ * (visible in the Admin-Log view) when a DB connection is available in the
+ * global scope; falls back to error_log() otherwise (e.g. unit tests that
+ * don't bootstrap $con).
  */
 function rss_log_error(string $url, string $reason): void {
+    $marker = rss_log_marker_path($url);
+    if (is_file($marker) && (time() - filemtime($marker)) < RSS_TTL) {
+        return;
+    }
+    @touch($marker);
+
     global $con;
     $message = 'RSS-Feed-Fehler: ' . $url . ' — ' . $reason;
     if (isset($con) && $con instanceof \mysqli) {
@@ -74,6 +93,7 @@ function rss_fetch(string $url): ?SimpleXMLElement {
         $xml = rss_parse($fresh);
         if ($xml !== null) {
             @file_put_contents($path, $fresh);
+            @unlink(rss_log_marker_path($url));
             return $xml;
         }
         rss_log_error($url, 'Antwort ist kein gültiges XML/RSS.');
