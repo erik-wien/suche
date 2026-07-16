@@ -28,6 +28,22 @@ function rss_cache_path(string $url): string {
 }
 
 /**
+ * Log an RSS fetch failure with the feed URL and a concrete reason.
+ * Uses appendLog() (visible in the Admin-Log view) when a DB connection is
+ * available in the global scope; falls back to error_log() otherwise (e.g.
+ * unit tests that don't bootstrap $con).
+ */
+function rss_log_error(string $url, string $reason): void {
+    global $con;
+    $message = 'RSS-Feed-Fehler: ' . $url . ' — ' . $reason;
+    if (isset($con) && $con instanceof \mysqli) {
+        appendLog($con, 'rss', $message);
+    } else {
+        error_log('[suche/rss] ' . $message);
+    }
+}
+
+/**
  * Returns parsed XML or null if neither a fresh fetch nor a cached copy works.
  * Side effect: writes fresh content to the cache file on success.
  */
@@ -60,6 +76,11 @@ function rss_fetch(string $url): ?SimpleXMLElement {
             @file_put_contents($path, $fresh);
             return $xml;
         }
+        rss_log_error($url, 'Antwort ist kein gültiges XML/RSS.');
+    } elseif ($fresh === false) {
+        rss_log_error($url, 'Fetch fehlgeschlagen (Timeout, DNS- oder HTTP-Fehler).');
+    } else {
+        rss_log_error($url, 'Leere Antwort vom Feed-Server.');
     }
 
     // ── Stale-while-error ──────────────────────────────────────────────────
@@ -67,6 +88,7 @@ function rss_fetch(string $url): ?SimpleXMLElement {
         return rss_parse((string) file_get_contents($path));
     }
 
+    rss_log_error($url, 'Kein Cache mehr verfügbar — Feed dauerhaft nicht erreichbar.');
     return null;
 }
 

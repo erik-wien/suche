@@ -1,9 +1,10 @@
 ---
 id: TASK-6
 title: RSS-Fetch-Fehler loggen (appendLog) — toter Feed muss im Log sichtbar sein
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-07-16 06:56'
+updated_date: '2026-07-16 11:16'
 labels: []
 dependencies: []
 priority: medium
@@ -35,13 +36,19 @@ einen `appendLog`/`error_log`-Eintrag mit Feed-URL und Fehlergrund schreiben.
 
 ## Acceptance Criteria
 
-- [ ] `rss_fetch()` schreibt bei fehlgeschlagenem Fresh-Fetch (Timeout, HTTP-Fehler, Parse-Fehler)
+- [x] `rss_fetch()` schreibt bei fehlgeschlagenem Fresh-Fetch (Timeout, HTTP-Fehler, Parse-Fehler)
       einen `appendLog`-Eintrag mit Feed-URL und konkretem Fehlergrund.
-- [ ] `rss_fetch()` schreibt beim finalen `null`-Return (kein gültiger Cache mehr verfügbar)
+- [x] `rss_fetch()` schreibt beim finalen `null`-Return (kein gültiger Cache mehr verfügbar)
       ebenfalls einen `appendLog`-Eintrag.
-- [ ] Log-Einträge sind über die bestehende Admin-Log-Ansicht sichtbar/auffindbar.
+- [x] Log-Einträge sind über die bestehende Admin-Log-Ansicht sichtbar/auffindbar.
 
 ## Referenz
 
 `/Users/erikr/TUEV/audit-robustheit-20260716/audit-suche.md` (MITTEL-Befund).
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Neue rss_log_error(url, reason) in inc/rss.php: appendLog($con,'rss',...) wenn $con (global) eine mysqli-Instanz ist, sonst error_log()-Fallback mit '[suche/rss]'-Prefix (rss_fetch() hat kein $con im Funktionsscope; global $con greift, weil alle Aufrufer (index.php, api/feeds.php) $con top-level aus initialize.php gesetzt haben). Aufrufstellen: fehlgeschlagener Fresh-Fetch (3 Fälle: file_get_contents=false / leerer Body / Parse-Fehler) und finaler null-Return ohne Cache. Kein Retry-Loop vorhanden -> kein Spam-Risiko durch Mehrfachlogging pro Aufruf. appendLog schreibt in auth_log (context='rss'), dieselbe Tabelle die admin.php's Log-Tab anzeigt -> in der Admin-Log-Ansicht sichtbar.
+<!-- SECTION:NOTES:END -->
