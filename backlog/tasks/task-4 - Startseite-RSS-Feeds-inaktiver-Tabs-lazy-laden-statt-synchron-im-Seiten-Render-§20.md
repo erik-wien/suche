@@ -3,9 +3,10 @@ id: TASK-4
 title: >-
   Startseite: RSS-Feeds inaktiver Tabs lazy laden statt synchron im
   Seiten-Render (§20)
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-07-16 06:56'
+updated_date: '2026-07-16 11:16'
 labels: []
 dependencies: []
 priority: high
@@ -40,13 +41,13 @@ mit klarem Lade-Platzhalter für den Rest.
 
 ## Acceptance Criteria
 
-- [ ] Beim initialen Laden von `index.php` wird `rss_fetch()` nur noch für den sichtbaren
+- [x] Beim initialen Laden von `index.php` wird `rss_fetch()` nur noch für den sichtbaren
       Erst-Tab synchron aufgerufen.
-- [ ] Inaktive Tabs zeigen einen Lade-Platzhalter und laden ihren Feed-Inhalt erst bei
+- [x] Inaktive Tabs zeigen einen Lade-Platzhalter und laden ihren Feed-Inhalt erst bei
       Tab-Aktivierung per AJAX nach (neuer/erweiterter Endpoint).
-- [ ] Ein einzelner hängender/toter Feed verzögert den initialen Seitenaufbau nicht mehr um
+- [x] Ein einzelner hängender/toter Feed verzögert den initialen Seitenaufbau nicht mehr um
       mehr als die Ladezeit des sichtbaren Tabs.
-- [ ] Bestehendes Stale-Cache-Fallback-Verhalten (`inc/rss.php`) bleibt für den nachgeladenen
+- [x] Bestehendes Stale-Cache-Fallback-Verhalten (`inc/rss.php`) bleibt für den nachgeladenen
       Feed erhalten.
 
 ## Referenz
@@ -54,3 +55,9 @@ mit klarem Lade-Platzhalter für den Rest.
 `/Users/erikr/TUEV/audit-robustheit-20260716/audit-suche.md` (HOCH-Befund 1),
 `/Users/erikr/TUEV/audit-robustheit-20260716/UEBERSICHT.md` (§20-Muster F).
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Erst-Tab weiter serverseitig via rss_fetch()/rss_render() (i===0). Alle anderen Panels: Platzhalter (data-lazy=1, data-feed-id) statt rss_fetch()-Aufruf. Neuer GET-Read-Endpoint web/api/feeds.php?action=render&id=<id> (kein CSRF, auth_require()+feeds_get() uid-scoped) liefert {ok,html} bzw. {ok:false,error}. Inline-Script in index.php lädt per Klick auf Tab-Button oder (per DOMContentLoaded, wegen deferred module timing) bei Hash-Deep-Link; Fehler landen mit role=alert im Panel. Stale-Cache-Fallback in rss.php unverändert, greift jetzt auch für den nachgeladenen Feed.
+<!-- SECTION:NOTES:END -->

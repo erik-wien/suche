@@ -6,6 +6,33 @@ header('Content-Type: application/json');
 
 auth_require();
 
+$uid = (int) ($_SESSION['id'] ?? 0);
+
+// ── GET: render (read-only, no CSRF — same class as any other data read;
+// ownership is still enforced via feeds_get()'s user_id-scoped lookup) ──────
+// Used by web/index.php to lazy-load inactive feed tabs (§20) instead of
+// fetching every feed synchronously during page render.
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'render') {
+    require_once __DIR__ . '/../../inc/rss.php';
+
+    $id = (int) ($_GET['id'] ?? 0);
+    try {
+        $feed = feeds_get($uid, $id);
+    } catch (\RuntimeException $e) {
+        http_response_code(404);
+        echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+        exit;
+    }
+
+    $xml = rss_fetch($feed['url']);
+    if ($xml) {
+        echo json_encode(['ok' => true, 'html' => rss_render($xml)]);
+    } else {
+        echo json_encode(['ok' => false, 'error' => 'Feed nicht verfügbar: ' . $feed['title']]);
+    }
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['ok' => false, 'error' => 'POST required']);
@@ -19,7 +46,6 @@ if (!csrf_verify()) {
     exit;
 }
 
-$uid    = (int) ($_SESSION['id'] ?? 0);
 $action = $_POST['action'] ?? '';
 
 try {

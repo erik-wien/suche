@@ -44,21 +44,83 @@ render_header('Start', 'home');
         <?php endforeach; ?>
     </div>
     <?php foreach ($feeds as $i => $f): ?>
-        <div class="app-tab-panel"
-             id="feed-<?= (int)$f['id'] ?>"
-             role="tabpanel"
-             aria-labelledby="feed-<?= (int)$f['id'] ?>"
-             <?= $i === 0 ? '' : 'hidden' ?>>
-            <?php
-            $xml = rss_fetch($f['url']);
-            if ($xml) {
-                echo rss_render($xml);
-            } else {
-                echo '<p class="text-muted">Feed nicht verfügbar: ' . htmlspecialchars($f['title'], ENT_QUOTES, 'UTF-8') . '</p>';
-            }
-            ?>
-        </div>
+        <?php if ($i === 0): ?>
+            <div class="app-tab-panel"
+                 id="feed-<?= (int)$f['id'] ?>"
+                 role="tabpanel"
+                 aria-labelledby="feed-<?= (int)$f['id'] ?>">
+                <?php
+                // Only the initially visible tab is fetched synchronously (§20) —
+                // inactive tabs render a placeholder below and lazy-load their
+                // content on first activation via api/feeds.php?action=render.
+                $xml = rss_fetch($f['url']);
+                if ($xml) {
+                    echo rss_render($xml);
+                } else {
+                    echo '<p class="text-muted">Feed nicht verfügbar: ' . htmlspecialchars($f['title'], ENT_QUOTES, 'UTF-8') . '</p>';
+                }
+                ?>
+            </div>
+        <?php else: ?>
+            <div class="app-tab-panel"
+                 id="feed-<?= (int)$f['id'] ?>"
+                 role="tabpanel"
+                 aria-labelledby="feed-<?= (int)$f['id'] ?>"
+                 data-feed-id="<?= (int)$f['id'] ?>"
+                 data-lazy="1"
+                 hidden>
+                <p class="text-muted">Lade Feed „<?= htmlspecialchars($f['title'], ENT_QUOTES, 'UTF-8') ?>“ …</p>
+            </div>
+        <?php endif; ?>
     <?php endforeach; ?>
 </section>
+<script nonce="<?= $_cspNonce ?>">
+(function () {
+    'use strict';
+
+    // ── Lazy-load inactive feed tabs (§20) ────────────────────────────────────
+    // The initial tab is rendered server-side above; every other tab shows a
+    // placeholder and fetches its content on first activation via the small
+    // read-only GET action added to api/feeds.php (auth + user-scoped
+    // ownership check happen server-side, same as the page itself).
+
+    function escapeHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    async function loadFeed(panel) {
+        if (!panel || panel.dataset.lazy !== '1') return;
+        panel.dataset.lazy = '0'; // mark as (being) loaded so a second click can't double-fetch
+        const id = panel.dataset.feedId;
+        try {
+            const data = await window.apiCall('api/feeds.php?action=render&id=' + encodeURIComponent(id), { method: 'GET' });
+            if (data && data.ok) {
+                panel.innerHTML = data.html;
+            } else {
+                panel.innerHTML = '<p class="text-muted" role="alert">' + escapeHtml((data && data.error) || 'Feed nicht verfügbar.') + '</p>';
+            }
+        } catch (e) {
+            panel.innerHTML = '<p class="text-muted" role="alert">' + escapeHtml((e && e.message) || 'Netzwerkfehler.') + '</p>';
+        }
+    }
+
+    document.querySelectorAll('.rss-section .app-tabs .app-tab').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            loadFeed(document.getElementById(btn.dataset.tab));
+        });
+    });
+
+    // Deep-link support (e.g. a bookmarked #feed-7): app.js activates the tab
+    // from location.hash on load; wait for DOMContentLoaded so window.apiCall
+    // (loaded by the deferred app.js module) is guaranteed to exist by then.
+    document.addEventListener('DOMContentLoaded', () => {
+        if (location.hash.length > 1) {
+            loadFeed(document.getElementById(location.hash.slice(1)));
+        }
+    });
+})();
+</script>
 <?php
 render_footer();
