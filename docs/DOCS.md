@@ -269,9 +269,34 @@ Same CRUD pattern as buttons: `feeds_for_user`, `feeds_get`, `feeds_create`, `fe
 4. On fetch failure, fall back to stale cache if it exists (stale-while-error)
 5. Returns parsed `SimpleXMLElement` or `null` on complete failure
 
+On every failed fresh-fetch attempt (timeout, HTTP error, invalid XML, empty
+response) and on the final `null` return, `rss_log_error()` writes an
+`appendLog($con, 'rss', …)` entry (falls back to `error_log()` if `$con` isn't
+in scope, e.g. unit tests) — a permanently dead feed is now visible in the
+admin Log tab. To avoid spamming the log every time a dead feed is
+re-requested (lazy-loaded tabs, or the synchronously-rendered first tab on
+every landing-page view), logging is throttled per URL to once per
+`RSS_TTL` window via a `.logged` marker file next to the cache entry
+(`data/cache/rss/<md5(url)>.logged`); a successful fetch removes the marker
+so the next failure re-arms logging immediately.
+
 **`rss_render(SimpleXMLElement $xml, int $limit = 8): string`**
 
 Extracts up to `$limit` `<item>` elements. For each, finds the first image either from an `<img>` tag inside `<description>` (regex) or from `<enclosure url type="image/*">`. Returns an HTML string of `<div class="rss-cards">` cards. Each card links to `<link>`, shows title and publication date.
+
+### Lazy-loaded feed tabs (§20)
+
+`web/index.php` only fetches the initially visible feed tab synchronously
+during page render; the other tabs render a `data-lazy="1"` placeholder and
+fetch their content on first activation (click, or a deep-linked `#feed-N`
+hash) via `GET api/feeds.php?action=render&id=<feed id>` — avoiding the
+multi-second stall a cold cache with several slow/dead feeds used to cause on
+every landing-page load. The endpoint is auth-gated and CSRF-checked like the
+POST actions below (`csrf_verify()` also accepts the token via the
+`X-CSRF-TOKEN` header, since this is a GET), verifies feed ownership via
+`feeds_get()`, calls `rss_fetch()` + `rss_render()`, and returns
+`{ok, html}` or `{ok:false, error}`. The inline script in `index.php` calls
+it through `window.apiCall()` (see §13).
 
 ---
 
@@ -323,6 +348,10 @@ POST /api/feeds.php?action={create|update|delete|reorder}
 ```
 
 All require: authenticated session + valid CSRF token (checked via `csrf_verify()`). Return `application/json`.
+
+`feeds.php` additionally exposes a read-only `GET ?action=render&id=<id>` used
+to lazy-load inactive RSS tabs (see §7) — still auth + CSRF gated (token via
+`X-CSRF-TOKEN` header on this GET), still ownership-scoped via `feeds_get()`.
 
 **Response shape:**
 
@@ -454,19 +483,20 @@ The theme toggle in the user dropdown writes `data-theme` to `<html>` and persis
 
 ## 13. JavaScript
 
-All JS lives in `web/js/app.js` (~90 lines, no dependencies).
+All JS lives in `web/js/app.js` (~90 lines). It is loaded as `<script type="module">` (`inc/layout.php`) so it can `import { apiForm, ApiError } from '../css/shared/js/api-call.js'` — the one dependency, shared across TÜV/jardyx apps.
 
 ### Capabilities
 
 - **Tab switching** — `.tab-link` clicks add/remove `active` class on panels. Used in preferences and admin.
 - **Theme switcher** — reads/writes `data-theme` on `<html>`, POSTs to `set-theme` endpoint.
-- **`apiPost(action, data)`** — thin wrapper around `fetch()` that includes the CSRF token header, decodes JSON, surfaces errors as alerts.
+- **`window.sucheFetch(url, params)`** — built on the shared `apiForm()`/`ApiError` hull instead of a bare `fetch()`. Reads the JSON body even on `!res.ok` so concrete server messages (e.g. `inc/feeds.php` validation errors) reach the caller instead of a generic `"HTTP 400"`, and catches `ApiError` internally so a network failure never surfaces as an unhandled promise rejection. The return contract stays `{ok, error, ...}` unchanged, so existing callsites in `preferences.php`/`admin.php` needed no changes.
+- **`window.apiCall(url, opts)`** — the shared low-level hull itself (`css/shared/js/api-call.js`), used directly where a GET is needed (e.g. the lazy feed-tab loader in `web/index.php`, see §7).
 - **Alert helper** — `showAlert(type, message)` prepends a dismissible alert to `#alerts`.
 - **Drag-to-reorder** — native HTML5 drag events on button/feed rows in preferences. Calls `reorder` endpoint on drop.
 
 ### CSP compliance
 
-All inline scripts in PHP files must include `nonce="<?= $_cspNonce ?>"`. `app.js` is an external file so it needs no nonce.
+All inline scripts in PHP files must include `nonce="<?= $_cspNonce ?>"`. `app.js` is an external module file so it needs no nonce; being a module also means it runs deferred, which callers relying on it (e.g. the lazy feed loader) account for by waiting on `DOMContentLoaded`.
 
 ---
 
