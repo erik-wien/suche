@@ -97,6 +97,8 @@ $rsyncExcludes = [
     '.DS_Store',
     '.claude/',
     '.claude.json',
+    '.superpowers/',
+    'cronjobs/',  // suche/web/cronjobs liegt server-seitig (jardyx-Cron-Glue), nicht im Repo -> vor --delete schuetzen
     '.phpunit.result.cache',
     '.worktrees/',
     'worktrees/',
