@@ -32,22 +32,32 @@ define('RATE_LIMIT_FILE', __DIR__ . '/../data/ratelimit.json');
 define('AUTH_DB_PREFIX', '');
 
 // Erlaubte Rücksprung-Hosts für den zentralen SSO-Login (Open-Redirect-Schutz).
-const AUTH_SSO_ALLOWED_HOSTS = [
-    // Prod (*.eriks.cloud)
+// Prod-Hosts gelten immer; .test-Hosts nur lokal (APP_ENV === 'local') — sie
+// sind öffentlich zwar ohnehin nicht auflösbar, gehören aber sauber nicht in
+// die Prod-Allowlist.
+const AUTH_SSO_ALLOWED_HOSTS_PROD = [
+    // *.eriks.cloud
     'www.eriks.cloud', 'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
     'energie.eriks.cloud', 'werda.eriks.cloud', 'biblio.eriks.cloud',
     'lastfm.eriks.cloud',
-    // Prod (*.jardyx.com) — bestätigtes echtes SSO-Return-Ziel (Audit S2,
+    // *.jardyx.com — bestätigtes echtes SSO-Return-Ziel (Audit S2,
     // 2026-07-12): appsMenu-Prodlinks der Apps zeigen auf diese Hosts.
     // biblio.jardyx.com bewusst enthalten (für den künftigen biblio-jardyx-Deploy).
     'www.jardyx.com', 'chat.jardyx.com', 'wlmonitor.jardyx.com',
     'energie.jardyx.com', 'zeit.jardyx.com', 'biblio.jardyx.com',
     'lastfm.jardyx.com',
-    // Lokal (*.test) — für den faithful-Test auf Hamish. Öffentlich nicht
-    // auflösbar, daher in Prod harmlos.
+];
+
+// Lokal (*.test) — für den faithful-Test auf Hamish.
+const AUTH_SSO_ALLOWED_HOSTS_TEST = [
     'suche.test', 'energie.test', 'chat.test', 'wlmonitor.test', 'zeit.test', 'werda.test',
     'lastfm.test', 'biblio.test',
 ];
+
+define('AUTH_SSO_ALLOWED_HOSTS', array_merge(
+    AUTH_SSO_ALLOWED_HOSTS_PROD,
+    APP_ENV === 'local' ? AUTH_SSO_ALLOWED_HOSTS_TEST : []
+));
 
 // URL prefix for this page. On DEV: '/suche.test'. On TEST/PROD: '' (bare vhost).
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
