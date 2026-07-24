@@ -62,4 +62,46 @@ final class SsoFinishTest extends TestCase
         // No open redirect: an unlisted host must not survive into the URL.
         self::assertSame('login.php', sso_login_redirect('https://evil.example.com/x'));
     }
+
+    // ── sso_append_ticket() — fragment-safe ticket URL building (Paket 3b) ──
+
+    public function testAppendTicketAddsQueryWhenNone(): void
+    {
+        self::assertSame(
+            'https://app.example.com/x?sso=TOKEN',
+            sso_append_ticket('https://app.example.com/x', 'TOKEN')
+        );
+    }
+
+    public function testAppendTicketExtendsExistingQuery(): void
+    {
+        self::assertSame(
+            'https://app.example.com/x?y=1&sso=TOKEN',
+            sso_append_ticket('https://app.example.com/x?y=1', 'TOKEN')
+        );
+    }
+
+    public function testAppendTicketInsertsBeforeFragmentWithoutQuery(): void
+    {
+        self::assertSame(
+            'https://app.example.com/x?sso=TOKEN#section',
+            sso_append_ticket('https://app.example.com/x#section', 'TOKEN')
+        );
+    }
+
+    public function testAppendTicketInsertsBeforeFragmentWithQuery(): void
+    {
+        self::assertSame(
+            'https://app.example.com/x?y=1&sso=TOKEN#section',
+            sso_append_ticket('https://app.example.com/x?y=1#section', 'TOKEN')
+        );
+    }
+
+    public function testAppendTicketUrlencodesToken(): void
+    {
+        self::assertSame(
+            'https://app.example.com/x?sso=a+b%2Fc',
+            sso_append_ticket('https://app.example.com/x', 'a b/c')
+        );
+    }
 }

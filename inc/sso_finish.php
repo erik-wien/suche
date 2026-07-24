@@ -33,6 +33,24 @@ function sso_login_redirect(string $rawReturn): string
     return $return === '' ? 'login.php' : ('login.php?return=' . urlencode($return));
 }
 
+/**
+ * Hängt das SSO-Ticket als `sso`-Query-Parameter an eine Rücksprung-URL an —
+ * fragment-sicher: die Query wird VOR einem etwaigen `#fragment` eingefügt,
+ * statt blind ans Ende angehängt (sonst landet `sso=` hinter dem Fragment und
+ * wird vom Browser nie an den Server geschickt).
+ */
+function sso_append_ticket(string $return, string $token): string
+{
+    $fragment = '';
+    $hashPos  = strpos($return, '#');
+    if ($hashPos !== false) {
+        $fragment = substr($return, $hashPos);
+        $return   = substr($return, 0, $hashPos);
+    }
+    $sep = (strpos($return, '?') !== false) ? '&' : '?';
+    return $return . $sep . 'sso=' . urlencode($token) . $fragment;
+}
+
 function sso_finish_login(mysqli $con, int $userId): void
 {
     $return = sso_validate_return((string) ($_SESSION['sso_return'] ?? ''));
@@ -40,8 +58,7 @@ function sso_finish_login(mysqli $con, int $userId): void
 
     if ($return !== '') {
         $token = auth_sso_issue($con, $userId, $return);
-        $sep   = (strpos($return, '?') !== false) ? '&' : '?';
-        header('Location: ' . $return . $sep . 'sso=' . urlencode($token));
+        header('Location: ' . sso_append_ticket($return, $token));
         exit;
     }
     header('Location: ./');
