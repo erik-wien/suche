@@ -37,7 +37,7 @@ $v          = defined('APP_BUILD') ? ('?v=' . APP_BUILD) : '';
 <html lang="de" data-theme="<?= htmlspecialchars($theme, ENT_QUOTES, 'UTF-8') ?>">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Anmelden &mdash; Eriks Cloud</title>
   <meta name="theme-color" content="#e2001a">
   <link rel="icon" type="image/svg+xml" href="<?= $base ?>/css/shared/logos/jardyx_offwhite.svg">

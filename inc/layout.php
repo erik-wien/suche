@@ -34,7 +34,7 @@ function render_header(string $title, string $active = ''): void {
 <html lang="de">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?= $pageTitle ?></title>
     <meta name="theme-color" content="<?= htmlspecialchars(APP_COLOR, ENT_QUOTES) ?>">
     <link rel="icon" type="image/svg+xml" href="<?= $base ?>/css/shared/logos/jardyx_offwhite.svg">
@@ -88,7 +88,7 @@ function render_anon_header(string $title): void {
 <html lang="de">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?= $pageTitle ?></title>
     <meta name="theme-color" content="<?= htmlspecialchars(APP_COLOR, ENT_QUOTES) ?>">
     <link rel="icon" type="image/svg+xml" href="<?= $base ?>/css/shared/logos/jardyx_offwhite.svg">
