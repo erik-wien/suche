@@ -45,6 +45,35 @@ function nginxlog_paths(?string $target = null, ?array $overrideConfig = null): 
     ];
 }
 
+/**
+ * Status::check callable for web/status.php (TASK-8, adminOnly). Reuses
+ * nginxlog_enabled()/nginxlog_paths() — a host absent from NGINX_LOG_HOSTS
+ * (world4you) is "ok" ("invisible" by design, same contract as the admin
+ * tab, not a failure). $target/$overrideConfig let unit tests bypass
+ * suche_load_config()/config.yaml, mirroring nginxlog_paths()'s own params.
+ */
+function nginxlog_status_check(?string $target = null, ?array $overrideConfig = null): array {
+    if (!nginxlog_enabled($target)) {
+        return ['state' => 'ok', 'detail' => 'Auf diesem Host nicht aktiviert (z. B. world4you).'];
+    }
+    $paths    = nginxlog_paths($target, $overrideConfig);
+    $accessOk = isset($paths['access']) && is_readable($paths['access']);
+    $errorOk  = isset($paths['error'])  && is_readable($paths['error']);
+
+    if ($accessOk && $errorOk) {
+        return ['state' => 'ok', 'detail' => 'access.log und error.log lesbar.'];
+    }
+    if ($accessOk || $errorOk) {
+        $missing = $accessOk ? ($paths['error'] ?? '?') : ($paths['access'] ?? '?');
+        return ['state' => 'warn', 'detail' => 'Nicht lesbar: ' . $missing];
+    }
+    return [
+        'state'  => 'fail',
+        'detail' => 'Weder access.log noch error.log lesbar (' . ($paths['access'] ?? '?')
+            . ', ' . ($paths['error'] ?? '?') . ').',
+    ];
+}
+
 function nginxlog_window_bytes(): int {
     $config = suche_load_config();
     return (int) ($config['nginx_log']['window_bytes'] ?? NGINX_LOG_DEFAULT_WINDOW_BYTES);

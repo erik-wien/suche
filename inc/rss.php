@@ -112,6 +112,74 @@ function rss_fetch(string $url): ?SimpleXMLElement {
     return null;
 }
 
+/**
+ * Aggregate RSS health for web/status.php (TASK-8). s_feeds has no
+ * per-feed "last successful fetch" column — the only signal on disk is the
+ * cache file's mtime (rss_cache_path()), which rss_fetch() only touches on a
+ * successful fetch (see file header). Actually live-fetching every configured
+ * feed on every status-page load would defeat the whole point of the RSS
+ * cache/§21 external-call discipline, so this is a lightweight AGGREGATE
+ * heuristic over the existing cache, not a per-feed live check:
+ *
+ *   - "fresh" = a feed's cache file mtime is within RSS_TTL (i.e. rss_fetch()
+ *     would currently serve it without attempting a refetch).
+ *   - state = ok when ALL feeds are fresh, warn when SOME are, fail when NONE
+ *     are (incl. never fetched at all) — the ratio-based heuristic requested
+ *     for TASK-8.
+ *   - last_success_ts = the newest cache-file mtime across all feeds (most
+ *     recent successful fetch recorded on disk, not per-feed).
+ *
+ * Caveat: a "stale" feed isn't necessarily broken — refetching only happens
+ * on page view (no background cron), so a feed nobody has viewed within the
+ * last RSS_TTL window (10 min) reads as stale/dead here even though it may be
+ * fine. Low-traffic periods can therefore show warn/fail without anything
+ * actually being down; a genuinely dead feed remains visible per-URL in the
+ * admin Log tab via rss_log_error(), which is the authoritative signal.
+ *
+ * Split into a pure part (testable without a DB) and a thin $pdo wrapper.
+ */
+function rss_status_from_urls(array $urls): array {
+    if ($urls === []) {
+        return ['state' => 'ok', 'detail' => 'Keine aktiven Feeds konfiguriert.'];
+    }
+
+    $total = count($urls);
+    $fresh = 0;
+    $lastSuccessTs = null;
+
+    foreach ($urls as $url) {
+        $path = rss_cache_path((string) $url);
+        if (!is_file($path)) {
+            continue;
+        }
+        $mtime = filemtime($path);
+        if ($mtime === false) {
+            continue;
+        }
+        if ($lastSuccessTs === null || $mtime > $lastSuccessTs) {
+            $lastSuccessTs = $mtime;
+        }
+        if ((time() - $mtime) < RSS_TTL) {
+            $fresh++;
+        }
+    }
+
+    $state = $fresh === $total ? 'ok' : ($fresh > 0 ? 'warn' : 'fail');
+
+    return [
+        'state'           => $state,
+        'detail'          => "$fresh/$total Feeds mit frischem Cache (< " . RSS_TTL . 's).',
+        'last_success_ts' => $lastSuccessTs,
+    ];
+}
+
+function rss_status_check(): array {
+    global $pdo;
+    $urls = $pdo->query('SELECT DISTINCT url FROM s_feeds WHERE enabled = 1')
+        ->fetchAll(PDO::FETCH_COLUMN);
+    return rss_status_from_urls($urls);
+}
+
 function rss_parse(string $raw): ?SimpleXMLElement {
     if ($raw === '') return null;
     libxml_use_internal_errors(true);
