@@ -68,6 +68,11 @@ function render_header(string $title, string $active = ''): void {
         'appPrefsHref'   => $base . '/preferences.php',
         'appPrefsLabel'  => 'Anwendung',
         'appsMenu'       => $appsMenu,
+        // statusHref/adminItems intentionally NOT overridden (TASK-7, Suite-Policy
+        // §Baustein 2): the Header default statusHref ($base/status.php) is exactly
+        // right once web/status.php exists (TASK-8); suche has no App-Admin-Aktionen
+        // beyond admin.php, which already renders as "Verwaltung" in the
+        // Administration-Dropdown for isAdmin users without passing adminItems.
     ]);
 ?>
 <main id="main-content" tabindex="-1">
