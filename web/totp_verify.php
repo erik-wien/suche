@@ -35,10 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     appendLog($con, 'auth_fail', 'TOTP failed (user="' . $pendingUser . '"): ' . $result['error'], 'suche');
 
     $error = $result['error'];
-    // If the library cleared the pending state (TTL, max attempts), bounce to login.
+    // If the library cleared the pending state (TTL, max attempts), bounce to
+    // login.php. sso_return normally survives via the session (it's never
+    // touched on this path), but carry it explicitly too — belt and braces.
     if (empty($_SESSION['auth_totp_pending'])) {
         addAlert('danger', $error);
-        header('Location: login.php'); exit;
+        header('Location: ' . sso_login_redirect((string) ($_SESSION['sso_return'] ?? ''))); exit;
     }
 }
 
@@ -51,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
         unset($_SESSION['auth_totp_pending']);
         addAlert('danger', 'Sitzung abgelaufen. Bitte erneut anmelden.');
-        header('Location: login.php'); exit;
+        header('Location: ' . sso_login_redirect((string) ($_SESSION['sso_return'] ?? ''))); exit;
     }
 }
 

@@ -5,16 +5,21 @@ require_once __DIR__ . '/../inc/sso_finish.php';
 $attemptUser = substr((string)($_POST['login-username'] ?? ''), 0, 64);
 $logUser     = $attemptUser !== '' ? $attemptUser : '(empty)';
 
+// Validierter Rücksprung aus dem Login-Formular (Hidden-Field `return`):
+// bei einem Fehl-Rücksprung an login.php anhängen, sonst geht er verloren,
+// falls die Session ihn aus irgendeinem Grund nicht mehr trägt.
+$loginRedirect = sso_login_redirect((string) ($_POST['return'] ?? ''));
+
 if (empty($_POST['login-username']) || empty($_POST['login-password'])) {
     appendLog($con, 'auth_fail', 'Missing credentials (user="' . $logUser . '")', 'suche');
     addAlert('danger', 'Bitte sowohl Benutzername als auch Kennwort ausfüllen.');
-    header('Location: login.php'); exit;
+    header('Location: ' . $loginRedirect); exit;
 }
 
 if (!csrf_verify()) {
     appendLog($con, 'auth_fail', 'CSRF failed on login (user="' . $logUser . '")', 'suche');
     addAlert('danger', 'Ungültige Anfrage.');
-    header('Location: login.php'); exit;
+    header('Location: ' . $loginRedirect); exit;
 }
 
 $remember = !empty($_POST['remember_me']);
@@ -63,5 +68,5 @@ if ($result['ok']) {
     sso_finish_login($con, (int) $_SESSION['id']);
 } else {
     addAlert('danger', $result['error']);
-    header('Location: login.php'); exit;
+    header('Location: ' . $loginRedirect); exit;
 }

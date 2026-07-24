@@ -7,8 +7,8 @@ if (!empty($_SESSION['loggedin'])) {
     // Bereits am zentralen Host angemeldet: liegt ein gültiger Rücksprung vor,
     // Ticket ausstellen und zurück zur App (App-zu-App-Navigation ohne
     // Remember-Cookie); sonst zur suche-Startseite.
-    $r = (string) ($_GET['return'] ?? '');
-    if ($r !== '' && auth_sso_return_allowed($r, AUTH_SSO_ALLOWED_HOSTS)) {
+    $r = sso_validate_return((string) ($_GET['return'] ?? ''));
+    if ($r !== '') {
         $_SESSION['sso_return'] = $r;
     }
     sso_finish_login($con, (int) $_SESSION['id']);
@@ -18,15 +18,23 @@ $alerts     = $_SESSION['alerts'] ?? [];
 unset($_SESSION['alerts']);
 
 // Zentraler-SSO-Rücksprung: validieren und für den POST in der Session halten.
+// Kommt kein ?return mit (z. B. ein Fehl-Rücksprung von authentication.php
+// oder totp_verify.php ohne eigenen return-Parameter), bleibt ein bereits in
+// der Session liegender sso_return unangetastet — sonst geht der Rücksprung
+// beim zweiten Login-Versuch verloren (Root-Cause des Rücksprung-Bugs).
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
     $r = (string) ($_GET['return'] ?? '');
-    if ($r !== '' && auth_sso_return_allowed($r, AUTH_SSO_ALLOWED_HOSTS)) {
-        $_SESSION['sso_return'] = $r;
-    } else {
-        unset($_SESSION['sso_return']);
+    if ($r !== '') {
+        $valid = sso_validate_return($r);
+        if ($valid !== '') {
+            $_SESSION['sso_return'] = $valid;
+        } else {
+            unset($_SESSION['sso_return']);
+        }
     }
 }
 
+$ssoReturn  = (string) ($_SESSION['sso_return'] ?? '');
 $remembered = htmlspecialchars($_COOKIE['suche_username'] ?? '', ENT_QUOTES, 'UTF-8');
 $theme      = $_COOKIE['theme'] ?? 'auto';
 $theme      = in_array($theme, ['light', 'dark', 'auto'], true) ? $theme : 'auto';
@@ -56,6 +64,9 @@ $v          = defined('APP_BUILD') ? ('?v=' . APP_BUILD) : '';
 <main class="login-main" id="main-content">
   <form class="login-card" method="post" action="authentication.php" autocomplete="on">
     <?= csrf_input() ?>
+    <?php if ($ssoReturn !== ''): ?>
+      <input type="hidden" name="return" value="<?= htmlspecialchars($ssoReturn, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
     <span class="login-logo" aria-hidden="true"></span>
     <h1>Eriks Cloud</h1>
     <?php foreach ($alerts as [$type, $msg]): ?>
