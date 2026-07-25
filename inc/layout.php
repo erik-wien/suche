@@ -62,17 +62,15 @@ function render_header(string $title, string $active = ''): void {
         'csrfToken'      => csrf_token(),
         'pageType'       => $active,
         'themeEndpoint'  => $base . '/preferences.php',
-        'profileHref'    => $base . '/preferences.php#profilbild',
-        'emailHref'      => $base . '/preferences.php#email',
-        'securityHref'   => $base . '/security.php',
-        'appPrefsHref'   => $base . '/preferences.php',
-        'appPrefsLabel'  => 'Anwendung',
         'appsMenu'       => $appsMenu,
-        // statusHref/adminItems intentionally NOT overridden (TASK-7, Suite-Policy
-        // §Baustein 2): the Header default statusHref ($base/status.php) is exactly
-        // right once web/status.php exists (TASK-8); suche has no App-Admin-Aktionen
-        // beyond admin.php, which already renders as "Verwaltung" in the
-        // Administration-Dropdown for isAdmin users without passing adminItems.
+        // statusHref/profilHref/activityHref/adminItems intentionally NOT
+        // overridden (TASK-7, Suite-Policy §Baustein 2; profil/aktivitaet
+        // rollout 2026-07-25): the Header defaults ($base/status.php,
+        // $base/profil.php, $base/aktivitaet.php) are exactly right now that
+        // web/status.php, web/profil.php and web/aktivitaet.php exist; suche
+        // has no App-Admin-Aktionen beyond admin.php, which already renders
+        // as "Verwaltung" in the Administration-Dropdown for isAdmin users
+        // without passing adminItems.
     ]);
 ?>
 <main id="main-content" tabindex="-1">
