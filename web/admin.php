@@ -376,7 +376,7 @@ render_header('Administration', 'admin');
                 showAlert('Gelöscht.', 'success');
                 setTimeout(() => location.reload(), 700);
             } else {
-                showAlert(res.error || 'Löschen fehlgeschlagen.', 'danger');
+                showAlert(res.message || res.error || 'Löschen fehlgeschlagen.', 'danger');
             }
         });
     });
