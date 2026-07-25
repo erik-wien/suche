@@ -322,3 +322,9 @@ body {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* ── §16 settings-form wrapper (Suite-Standard, wortgleich zu Energie) ───────
+   Used by Erikr\Chrome\Profile::render() (web/profil.php) — chrome ships no
+   CSS of its own, every app defines this locally. */
+
+.pref-section { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
