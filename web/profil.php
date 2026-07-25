@@ -60,6 +60,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'clear
     exit;
 }
 
+// ── API-Token anlegen — fetch-basiert, JSON-Antwort (Kontrakt: Chrome\ApiTokens) ─
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'token_create') {
+    header('Content-Type: application/json');
+    if (!csrf_verify()) {
+        appendLog($con, 'prefs', 'API token create: CSRF-Token ungültig.');
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'error' => 'Ungültige Anfrage (CSRF-Token abgelaufen). Bitte Seite neu laden.']);
+        exit;
+    }
+    $label = trim((string) ($_POST['label'] ?? ''));
+    $token = auth_api_token_issue($con, $uid, $label, 'web', null);
+    $item  = auth_api_tokens_list($con, $uid)[0] ?? null;
+    appendLog($con, 'prefs', 'API token created (label: ' . ($label !== '' ? $label : '(ohne Bezeichnung)') . ').');
+    echo json_encode(['ok' => true, 'token' => $token, 'item' => $item]);
+    exit;
+}
+
+// ── API-Token widerrufen — fetch-basiert, JSON-Antwort (Kontrakt: Chrome\ApiTokens) ─
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'token_revoke') {
+    header('Content-Type: application/json');
+    if (!csrf_verify()) {
+        appendLog($con, 'prefs', 'API token revoke: CSRF-Token ungültig.');
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'error' => 'Ungültige Anfrage (CSRF-Token abgelaufen). Bitte Seite neu laden.']);
+        exit;
+    }
+    $tokenId = (int) ($_POST['id'] ?? 0);
+    $deleted = auth_api_token_revoke($con, $uid, $tokenId);
+    if (!$deleted) {
+        appendLog($con, 'prefs', 'API token revoke failed (id ' . $tokenId . ').');
+        http_response_code(404);
+        echo json_encode(['ok' => false, 'error' => 'Token nicht gefunden oder bereits widerrufen.']);
+        exit;
+    }
+    appendLog($con, 'prefs', 'API token revoked (id ' . $tokenId . ').');
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 // ── E-Mail-Änderung — normaler Browser-POST (Reload) ──────────────────────────
 $emailError = null;
 
@@ -131,6 +170,8 @@ render_header('Profil', 'profil');
         'emailEditAction'    => 'profil.php',
         'emailError'         => $emailError,
         'passwordHref'       => $base . '/security.php',
+        'tokens'             => auth_api_tokens_list($con, $uid),
+        'tokenAction'        => 'profil.php',
         'csrfToken'          => csrf_token(),
         'cspNonce'           => $_cspNonce,
         'base'               => $base,
