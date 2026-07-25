@@ -206,6 +206,20 @@ final class PageProbeTest extends TestCase
             $out
         );
 
+        // "Konto deaktivieren" trigger + dialog, dialog initially hidden.
+        self::assertStringContainsString('id="profileDeactivate"', $out);
+        self::assertStringContainsString('Konto deaktivieren', $out);
+        self::assertMatchesRegularExpression(
+            '#<div class="app-modal-backdrop" id="deactivate-modal"[^>]*\brole="dialog"[^>]*\baria-modal="true"[^>]*\bhidden\b[^>]*>#',
+            $out
+        );
+        // No inline style="…" on the trigger specifically (the generic sweep
+        // below covers it too — kept explicit because this is the new control).
+        self::assertMatchesRegularExpression(
+            '/<button\b(?:(?!style=)[^>])*id="profileDeactivate"(?:(?!style=)[^>])*>/',
+            $out
+        );
+
         // No inline style="..." on any <button> element (project UI rule).
         preg_match_all('/<button\b[^>]*>/', $out, $buttons);
         foreach ($buttons[0] as $button) {
@@ -214,6 +228,27 @@ final class PageProbeTest extends TestCase
 
         // No plaintext token value leaked into the initial GET markup.
         self::assertStringNotContainsString(self::$probeTokenCleartext, $out);
+    }
+
+    /**
+     * The visibility rule IS the feature: an admin deactivating themselves
+     * would lock themselves out and could leave the whole suite without any
+     * administration. Chrome\Profile therefore renders neither button nor
+     * dialog for admins (auth_deactivate_own_account() refuses them too).
+     */
+    public function testProfilHidesDeactivateForAdmins(): void
+    {
+        $r = self::runPageProbe('profil.php', [
+            'loggedin' => true,
+            'id'       => self::$probeUserId,
+            'username' => self::$probeUsername,
+            'rights'   => 'Admin',
+        ]);
+
+        self::assertSame(200, $r['status']);
+        self::assertStringNotContainsString('id="profileDeactivate"', $r['out']);
+        self::assertStringNotContainsString('Konto deaktivieren', $r['out']);
+        self::assertStringNotContainsString('id="deactivate-modal"', $r['out']);
     }
 
     // ── aktivitaet.php ───────────────────────────────────────────────────

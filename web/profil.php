@@ -16,6 +16,34 @@ auth_require();
 $uid      = (int) ($_SESSION['id'] ?? 0);
 $username = $_SESSION['username'] ?? '';
 
+// ── Konto deaktivieren — fetch-basiert, JSON-Antwort (Kontrakt: Chrome\Profile) ─
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'deactivate_account') {
+    header('Content-Type: application/json');
+    if (!csrf_verify()) {
+        appendLog($con, 'account', 'Deaktivierung: CSRF-Token ungueltig.');
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'csrf',
+            'message' => 'Ungueltige Anfrage (CSRF-Token abgelaufen). Bitte Seite neu laden.']);
+        exit;
+    }
+    $res = auth_deactivate_own_account($con, $uid, (string) ($_POST['password'] ?? ''));
+    if ($res['ok']) {
+        echo json_encode(['ok' => true]);
+        $_SESSION = [];
+        session_destroy();
+        exit;
+    }
+    $msg = match ($res['error']) {
+        'wrong_password'          => 'Das Kennwort ist falsch.',
+        'admin_cannot_deactivate' => 'Administratorkonten koennen nicht selbst deaktiviert werden.',
+        'already_disabled'        => 'Das Konto ist bereits deaktiviert.',
+        default                   => 'Deaktivierung fehlgeschlagen. Details im Log.',
+    };
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'error' => $res['error'], 'message' => $msg]);
+    exit;
+}
+
 // ── Avatar-Upload — fetch-basiert, JSON-Antwort (Kontrakt: Chrome\Profile) ────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upload_avatar') {
     header('Content-Type: application/json');
@@ -172,6 +200,8 @@ render_header('Profil', 'profil');
         'passwordHref'       => $base . '/security.php',
         'tokens'             => auth_api_tokens_list($con, $uid),
         'tokenAction'        => 'profil.php',
+        'deactivateAction'   => 'profil.php',
+        'isAdmin'            => (($_SESSION['rights'] ?? '') === 'Admin'),
         'csrfToken'          => csrf_token(),
         'cspNonce'           => $_cspNonce,
         'base'               => $base,
