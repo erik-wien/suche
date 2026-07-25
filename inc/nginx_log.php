@@ -9,9 +9,12 @@
 require_once __DIR__ . '/config.php';
 
 const NGINX_LOG_HOSTS = [
-    'akadbrain' => [
-        'access' => '/var/log/nginx/suche.access.log',
-        'error'  => '/var/log/nginx/suche.error.log',
+    'akadbrain' => [ // macOS + Homebrew-nginx → Präfix /opt/homebrew/var/log/nginx,
+                     // NICHT das Linux-übliche /var/log/nginx (existiert dort nicht).
+                     // Per-site-Logs schreibt sites-available/eriks.cloud.conf
+                     // (access_log/error_log), daher suche-only statt global.
+        'access' => '/opt/homebrew/var/log/nginx/suche.access.log',
+        'error'  => '/opt/homebrew/var/log/nginx/suche.error.log',
     ],
     'local' => [ // Hamish — Homebrew nginx; suche.test.conf has no per-site access_log/error_log,
                  // so this is nginx.conf's global log, shared across all *.test vhosts.

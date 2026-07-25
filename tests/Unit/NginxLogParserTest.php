@@ -163,9 +163,12 @@ final class NginxLogParserTest extends TestCase
 
     public function testPathsReturnsDefaultsForKnownHost(): void
     {
+        // akadbrain ist macOS + Homebrew-nginx → /opt/homebrew/var/log/nginx.
+        // (Vorher stand hier das Linux-uebliche /var/log/nginx, das es dort gar
+        // nicht gibt — der Viewer meldete dauerhaft „Log nicht lesbar".)
         $paths = nginxlog_paths('akadbrain', []);
-        self::assertSame('/var/log/nginx/suche.access.log', $paths['access']);
-        self::assertSame('/var/log/nginx/suche.error.log', $paths['error']);
+        self::assertSame('/opt/homebrew/var/log/nginx/suche.access.log', $paths['access']);
+        self::assertSame('/opt/homebrew/var/log/nginx/suche.error.log', $paths['error']);
     }
 
     public function testPathsEmptyForUnknownHost(): void
