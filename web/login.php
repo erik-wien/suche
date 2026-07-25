@@ -3,6 +3,20 @@ require_once __DIR__ . '/../inc/initialize.php';
 require_once __DIR__ . '/../inc/layout.php';
 require_once __DIR__ . '/../inc/sso_finish.php';
 
+// Kommt der Nutzer mit ?disabled=1 hier an, wurde sein Konto gerade deaktiviert
+// und eine andere App hat ihn hinausgeworfen. Die Sitzung auf DIESEM Host kann
+// dann noch bestehen, weil der disabled-Recheck in auth_bootstrap() auf eine
+// Abfrage je Minute gedrosselt ist. Ohne diesen Riegel wuerde der Block unten
+// sofort ein SSO-Ticket ausstellen und zurueckschicken — die App wirft erneut
+// hinaus, und der Nutzer pendelt bis zu 60 Sekunden hin und her. Das sieht aus
+// wie eine Endlosschleife. Also hier die eigene Sitzung sofort beenden und die
+// Erklaerung zeigen, statt auf das Ablaufen der Drossel zu warten.
+if (isset($_GET['disabled']) && !empty($_SESSION['loggedin'])) {
+    $_SESSION = [];
+    session_destroy();
+    session_start();
+}
+
 if (!empty($_SESSION['loggedin'])) {
     // Bereits am zentralen Host angemeldet: liegt ein gültiger Rücksprung vor,
     // Ticket ausstellen und zurück zur App (App-zu-App-Navigation ohne
