@@ -31,6 +31,16 @@ define('RATE_LIMIT_FILE', __DIR__ . '/../data/ratelimit.json');
  */
 define('AUTH_DB_PREFIX', '');
 
+// Privilegierte Loeschverbindung (Spec 2026-07-25 §3.1a). Verpflichtend:
+// admin_delete_user() faellt NICHT auf $con zurueck.
+$_adminDb = $_cfg['auth_admin_db'] ?? [];
+define('AUTH_ADMIN_DB_HOST', $_adminDb['host']     ?? 'localhost');
+define('AUTH_ADMIN_DB_NAME', $_adminDb['name']     ?? '');
+define('AUTH_ADMIN_DB_USER', $_adminDb['user']     ?? '');
+define('AUTH_ADMIN_DB_PASS', $_adminDb['password'] ?? '');
+define('AUTH_ADMIN_DB_SOCKET', $_adminDb['socket'] ?? null);
+unset($_adminDb);
+
 // Erlaubte Rücksprung-Hosts für den zentralen SSO-Login (Open-Redirect-Schutz).
 // Prod-Hosts gelten immer; .test-Hosts nur lokal (APP_ENV === 'local') — sie
 // sind öffentlich zwar ohnehin nicht auflösbar, gehören aber sauber nicht in
