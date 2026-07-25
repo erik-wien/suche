@@ -72,6 +72,9 @@ $v          = defined('APP_BUILD') ? ('?v=' . APP_BUILD) : '';
     <?php foreach ($alerts as [$type, $msg]): ?>
       <p class="app-alert app-alert-<?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>" role="alert"><?= $msg ?></p>
     <?php endforeach; ?>
+    <?php if (isset($_GET['disabled'])): ?>
+      <p class="app-alert app-alert-error" role="alert">Dein Konto wurde deaktiviert. Wende dich an einen Administrator, um es wieder freizuschalten.</p>
+    <?php endif; ?>
     <label class="login-field">
       <span>Benutzername</span>
       <input type="text" name="login-username" autocomplete="username" required autofocus
