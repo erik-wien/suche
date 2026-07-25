@@ -45,6 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
     exit;
 }
 
+// ── Avatar entfernen — fetch-basiert, JSON-Antwort (Kontrakt: Chrome\Profile) ─
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'clear_avatar') {
+    header('Content-Type: application/json');
+    if (!csrf_verify()) {
+        appendLog($con, 'prefs', 'Avatar clear: CSRF-Token ungültig.');
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Ungültige Anfrage (CSRF-Token abgelaufen). Bitte Seite neu laden.']);
+        exit;
+    }
+    \Erikr\Chrome\AvatarUpload::clear($con, $uid);
+    appendLog($con, 'prefs', 'Avatar removed.');
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 // ── E-Mail-Änderung — normaler Browser-POST (Reload) ──────────────────────────
 $emailError = null;
 
@@ -112,6 +127,7 @@ render_header('Profil', 'profil');
         'username'           => (string) $username,
         'email'              => (string) $currentEmail,
         'avatarChangeAction' => 'profil.php',
+        'avatarClearAction'  => 'profil.php',
         'emailEditAction'    => 'profil.php',
         'emailError'         => $emailError,
         'passwordHref'       => $base . '/security.php',
