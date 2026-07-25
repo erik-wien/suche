@@ -101,8 +101,6 @@ $emailStmt->close();
 render_header('Profil', 'profil');
 ?>
 <div class="container" style="padding:1.5rem">
-    <h1>Profil</h1>
-
     <?php foreach ($_SESSION['alerts'] ?? [] as [$type, $msg]): ?>
         <div class="app-alert app-alert-<?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>"
              role="alert"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>

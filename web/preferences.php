@@ -30,8 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
     exit;
 }
 
-$theme = $_SESSION['theme'] ?? 'auto';
-
 render_header('Einstellungen', 'preferences');
 ?>
 <div class="container" style="padding:1.5rem">
@@ -44,30 +42,12 @@ render_header('Einstellungen', 'preferences');
 
     <div class="app-tabs" role="tablist">
         <button type="button" class="app-tab active" role="tab"
-                data-tab="pref-display" aria-controls="pref-display" aria-selected="true">Darstellung</button>
-        <button type="button" class="app-tab" role="tab"
-                data-tab="pref-links" aria-controls="pref-links" aria-selected="false">Links</button>
+                data-tab="pref-links" aria-controls="pref-links" aria-selected="true">Links</button>
         <button type="button" class="app-tab" role="tab"
                 data-tab="pref-feeds" aria-controls="pref-feeds" aria-selected="false">Feeds</button>
     </div>
 
-    <div class="app-tab-panel" id="pref-display" role="tabpanel">
-        <div class="app-card mt-3">
-            <div class="app-card-body">
-                <h3>Theme</h3>
-                <p class="text-muted">
-                    Wähle das Farbschema. <em>Auto</em> folgt deiner Systemeinstellung.
-                </p>
-                <div class="theme-row" style="justify-content:flex-start">
-                    <button class="theme-btn<?= $theme === 'light' ? ' active' : '' ?>" data-theme="light"><span class="ui-icon ui-icon-sun" aria-hidden="true"></span> Hell</button>
-                    <button class="theme-btn<?= $theme === 'auto'  ? ' active' : '' ?>" data-theme="auto"><span class="ui-icon ui-icon-sun-moon" aria-hidden="true"></span> Auto</button>
-                    <button class="theme-btn<?= $theme === 'dark'  ? ' active' : '' ?>" data-theme="dark"><span class="ui-icon ui-icon-moon" aria-hidden="true"></span> Dunkel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="app-tab-panel" id="pref-links" role="tabpanel" hidden>
+    <div class="app-tab-panel" id="pref-links" role="tabpanel">
         <div class="app-card mt-3">
             <div class="app-card-header app-card-header-split">
                 <h3>Links</h3>
@@ -630,24 +610,6 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     document.querySelectorAll('.btn-move-down-feed').forEach((b) =>
         b.addEventListener('click', () => moveFeed(b.closest('tr'), +1))
     );
-})();
-</script>
-<script nonce="<?= $_cspNonce ?>">
-(function () {
-    'use strict';
-    // Wire the Darstellung-tab theme buttons (the header user-menu switcher is
-    // handled separately by the shared Chrome library).
-    const btns = document.querySelectorAll('#pref-display .theme-btn');
-    btns.forEach((btn) => {
-        btn.addEventListener('click', async () => {
-            const t = btn.dataset.theme;
-            if (t === 'auto') { delete document.documentElement.dataset.theme; }
-            else { document.documentElement.dataset.theme = t; }
-            btns.forEach((b) => b.classList.toggle('active', b.dataset.theme === t));
-            document.cookie = 'theme=' + t + ';path=/;max-age=' + (365 * 86400) + ';samesite=Lax';
-            await sucheFetch('preferences.php', { action: 'change_theme', theme: t });
-        });
-    });
 })();
 </script>
 <?php

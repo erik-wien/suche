@@ -15,7 +15,6 @@ auth_require();
 render_header('Log', 'aktivitaet');
 ?>
 <div class="container-md" style="padding-block:1.5rem">
-    <h1>Log</h1>
     <?php
     \Erikr\Chrome\Activity::render([
         'con'    => $con,
