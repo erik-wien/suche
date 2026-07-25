@@ -50,6 +50,7 @@ $emailError = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'change_email') {
     if (!csrf_verify()) {
+        appendLog($con, 'prefs', 'Email change: CSRF-Token ungültig.');
         http_response_code(403);
         exit('CSRF token mismatch');
     }

@@ -55,5 +55,5 @@ if (!empty($_SESSION['id']) && (int) $_SESSION['id'] === (int) $row['id']) {
 
 appendLog($con, 'prefs', 'Email confirmed for ' . $row['username']);
 addAlert('success', 'E-Mail-Adresse erfolgreich aktualisiert.');
-header('Location: ' . $base . '/' . (empty($_SESSION['loggedin']) ? 'login.php' : 'preferences.php#email'));
+header('Location: ' . $base . '/' . (empty($_SESSION['loggedin']) ? 'login.php' : 'profil.php'));
 exit;
