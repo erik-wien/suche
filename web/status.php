@@ -2,8 +2,8 @@
 /**
  * web/status.php — Suite-Policy §5 status page (TASK-8, chrome Erikr\Chrome\Status).
  *
- * Checks: Auth-DB ($con ping), App-DB ($pdo ping), RSS-Feeds (aggregated cache
- * freshness — heuristic documented at rss_status_from_urls() in inc/rss.php),
+ * Checks: Auth-DB ($con ping), App-DB ($pdo ping), RSS-Feeds (live reachability
+ * per feed, HEAD with short timeout — rss_status_check() in inc/rss.php),
  * Nginx-Log availability (adminOnly — nginxlog_status_check() in inc/nginx_log.php).
  *
  * Access:

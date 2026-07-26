@@ -113,40 +113,13 @@ function rss_fetch(string $url): ?SimpleXMLElement {
 }
 
 /**
- * Aggregate RSS health for web/status.php (TASK-8). s_feeds has no
- * per-feed "last successful fetch" column — the only signal on disk is the
- * cache file's mtime (rss_cache_path()), which rss_fetch() only touches on a
- * successful fetch (see file header). Actually live-fetching every configured
- * feed on every status-page load would defeat the whole point of the RSS
- * cache/§21 external-call discipline, so this is a lightweight AGGREGATE
- * heuristic over the existing cache, not a per-feed live check:
- *
- *   - "fresh" = a feed's cache file mtime is within RSS_TTL (i.e. rss_fetch()
- *     would currently serve it without attempting a refetch).
- *   - state = ok when ALL feeds are fresh, warn when SOME are, fail when NONE
- *     are (incl. never fetched at all) — the ratio-based heuristic requested
- *     for TASK-8.
- *   - last_success_ts = the newest cache-file mtime across all feeds (most
- *     recent successful fetch recorded on disk, not per-feed).
- *
- * Caveat: a "stale" feed isn't necessarily broken — refetching only happens
- * on page view (no background cron), so a feed nobody has viewed within the
- * last RSS_TTL window (10 min) reads as stale/dead here even though it may be
- * fine. Low-traffic periods can therefore show warn/fail without anything
- * actually being down; a genuinely dead feed remains visible per-URL in the
- * admin Log tab via rss_log_error(), which is the authoritative signal.
- *
- * Split into a pure part (testable without a DB) and a thin $pdo wrapper.
+ * Newest cache-file mtime across the given feed URLs — der letzte auf Platte
+ * belegte ERFOLGREICHE Abruf (rss_fetch() schreibt die Datei nur bei Erfolg).
+ * Quelle für `last_success_ts` der Statusseite (Suite-Policy §5: Zeitstempel des
+ * letzten Erfolgs). null, wenn kein Feed je erfolgreich geholt wurde.
  */
-function rss_status_from_urls(array $urls): array {
-    if ($urls === []) {
-        return ['state' => 'ok', 'detail' => 'Keine aktiven Feeds konfiguriert.'];
-    }
-
-    $total = count($urls);
-    $fresh = 0;
-    $lastSuccessTs = null;
-
+function rss_cache_newest_mtime(array $urls): ?int {
+    $newest = null;
     foreach ($urls as $url) {
         $path = rss_cache_path((string) $url);
         if (!is_file($path)) {
@@ -156,28 +129,105 @@ function rss_status_from_urls(array $urls): array {
         if ($mtime === false) {
             continue;
         }
-        if ($lastSuccessTs === null || $mtime > $lastSuccessTs) {
-            $lastSuccessTs = $mtime;
+        if ($newest === null || $mtime > $newest) {
+            $newest = $mtime;
         }
-        if ((time() - $mtime) < RSS_TTL) {
-            $fresh++;
+    }
+    return $newest;
+}
+
+/**
+ * Aggregiert die Feed-Erreichbarkeit für web/status.php — reine Funktion über
+ * bereits erhobene Probe-Ergebnisse (Netzwerk macht rss_status_check()).
+ *
+ * $probes: URL => Ergebnis in der Form von Chrome\Status::httpCheck()
+ * (`['state' => 'ok'|'fail', 'detail' => …]`); alles außer 'ok' zählt als
+ * nicht erreichbar.
+ *
+ *   - state = ok wenn ALLE erreichbar, warn wenn EINIGE, fail wenn KEINER.
+ *   - Leere Feed-Liste = ok (nichts konfiguriert ist kein Fehler).
+ *
+ * WARUM Erreichbarkeit statt Cache-Alter (Fix 2026-07-26): der Vorgänger
+ * (rss_status_from_urls) verlangte für „ok" bei JEDEM Feed einen Cache jünger
+ * als RSS_TTL. web/index.php holt aber nur den aktiven Tab synchron (§20-Lazy-
+ * Load), die übrigen Feeds erst beim Anklicken — die Bedingung war praktisch nie
+ * erfüllbar: bestes Ergebnis nach einem Seitenaufruf 1/4 (gelb), nach 10 Minuten
+ * Leerlauf 0/4 (rot), obwohl alle Feeds HTTP 200 lieferten. Der Check maß „hat
+ * jemand alle Tabs durchgeklickt", nicht „sind die Feeds erreichbar".
+ *
+ * KEINE URLs/Hostnamen im Detailtext: der RSS-Check ist nicht `adminOnly`, also
+ * lesen ihn alle eingeloggten User — und `s_feeds` ist user-scoped, während
+ * dieser Check über ALLE User aggregiert (fremde Feed-URLs sind nichts für
+ * andere Augen, Suite-Policy §5). Die konkret ausgefallenen Feeds nennt
+ * rss_status_check() per rss_log_error() im Admin-Log (§21).
+ *
+ * @param array<string,array{state?:string,detail?:string}> $probes
+ * @return array{state:string, detail:string, last_success_ts:?int}
+ */
+function rss_status_from_probes(array $probes, ?int $lastSuccessTs = null): array {
+    if ($probes === []) {
+        return [
+            'state'           => 'ok',
+            'detail'          => 'Keine aktiven Feeds konfiguriert.',
+            'last_success_ts' => $lastSuccessTs,
+        ];
+    }
+
+    $total = count($probes);
+    $ok    = 0;
+    foreach ($probes as $probe) {
+        if (($probe['state'] ?? '') === 'ok') {
+            $ok++;
         }
     }
 
-    $state = $fresh === $total ? 'ok' : ($fresh > 0 ? 'warn' : 'fail');
-
     return [
-        'state'           => $state,
-        'detail'          => "$fresh/$total Feeds mit frischem Cache (< " . RSS_TTL . 's).',
+        'state'           => $ok === $total ? 'ok' : ($ok > 0 ? 'warn' : 'fail'),
+        'detail'          => "{$ok}/{$total} Feeds erreichbar.",
         'last_success_ts' => $lastSuccessTs,
     ];
 }
 
-function rss_status_check(): array {
+/**
+ * Live-Check der aktiven Feeds für web/status.php: je Feed ein HEAD-Request
+ * (Suite-Policy §5 — externe HTTP-Checks mit kurzem Timeout, HTTP >= 400 =
+ * Fehler; die Status-Checks selbst sind in status.php 60 s gecacht, es läuft
+ * also höchstens ein Durchlauf pro Minute).
+ *
+ * HEAD statt GET, weil für „erreichbar?" der Body irrelevant ist (derStandard
+ * liefert ~200 KB) — alle konfigurierten Feeds antworten auf HEAD mit 200
+ * (2026-07-26 gegen alle vier geprüft). Ein Feed, der HEAD verweigert, würde
+ * korrekt als Fehler auffallen, statt still als ok durchzugehen.
+ *
+ * §21: jeder ausgefallene Feed wird MIT URL und Grund protokolliert
+ * (rss_log_error → Admin-Log, dort per RSS_TTL entprellt), nicht bloß gezählt.
+ * Der Detailtext der Ampel bleibt URL-frei (siehe rss_status_from_probes).
+ *
+ * @param callable|null $prober Test-Seam: fn(string $url): array (Form wie
+ *        Chrome\Status::httpCheck). Produktion lässt ihn weg.
+ */
+function rss_status_check(?callable $prober = null): array {
     global $pdo;
     $urls = $pdo->query('SELECT DISTINCT url FROM s_feeds WHERE enabled = 1')
         ->fetchAll(PDO::FETCH_COLUMN);
-    return rss_status_from_urls($urls);
+
+    $prober ??= static fn(string $url): array => \Erikr\Chrome\Status::httpCheck(
+        $url,
+        RSS_FETCH_TIMEOUT,
+        [CURLOPT_NOBODY => true, CURLOPT_USERAGENT => RSS_USER_AGENT]
+    );
+
+    $probes = [];
+    foreach ($urls as $url) {
+        $url          = (string) $url;
+        $probe        = $prober($url);
+        $probes[$url] = $probe;
+        if (($probe['state'] ?? '') !== 'ok') {
+            rss_log_error($url, 'Statuscheck: nicht erreichbar — ' . ($probe['detail'] ?? 'unbekannter Fehler'));
+        }
+    }
+
+    return rss_status_from_probes($probes, rss_cache_newest_mtime($urls));
 }
 
 function rss_parse(string $raw): ?SimpleXMLElement {

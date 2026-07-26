@@ -10,9 +10,9 @@ require_once __DIR__ . '/../../inc/nginx_log.php';
 
 /**
  * Covers the pure/parameterized halves of the web/status.php (TASK-8) check
- * callables — rss_status_from_urls() and nginxlog_status_check() both accept
- * their inputs explicitly so they're testable without a DB or config.yaml
- * (see doc comments at their definitions for the state heuristics).
+ * callables — rss_status_from_probes() and nginxlog_status_check() both accept
+ * their inputs explicitly so they're testable without a DB, config.yaml or
+ * network (see doc comments at their definitions for the state heuristics).
  */
 final class StatusChecksTest extends TestCase
 {
@@ -37,40 +37,79 @@ final class StatusChecksTest extends TestCase
         $this->cleanupPaths[] = $path;
     }
 
+    /** Probe-Ergebnis in der Form von Status::httpCheck(). */
+    private function probe(bool $ok, string $detail = ''): array
+    {
+        return ['state' => $ok ? 'ok' : 'fail', 'detail' => $detail];
+    }
+
     public function testRssStatusOkWithNoFeedsConfigured(): void
     {
-        $result = rss_status_from_urls([]);
+        $result = rss_status_from_probes([]);
         self::assertSame('ok', $result['state']);
     }
 
-    public function testRssStatusOkWhenAllFeedsFresh(): void
+    public function testRssStatusOkWhenAllFeedsReachable(): void
     {
-        $url = 'https://status-check-test.invalid/fresh-' . uniqid() . '.xml';
-        $this->seedRssCache($url, time());
+        $result = rss_status_from_probes([
+            'https://a.invalid/rss' => $this->probe(true, 'HTTP 200'),
+            'https://b.invalid/rss' => $this->probe(true, 'HTTP 200'),
+        ], 1750000000);
 
-        $result = rss_status_from_urls([$url]);
         self::assertSame('ok', $result['state']);
-        self::assertIsInt($result['last_success_ts']);
+        self::assertSame('2/2 Feeds erreichbar.', $result['detail']);
+        self::assertSame(1750000000, $result['last_success_ts']);
     }
 
-    public function testRssStatusWarnWhenSomeFeedsStale(): void
+    public function testRssStatusWarnWhenSomeFeedsUnreachable(): void
     {
-        $fresh = 'https://status-check-test.invalid/fresh-' . uniqid() . '.xml';
-        $stale = 'https://status-check-test.invalid/stale-' . uniqid() . '.xml';
-        $this->seedRssCache($fresh, time());
-        $this->seedRssCache($stale, time() - RSS_TTL - 60);
+        $result = rss_status_from_probes([
+            'https://a.invalid/rss' => $this->probe(true, 'HTTP 200'),
+            'https://b.invalid/rss' => $this->probe(false, 'HTTP 503'),
+        ]);
 
-        $result = rss_status_from_urls([$fresh, $stale]);
         self::assertSame('warn', $result['state']);
+        self::assertSame('1/2 Feeds erreichbar.', $result['detail']);
     }
 
-    public function testRssStatusFailWhenNoFeedHasEverBeenCached(): void
+    public function testRssStatusFailWhenNoFeedReachable(): void
     {
-        $url = 'https://status-check-test.invalid/never-' . uniqid() . '.xml';
-        // No seedRssCache() call — rss_cache_path() points at a file that was never written.
-        $result = rss_status_from_urls([$url]);
+        $result = rss_status_from_probes([
+            'https://a.invalid/rss' => $this->probe(false, 'Could not resolve host'),
+        ]);
+
         self::assertSame('fail', $result['state']);
-        self::assertNull($result['last_success_ts']);
+    }
+
+    /**
+     * Suite-Policy §5: der RSS-Check ist NICHT adminOnly, also sehen alle
+     * eingeloggten User seinen Detailtext — und die Feed-URLs gehören einzelnen
+     * Usern (s_feeds ist user-scoped, der Check aggregiert über alle). Es darf
+     * daher keine URL/kein Hostname im Detail landen; die konkreten Ausfälle
+     * gehen per rss_log_error() ins Admin-Log (§21).
+     */
+    public function testRssStatusDetailLeaksNoFeedUrls(): void
+    {
+        $result = rss_status_from_probes([
+            'https://geheim.example.org/privater-feed.xml' => $this->probe(false, 'HTTP 404'),
+        ]);
+
+        self::assertStringNotContainsString('geheim.example.org', $result['detail']);
+        self::assertStringNotContainsString('privater-feed', $result['detail']);
+    }
+
+    public function testRssStatusStaleCacheAloneIsNotAFailure(): void
+    {
+        // Regression (2026-07-26): der alte Check verlangte fuer "ok" einen
+        // Cache < RSS_TTL bei ALLEN Feeds, obwohl web/index.php nur den aktiven
+        // Tab synchron holt (§20-Lazy-Load) — die Ampel stand dauerhaft auf
+        // rot/gelb, obwohl alle Feeds HTTP 200 lieferten. Erreichbarkeit zaehlt,
+        // nicht Cache-Alter.
+        $stale = 'https://status-check-test.invalid/stale-' . uniqid() . '.xml';
+        $this->seedRssCache($stale, time() - RSS_TTL - 86400);
+
+        $result = rss_status_from_probes([$stale => $this->probe(true, 'HTTP 200')]);
+        self::assertSame('ok', $result['state']);
     }
 
     public function testNginxLogStatusOkWhenHostNotEnabled(): void
