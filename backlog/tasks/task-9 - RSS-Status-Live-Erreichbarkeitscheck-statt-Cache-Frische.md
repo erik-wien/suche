@@ -1,9 +1,10 @@
 ---
 id: TASK-9
 title: 'RSS-Status: Live-Erreichbarkeitscheck statt Cache-Frische'
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-07-26 11:18'
+updated_date: '2026-07-26 14:28'
 labels: []
 dependencies: []
 priority: medium
