@@ -31,6 +31,16 @@ define('RATE_LIMIT_FILE', __DIR__ . '/../data/ratelimit.json');
  */
 define('AUTH_DB_PREFIX', '');
 
+// Mail-Konfiguration: erikr/auth sucht diesen Pfad ZUERST, danach die
+// Systempfade (/opt/homebrew/etc, /etc/jardyx). Auf world4you ist keiner
+// der beiden anlegbar und open_basedir sperrt alles ausserhalb des
+// Web-Verzeichnisses aus — die Datei liegt dort deshalb neben der
+// config.yaml im App-Wurzelverzeichnis, das nicht ausgeliefert wird
+// (nachgewiesen 2026-07-28: HTTP 404). Fehlt die Datei, gelten die
+// Systempfade wie bisher. auth TASK-6.
+define('AUTH_MAIL_CONFIG_PATH', dirname(__DIR__) . '/mail.ini');
+
+
 // Privilegierte Loeschverbindung (Spec 2026-07-25 §3.1a). Verpflichtend:
 // admin_delete_user() faellt NICHT auf $con zurueck.
 $_adminDb = $_cfg['auth_admin_db'] ?? [];
