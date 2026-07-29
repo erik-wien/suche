@@ -265,15 +265,49 @@ render_header('Administration', 'admin');
     // Fetch + tab switching come from window.sucheFetch / sucheActivateTab
     // (provided by /js/app.js, loaded by render_footer).
 
-    function showAlert(msg, type, targetEl) {
+    // persistent=true laesst die Meldung stehen — fuer Befunde, die der Admin
+    // wirklich lesen muss (etwa: die Einladungsmail ging nicht raus).
+    function showAlert(msg, type, targetEl, persistent) {
         const box = targetEl || document.getElementById('adminAlerts');
         if (!box) return;
         const div = document.createElement('div');
         div.className = 'app-alert app-alert-' + (type || 'info');
+        div.setAttribute('role', 'alert');
         div.textContent = msg;
         box.appendChild(div);
-        setTimeout(() => div.remove(), 5000);
+        if (!persistent) setTimeout(() => div.remove(), 5000);
     }
+
+    // Eine Aktion kann gelingen und trotzdem etwas zu melden haben — Benutzer
+    // angelegt, aber die Einladungsmail ging nicht raus (auth TASK-7). suche
+    // nutzt nicht die geteilte admin.js, deshalb hier dieselbe Mechanik:
+    // ueber den Reload retten, denn nach einem Erfolg laedt die Seite 700 ms
+    // spaeter neu und eine sofort gezeigte Meldung waere weg, bevor man sie
+    // gelesen hat.
+    const WARN_KEY = 'adminWarning';
+
+    function showWarning(msg) {
+        const box = document.getElementById('adminAlerts');
+        if (box) {
+            for (const kind of box.children) if (kind.textContent === msg) return;
+        }
+        showAlert(msg, 'warning', null, true);
+    }
+
+    function stashWarning(msg) {
+        try { sessionStorage.setItem(WARN_KEY, msg); } catch (_) { /* Privatmodus */ }
+        showWarning(msg);
+    }
+
+    function replayWarning() {
+        let msg = null;
+        try {
+            msg = sessionStorage.getItem(WARN_KEY);
+            if (msg) sessionStorage.removeItem(WARN_KEY);
+        } catch (_) { /* Privatmodus */ }
+        if (msg) showWarning(msg);
+    }
+    replayWarning();
 
     function modalAlertBox(form) {
         return form?.closest('.app-modal-backdrop')?.querySelector('.app-modal-alerts') || null;
@@ -313,7 +347,9 @@ render_header('Administration', 'admin');
     });
 
     async function apiPost(action, params) {
-        return window.sucheFetch('api.php?action=' + encodeURIComponent(action), params || {});
+        const data = await window.sucheFetch('api.php?action=' + encodeURIComponent(action), params || {});
+        if (data && data.warning) stashWarning(data.warning);
+        return data;
     }
 
     // ── Users tab: row actions ──────────────────────────────────────────────
@@ -335,7 +371,10 @@ render_header('Administration', 'admin');
         try {
             const res = await apiPost(action, params);
             if (res && res.ok) {
-                showAlert(okMsg, 'success');
+                // Bei res.warning ist die Aktion gelaufen, aber etwas ging
+                // schief; apiPost() zeigt die Ursache bereits an. Dann keinen
+                // Erfolg behaupten (auth TASK-7).
+                if (!res.warning) showAlert(okMsg, 'success');
                 if (onOk) onOk(fd);
                 setTimeout(() => location.reload(), 700);
             } else {
@@ -364,7 +403,11 @@ render_header('Administration', 'admin');
         btn.addEventListener('click', async () => {
             if (!await window.confirmDialog('Passwort-Reset-E-Mail an «' + btn.dataset.username + '» senden?', { titel: 'Passwort-Reset', okLabel: 'Senden', gefahr: 'secondary' })) return;
             const res = await apiPost('admin_user_reset', { id: btn.dataset.id });
-            showAlert(res.ok ? 'E-Mail versandt.' : (res.error || 'Fehler.'), res.ok ? 'success' : 'danger');
+            if (!res.ok) {
+                showAlert(res.error || 'Reset fehlgeschlagen.', 'danger');
+            } else if (!res.warning) {
+                showAlert('E-Mail versandt.', 'success');
+            }
         });
     });
 
