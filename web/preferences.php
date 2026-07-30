@@ -228,7 +228,7 @@ data-img-url="<?= htmlspecialchars($b['img_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
     </div>
 </div>
 
-<script src="<?= $base ?>/js/sortable.min.js"></script>
+<script src="<?= $base ?>/js/sortable.min.js?v=<?= APP_BUILD ?>"></script>
 <script type="module" src="<?= $base ?>/css/shared/js/dialog.js?v=<?= APP_BUILD ?>" nonce="<?= $_cspNonce ?>"></script>
 <script nonce="<?= $_cspNonce ?>">
 (function () {

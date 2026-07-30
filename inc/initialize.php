@@ -16,7 +16,15 @@ $_cfg = suche_load_config();
 define('APP_NAME',          $_cfg['app']['name']          ?? 'Suche');
 define('APP_SUPPORT_EMAIL', $_cfg['app']['support_email'] ?? 'contact@eriks.cloud');
 define('APP_VERSION',       '3.0');
-define('APP_BUILD',         6);
+// APP_BUILD war eine handgepflegte Zahl (6) — und wurde damit bei jeder
+// Änderung an css_library vergessen. Jede Asset-URL in suche hängt an ?v=,
+// also blieben Nutzer nach einer Library-Änderung auf dem alten Stand, bis der
+// Browser von selbst revalidierte (max-age=14400, also bis zu 4 h).
+// Jetzt aus den Dateizeiten abgeleitet, wie in biblio (css_library TASK-12).
+define('APP_BUILD',         \Erikr\Chrome\AssetVersion::fromMtimes([
+    __DIR__ . '/../web/js',
+    __DIR__ . '/../web/css',
+]));
 define('APP_ENV',           $_cfg['app']['env']           ?? 'dev');
 define('APP_CODE',          $_cfg['APP_CODE']             ?? 'suche');
 
