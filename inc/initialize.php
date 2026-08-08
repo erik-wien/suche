@@ -79,7 +79,7 @@ const AUTH_SSO_ALLOWED_HOSTS_PROD = [
 // Lokal (*.test) — für den faithful-Test auf Hamish.
 const AUTH_SSO_ALLOWED_HOSTS_TEST = [
     'suche.test', 'energie.test', 'chat.test', 'wlmonitor.test', 'zeit.test', 'werda.test',
-    'lastfm.test', 'biblio.test',
+    'lastfm.test', 'biblio.test', 'mailprint.test',
 ];
 
 define('AUTH_SSO_ALLOWED_HOSTS', array_merge(
