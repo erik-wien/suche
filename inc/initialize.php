@@ -67,7 +67,7 @@ const AUTH_SSO_ALLOWED_HOSTS_PROD = [
     // *.eriks.cloud
     'www.eriks.cloud', 'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
     'energie.eriks.cloud', 'werda.eriks.cloud', 'biblio.eriks.cloud',
-    'lastfm.eriks.cloud',
+    'lastfm.eriks.cloud', 'mailprint.eriks.cloud',
     // *.jardyx.com — bestätigtes echtes SSO-Return-Ziel (Audit S2,
     // 2026-07-12): appsMenu-Prodlinks der Apps zeigen auf diese Hosts.
     // biblio.jardyx.com bewusst enthalten (für den künftigen biblio-jardyx-Deploy).
