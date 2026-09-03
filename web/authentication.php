@@ -48,6 +48,21 @@ if (!empty($result['ok']) && !empty($result['totp_required'])) {
 }
 
 if ($result['ok']) {
+    // Rücksprung aus dem POST übernehmen, BEVOR sso_finish_login() ihn aus der
+    // Session liest. Das Hidden-Field trägt ihn ohnehin mit (login.php:82) —
+    // bisher wurde er auf dem Erfolgspfad aber weggeworfen und ausschließlich
+    // $_SESSION['sso_return'] vertraut. Geht die Session zwischen dem GET auf
+    // login.php und diesem POST verloren oder wird sie rotiert, landete der
+    // Nutzer damit still auf der suche-Startseite statt in seiner App —
+    // dieselbe Session-Kontinuität, deren Bruch bootstrap.php:99 schon für den
+    // CSRF-Token dokumentiert. sso_validate_return() hält den
+    // Open-Redirect-Schutz aufrecht, es wird also kein ungeprüfter Wert
+    // übernommen.
+    $postReturn = sso_validate_return((string) ($_POST['return'] ?? ''));
+    if ($postReturn !== '') {
+        $_SESSION['sso_return'] = $postReturn;
+    }
+
     if (!empty($_POST['rememberName'])) {
         setcookie('suche_username', $_POST['login-username'], [
             'expires'  => time() + 10 * 24 * 60 * 60,
