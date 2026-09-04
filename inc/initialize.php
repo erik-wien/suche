@@ -65,7 +65,15 @@ unset($_adminDb);
 // die Prod-Allowlist.
 const AUTH_SSO_ALLOWED_HOSTS_PROD = [
     // *.eriks.cloud
-    'www.eriks.cloud', 'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
+    // 'eriks.cloud' und 'suche.eriks.cloud' sind laut nginx auf akadbrain
+    // DERSELBE vhost wie www.eriks.cloud ("server_name eriks.cloud
+    // www.eriks.cloud suche.eriks.cloud", verifiziert 2026-09-03) -- also
+    // dieselbe App. Ohne sie fiel ein Ruecksprung auf einen dieser beiden
+    // Namen still weg und der Nutzer landete auf der Startseite;
+    // mcp/config.yaml setzt suches akadbrain-base_url sogar auf
+    // suche.eriks.cloud.
+    'eriks.cloud', 'www.eriks.cloud', 'suche.eriks.cloud',
+    'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
     'energie.eriks.cloud', 'werda.eriks.cloud', 'biblio.eriks.cloud',
     'lastfm.eriks.cloud', 'mailprint.eriks.cloud',
     // *.jardyx.com — bestätigtes echtes SSO-Return-Ziel (Audit S2,

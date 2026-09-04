@@ -25,6 +25,23 @@ if (!csrf_verify()) {
 $remember = !empty($_POST['remember_me']);
 $result   = auth_login($con, $_POST['login-username'], $_POST['login-password'], $remember);
 
+// Rücksprung aus dem POST übernehmen, BEVOR die TOTP-Weiche greift und bevor
+// sso_finish_login() ihn aus der Session liest. Das Hidden-Field trägt ihn
+// ohnehin mit (login.php:82) — verlassen wir uns allein auf
+// $_SESSION['sso_return'], landet der Nutzer nach einem Session-Verlust
+// zwischen dem GET auf login.php und diesem POST still auf der
+// suche-Startseite statt in seiner App. Dieselbe Session-Kontinuität, deren
+// Bruch bootstrap.php:99 schon für den CSRF-Token dokumentiert.
+//
+// MUSS vor dem totp_required-Zweig stehen: der springt auf totp_verify.php,
+// und dort ist der POST-Wert weg — für 2FA-Nutzer bestünde die Lücke sonst
+// unverändert weiter. sso_validate_return() hält den Open-Redirect-Schutz
+// aufrecht, es wird also kein ungeprüfter Wert übernommen.
+$postReturn = sso_validate_return((string) ($_POST['return'] ?? ''));
+if ($postReturn !== '') {
+    $_SESSION['sso_return'] = $postReturn;
+}
+
 if (!empty($result['ok']) && !empty($result['totp_required'])) {
     // Persist rememberName cookie intent for the post-TOTP redirect.
     if (!empty($_POST['rememberName'])) {
@@ -48,21 +65,6 @@ if (!empty($result['ok']) && !empty($result['totp_required'])) {
 }
 
 if ($result['ok']) {
-    // Rücksprung aus dem POST übernehmen, BEVOR sso_finish_login() ihn aus der
-    // Session liest. Das Hidden-Field trägt ihn ohnehin mit (login.php:82) —
-    // bisher wurde er auf dem Erfolgspfad aber weggeworfen und ausschließlich
-    // $_SESSION['sso_return'] vertraut. Geht die Session zwischen dem GET auf
-    // login.php und diesem POST verloren oder wird sie rotiert, landete der
-    // Nutzer damit still auf der suche-Startseite statt in seiner App —
-    // dieselbe Session-Kontinuität, deren Bruch bootstrap.php:99 schon für den
-    // CSRF-Token dokumentiert. sso_validate_return() hält den
-    // Open-Redirect-Schutz aufrecht, es wird also kein ungeprüfter Wert
-    // übernommen.
-    $postReturn = sso_validate_return((string) ($_POST['return'] ?? ''));
-    if ($postReturn !== '') {
-        $_SESSION['sso_return'] = $postReturn;
-    }
-
     if (!empty($_POST['rememberName'])) {
         setcookie('suche_username', $_POST['login-username'], [
             'expires'  => time() + 10 * 24 * 60 * 60,
