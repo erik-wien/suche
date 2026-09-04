@@ -28,10 +28,6 @@ auth_admin_db:
   password: your_password
 slack:
   bot_token: your_bot_token
-# nginx_log:                         # optional — overrides inc/nginx_log.php's per-host defaults
-#   access: /var/log/nginx/suche.access.log
-#   error:  /var/log/nginx/suche.error.log
-#   window_bytes: 4194304            # tail-read window, default 4 MB
 app:
   name: Suche
   support_email: contact@eriks.cloud
@@ -39,3 +35,8 @@ app:
   base_url: http://localhost
   env: local
 APP_CODE: suche
+
+# nginx_log:                         # optional — overrides inc/nginx_log.php's per-host defaults
+#   access: /var/log/nginx/suche.access.log
+#   error:  /var/log/nginx/suche.error.log
+#   window_bytes: 4194304            # tail-read window, default 4 MB
