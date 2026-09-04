@@ -89,6 +89,9 @@ $v          = defined('APP_BUILD') ? ('?v=' . APP_BUILD) : '';
     <?php if (isset($_GET['disabled'])): ?>
       <p class="app-alert app-alert-error" role="alert">Dein Konto wurde deaktiviert. Wende dich an einen Administrator, um es wieder freizuschalten.</p>
     <?php endif; ?>
+    <?php if (($_GET['msg'] ?? '') === 'password_set'): ?>
+      <p class="app-alert app-alert-success" role="alert">Passwort gespeichert. Bitte melde dich an.</p>
+    <?php endif; ?>
     <label class="login-field">
       <span>Benutzername</span>
       <input type="text" name="login-username" autocomplete="username" required autofocus

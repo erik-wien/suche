@@ -20,6 +20,12 @@ auth_db:
   name: jardyx
   user: suche
   password: your_password
+auth_admin_db:
+  host: localhost
+  socket: /tmp/mysql.sock
+  name: jardyx
+  user: authadmin
+  password: your_password
 slack:
   bot_token: your_bot_token
 # nginx_log:                         # optional — overrides inc/nginx_log.php's per-host defaults
