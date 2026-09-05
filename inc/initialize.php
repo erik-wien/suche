@@ -76,6 +76,13 @@ const AUTH_SSO_ALLOWED_HOSTS_PROD = [
     'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
     'energie.eriks.cloud', 'werda.eriks.cloud', 'biblio.eriks.cloud',
     'lastfm.eriks.cloud', 'mailprint.eriks.cloud',
+    // display.eriks.cloud: das E-Paper-Board, am 2026-09-05 aus wlmonitor
+    // herausgeloest. Fehlte hier zunaechst -- der Rueckweg wurde still
+    // verworfen und der Nutzer landete nach dem Login auf der Suche statt
+    // auf Display. Genau der Fehler, den der Kommentar oben schon fuer
+    // eriks.cloud/suche.eriks.cloud beschreibt: die Liste wird von Hand
+    // gepflegt, und niemand denkt beim Anlegen einer App daran.
+    'display.eriks.cloud',
     // *.jardyx.com — bestätigtes echtes SSO-Return-Ziel (Audit S2,
     // 2026-07-12): appsMenu-Prodlinks der Apps zeigen auf diese Hosts.
     // biblio.jardyx.com bewusst enthalten (für den künftigen biblio-jardyx-Deploy).
@@ -87,7 +94,7 @@ const AUTH_SSO_ALLOWED_HOSTS_PROD = [
 // Lokal (*.test) — für den faithful-Test auf Hamish.
 const AUTH_SSO_ALLOWED_HOSTS_TEST = [
     'suche.test', 'energie.test', 'chat.test', 'wlmonitor.test', 'zeit.test', 'werda.test',
-    'lastfm.test', 'biblio.test', 'mailprint.test',
+    'lastfm.test', 'biblio.test', 'mailprint.test', 'display.test',
 ];
 
 define('AUTH_SSO_ALLOWED_HOSTS', array_merge(
