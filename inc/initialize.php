@@ -58,49 +58,34 @@ define('AUTH_ADMIN_DB_USER', $_adminDb['user']     ?? '');
 define('AUTH_ADMIN_DB_PASS', $_adminDb['password'] ?? '');
 define('AUTH_ADMIN_DB_SOCKET', $_adminDb['socket'] ?? null);
 unset($_adminDb);
-
-// Erlaubte Rücksprung-Hosts für den zentralen SSO-Login (Open-Redirect-Schutz).
-// Prod-Hosts gelten immer; .test-Hosts nur lokal (APP_ENV === 'local') — sie
-// sind öffentlich zwar ohnehin nicht auflösbar, gehören aber sauber nicht in
-// die Prod-Allowlist.
-const AUTH_SSO_ALLOWED_HOSTS_PROD = [
-    // *.eriks.cloud
-    // 'eriks.cloud' und 'suche.eriks.cloud' sind laut nginx auf akadbrain
-    // DERSELBE vhost wie www.eriks.cloud ("server_name eriks.cloud
-    // www.eriks.cloud suche.eriks.cloud", verifiziert 2026-09-03) -- also
-    // dieselbe App. Ohne sie fiel ein Ruecksprung auf einen dieser beiden
-    // Namen still weg und der Nutzer landete auf der Startseite;
-    // mcp/config.yaml setzt suches akadbrain-base_url sogar auf
-    // suche.eriks.cloud.
-    'eriks.cloud', 'www.eriks.cloud', 'suche.eriks.cloud',
-    'chat.eriks.cloud', 'wlmonitor.eriks.cloud',
-    'energie.eriks.cloud', 'werda.eriks.cloud', 'biblio.eriks.cloud',
-    'lastfm.eriks.cloud', 'mailprint.eriks.cloud',
-    // display.eriks.cloud: das E-Paper-Board, am 2026-09-05 aus wlmonitor
-    // herausgeloest. Fehlte hier zunaechst -- der Rueckweg wurde still
-    // verworfen und der Nutzer landete nach dem Login auf der Suche statt
-    // auf Display. Genau der Fehler, den der Kommentar oben schon fuer
-    // eriks.cloud/suche.eriks.cloud beschreibt: die Liste wird von Hand
-    // gepflegt, und niemand denkt beim Anlegen einer App daran.
-    'display.eriks.cloud',
-    // *.jardyx.com — bestätigtes echtes SSO-Return-Ziel (Audit S2,
-    // 2026-07-12): appsMenu-Prodlinks der Apps zeigen auf diese Hosts.
-    // biblio.jardyx.com bewusst enthalten (für den künftigen biblio-jardyx-Deploy).
-    'www.jardyx.com', 'chat.jardyx.com', 'wlmonitor.jardyx.com',
-    'energie.jardyx.com', 'zeit.jardyx.com', 'biblio.jardyx.com',
-    'lastfm.jardyx.com',
-];
-
-// Lokal (*.test) — für den faithful-Test auf Hamish.
-const AUTH_SSO_ALLOWED_HOSTS_TEST = [
-    'suche.test', 'energie.test', 'chat.test', 'wlmonitor.test', 'zeit.test', 'werda.test',
-    'lastfm.test', 'biblio.test', 'mailprint.test', 'display.test',
-];
-
-define('AUTH_SSO_ALLOWED_HOSTS', array_merge(
-    AUTH_SSO_ALLOWED_HOSTS_PROD,
-    APP_ENV === 'local' ? AUTH_SSO_ALLOWED_HOSTS_TEST : []
-));
+// ── SSO-Rueckweg-Allowlist ────────────────────────────────────────────────────
+//
+// ABGELEITET aus der zentralen Suite-Registry (Chrome\AppsMenu), nicht mehr von
+// Hand gepflegt. Bis 2026-09-05 stand dieselbe Information hier ein zweites Mal,
+// und das war die Ursache eines wiederkehrenden Fehlers: eine App in die
+// Registry einzutragen kann man nicht vergessen (AppsMenu::build() wirft sonst
+// sofort "unknown app key", keine Seite der App rendert) -- die Liste hier
+// vergisst man dagegen immer, weil nichts kracht. sso_validate_return()
+// verwirft den Rueckweg dann STILL, der Nutzer landet nach dem Login auf der
+// Startseite und niemand erfaehrt warum. Zuletzt bei display.eriks.cloud.
+//
+// Die Sicherheitseigenschaft bleibt: die Registry ist kuratierter
+// Bibliothekscode, keine Nutzereingabe, und AppsMenu::ssoHosts() liefert
+// ausschliesslich vollstaendige Hostnamen -- keine Wildcards, nichts aus der
+// Umgebung.
+//
+// .test-Hosts sind in der Registry mit enthalten und werden ausserhalb von
+// APP_ENV === 'local' herausgefiltert: auf akadbrain oder world4you waere ein
+// Ruecksprung auf display.test sinnlos und nur zusaetzliche Angriffsflaeche.
+$_ssoHosts = \Erikr\Chrome\AppsMenu::ssoHosts();
+if (APP_ENV !== 'local') {
+    $_ssoHosts = array_values(array_filter(
+        $_ssoHosts,
+        static fn (string $h): bool => !str_ends_with($h, '.test')
+    ));
+}
+define('AUTH_SSO_ALLOWED_HOSTS', $_ssoHosts);
+unset($_ssoHosts);
 
 // URL prefix for this page. On DEV: '/suche.test'. On TEST/PROD: '' (bare vhost).
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
